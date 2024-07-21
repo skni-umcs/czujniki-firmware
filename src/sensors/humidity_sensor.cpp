@@ -43,7 +43,7 @@ void HumiditySensor::setupSensor(uint32_t* delayMS) {
     Serial.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("%"));
     Serial.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("%"));
     Serial.println(F("------------------------------------"));
-    
+
     // Set delay between sensor readings based on sensor details.
     *delayMS = sensor.min_delay / 1000;
 
@@ -61,21 +61,4 @@ std::string HumiditySensor::getSensorDataJson() {
     result << " ";
     result << event.relative_humidity;
     return result.str();
-
-
-//   else {
-//     Serial.print(F("Temperature: "));
-//     Serial.print(event.temperature);
-//     Serial.println(F("°C"));
-//   }
-//   // Get humidity event and print its value.
-//   dht.humidity().getEvent(&event);
-//   if (isnan(event.relative_humidity)) {
-//     Serial.println(F("Error reading humidity!"));
-//   }
-//   else {
-//     Serial.print(F("Humidity: "));
-//     Serial.print(event.relative_humidity);
-//     Serial.println(F("%"));
-//   }
 }

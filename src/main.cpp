@@ -11,19 +11,23 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include "sensors/humidity_sensor.h"
+#include "sensors/SensorFacade.h"
 
 uint32_t delayMS;
 
-HumiditySensor s;
+SensorFacade facade;
+
+std::unique_ptr<HumiditySensor> haha;
 
 void setup() {
   Serial.begin(9600);
-  s = HumiditySensor();
-  s.setupSensor(&delayMS);
+  facade = SensorFacade();
+  std::unique_ptr<Sensor> h = std::unique_ptr<HumiditySensor>(new HumiditySensor());
+  h->setupSensor(&delayMS);
+  facade.addSensor(std::move(h));
 }
 
 void loop() {
-  // Delay between measurements.
   delay(delayMS);
-  Serial.print(s.getSensorDataJson().c_str());
+  facade.sendAllSensors();
 }
