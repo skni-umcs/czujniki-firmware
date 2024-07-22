@@ -1,0 +1,30 @@
+stages:
+  - build
+  - test
+  - deploy
+
+variables:
+  PLATFORMIO_CACHE_DIR: $CI_PROJECT_DIR/.cache/platformio
+
+before_script:
+  - pip install platformio
+
+build:
+  stage: build
+  script:
+    - platformio run
+  artifacts:
+    paths:
+      - .pio/build
+
+test:
+  stage: test
+  script:
+    - platformio test
+
+deploy:
+  stage: deploy
+  only:
+    - main
+  script:
+    - platformio run --target upload
