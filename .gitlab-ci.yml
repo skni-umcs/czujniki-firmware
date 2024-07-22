@@ -1,3 +1,5 @@
+image: python
+
 stages:
   - build
   - test
