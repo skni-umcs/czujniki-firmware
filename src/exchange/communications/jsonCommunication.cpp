@@ -14,11 +14,11 @@ OperationResult JsonCommunication::getNotified(std::string message) {
 }
 
 OperationResult JsonCommunication::transmit(std::string message) {
-    std::cout << "transmitting message: \n" << message;
+    std::cout << "generic transmitting message: \n" << message << "\n";
     for(auto const& destination : transmitTo) {
-        std::cout << "another destination\n";
-        //destination.get()->send(message);
+        destination->send(message);
     }
+    std::cout << "finished generic transmit message\n";
     return OperationResult::SUCCESS;
 }
 

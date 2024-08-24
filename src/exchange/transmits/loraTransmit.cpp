@@ -3,7 +3,7 @@
 #include <iostream>
 
 OperationResult LoraTransmit::send(std::string message) {
-    std::cout << "jsonTransmit sending" << message << std::flush;
+    std::cout << "lora sending\n" << message << "\n" << std::flush;
     return OperationResult::SUCCESS;
 }
 

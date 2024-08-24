@@ -2,11 +2,14 @@
 #include <Adafruit_Sensor.h>
 #include <memory>
 #include <exchange/transmits/loraTransmit.h>
+#include <exchange/transmits/wifiTransmit.h>
 
 SensorFacade::SensorFacade() {
     sensorCommunication = SensorCommunication::create();
     std::unique_ptr<JsonTransmit> transmit = std::unique_ptr<LoraTransmit>(new LoraTransmit());
+    std::unique_ptr<JsonTransmit> transmitTwo = std::unique_ptr<WifiTransmit>(new WifiTransmit());
     sensorCommunication->subscribe(std::move(transmit));
+    sensorCommunication->subscribe(std::move(transmitTwo));
 }
 
 void SensorFacade::sendAllSensors() {
