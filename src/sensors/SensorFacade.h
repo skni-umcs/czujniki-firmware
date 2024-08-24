@@ -1,4 +1,4 @@
-#include "sensor.h"
+#include "subtypes/sensor.h"
 #include <vector>
 #include <memory>
 
