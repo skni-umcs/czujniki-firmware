@@ -1,17 +1,22 @@
 #include "sensorFacade.h"
 #include <Adafruit_Sensor.h>
 #include <memory>
+#include <exchange/transmits/loraTransmit.h>
+
+SensorFacade::SensorFacade() {
+    sensorCommunication = SensorCommunication::create();
+    std::unique_ptr<JsonTransmit> transmit = std::unique_ptr<LoraTransmit>(new LoraTransmit());
+    sensorCommunication->subscribe(std::move(transmit));
+}
 
 void SensorFacade::sendAllSensors() {
-    Serial.println("Read begin");
     for(auto const& sensor : sensors) {
         sendSensorData(sensor);
     }
-    Serial.println("Read end");
 }
 
 void SensorFacade::sendSensorData(std::unique_ptr<Sensor> const& sensor) {
-    Serial.println(sensor->getSensorDataJson().c_str());
+    sensorCommunication->transmit(sensor->getSensorDataJson());
 }
 
 void SensorFacade::addSensor(std::unique_ptr<Sensor> sensor) {

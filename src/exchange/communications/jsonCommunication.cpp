@@ -1,8 +1,12 @@
 #include <string>
 #include <algorithm> 
-#include "sensorCommunication.h"
+#include "jsonCommunication.h"
 #include <iostream>
 #include <memory>
+
+std::shared_ptr<JsonCommunication> JsonCommunication::create() {
+    return std::shared_ptr<JsonCommunication>{new JsonCommunication()};
+}
 
 OperationResult JsonCommunication::getNotified(std::string message) {
     std::cout << "im notified of" << message;
@@ -10,14 +14,17 @@ OperationResult JsonCommunication::getNotified(std::string message) {
 }
 
 OperationResult JsonCommunication::transmit(std::string message) {
-    std::cout << "transmitting message: " << message;
+    std::cout << "transmitting message: \n" << message;
     for(auto const& destination : transmitTo) {
-        destination.get()->send(message);
+        std::cout << "another destination\n";
+        //destination.get()->send(message);
     }
     return OperationResult::SUCCESS;
 }
 
 OperationResult JsonCommunication::subscribe(std::unique_ptr<JsonTransmit> transmit) {
+    auto thisPtr = shared_from_this();
+    transmit->addSubscriber(thisPtr);
     transmitTo.push_back(std::move(transmit));
     return OperationResult::SUCCESS;
 }

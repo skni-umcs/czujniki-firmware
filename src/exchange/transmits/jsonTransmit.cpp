@@ -2,7 +2,10 @@
 #include "jsonTransmit.h"
 #include <iostream>
 
-OperationResult JsonTransmit::send(std::string message) {
-    std::cout << "jsonTransmit sending" << message;
+OperationResult JsonTransmit::notifySubscribers(std::string message) {
+    return OperationResult::SUCCESS;
+}
+
+OperationResult JsonTransmit::addSubscriber(std::weak_ptr<Communication> communication) {
     return OperationResult::SUCCESS;
 }
