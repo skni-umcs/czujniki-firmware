@@ -11,7 +11,7 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include "sensors/subtypes/humidity_sensor.h"
-#include "sensors/SensorFacade.h"
+#include "sensors/sensorFacade.h"
 
 uint32_t delayMS;
 SensorFacade facade;

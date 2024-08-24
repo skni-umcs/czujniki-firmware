@@ -1,4 +1,4 @@
-#include "SensorFacade.h"
+#include "sensorFacade.h"
 #include <Adafruit_Sensor.h>
 #include <memory>
 
