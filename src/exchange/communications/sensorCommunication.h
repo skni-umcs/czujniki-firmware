@@ -1,3 +1,6 @@
+#ifndef SENSORCOMMUNICATION_H
+#define SENSORCOMMUNICATION_H
+
 #include "sensor.h"
 #include <vector>
 #include "jsonCommunication.h"
@@ -9,3 +12,5 @@ class SensorCommunication : JsonCommunication {
         void subscribe(std::unique_ptr<JsonTransmit> transmit) override;
         void unsubscribe(std::unique_ptr<JsonTransmit> transmit) override;
 };
+
+#endif

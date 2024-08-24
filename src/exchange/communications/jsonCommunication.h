@@ -1,3 +1,6 @@
+#ifndef JSONCOMMUNICATION_H
+#define JSONCOMMUNICATION_H
+
 #include "sensor.h"
 #include <vector>
 #include <exchange/transmits/jsonTransmit.h>
@@ -12,3 +15,5 @@ class JsonCommunication : Communication {
         virtual void subscribe(std::unique_ptr<JsonTransmit> transmit) = 0;
         virtual void unsubscribe(std::unique_ptr<JsonTransmit> transmit) = 0;
 };
+
+#endif
