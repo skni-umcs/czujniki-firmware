@@ -10,7 +10,8 @@
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
 #include <DHT_U.h>
-#include "sensors/subtypes/humidity_sensor.h"
+#include "sensors/subtypes/humidity_temperature_sensor.h"
+#include "sensors/subtypes/test_sensor.h"
 #include "sensors/sensorFacade.h"
 
 uint32_t delayMS;
@@ -19,9 +20,12 @@ SensorFacade facade;
 void setup() {
   Serial.begin(9600);
   facade = SensorFacade();
-  std::unique_ptr<Sensor> h = std::unique_ptr<HumiditySensor>(new HumiditySensor());
+  std::unique_ptr<Sensor> h = std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor());
+  std::unique_ptr<Sensor> t = std::unique_ptr<TestSensor>(new TestSensor());
   h->setupSensor(&delayMS);
+  t->setupSensor(&delayMS);
   facade.addSensor(std::move(h));
+  facade.addSensor(std::move(t));
 }
 
 void loop() {

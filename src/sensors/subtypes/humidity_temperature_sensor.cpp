@@ -1,4 +1,4 @@
-#include "humidity_sensor.h"
+#include "humidity_temperature_sensor.h"
 #include <string>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
@@ -18,12 +18,12 @@
 // See guide for details on sensor wiring and usage:
 //   https://learn.adafruit.com/dht/overview
 
-DHT_Unified dht(DHTPIN, DHTTYPE);
+DHT_Unified humidityTemperatureDht(DHTPIN, DHTTYPE);
 
-void HumiditySensor::setupSensor(uint32_t* delayMS) {
-    dht.begin();
+void HumidityTemperatureSensor::setupSensor(uint32_t* delayMS) {
+    humidityTemperatureDht.begin();
     sensor_t sensor;
-    dht.temperature().getSensor(&sensor);
+    humidityTemperatureDht.temperature().getSensor(&sensor);
     Serial.println(F("------------------------------------"));
     Serial.println(F("Temperature Sensor"));
     Serial.print  (F("Sensor Type: ")); Serial.println(sensor.name);
@@ -34,7 +34,7 @@ void HumiditySensor::setupSensor(uint32_t* delayMS) {
     Serial.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("°C"));
     Serial.println(F("------------------------------------"));
     // Print humidity sensor details.
-    dht.humidity().getSensor(&sensor);
+    humidityTemperatureDht.humidity().getSensor(&sensor);
     Serial.println(F("Humidity Sensor"));
     Serial.print  (F("Sensor Type: ")); Serial.println(sensor.name);
     Serial.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
@@ -49,16 +49,11 @@ void HumiditySensor::setupSensor(uint32_t* delayMS) {
 
 }
 
-std::string HumiditySensor::getSensorDataJson() {
+std::string HumidityTemperatureSensor::getSensorDataJson() {
     // Get temperature event and print its value.
     sensors_event_t event;
     std::stringstream result;
-    dht.temperature().getEvent(&event);
-    if (isnan(event.temperature)) {
-        Serial.println(F("Error reading temperature!"));
-    }
-    result << event.temperature;
-    result << " ";
-    result << event.relative_humidity;
+    humidityTemperatureDht.temperature().getEvent(&event);
+    result << "humidity: " << event.relative_humidity << " temperature: " << event.temperature;
     return result.str();
 }

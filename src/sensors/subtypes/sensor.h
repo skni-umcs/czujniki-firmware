@@ -1,5 +1,5 @@
- #ifndef SENSOR_H
- #define SENSOR_H
+#ifndef SENSOR_H
+#define SENSOR_H
 
 #include <string>
 
@@ -10,4 +10,4 @@ class Sensor
         virtual void setupSensor(uint32_t* delayMS) = 0;
 };
 
- #endif
+#endif
