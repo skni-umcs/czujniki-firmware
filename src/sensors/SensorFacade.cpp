@@ -3,6 +3,9 @@
 #include <memory>
 #include <exchange/transmits/loraTransmit.h>
 #include <exchange/transmits/wifiTransmit.h>
+#include <vector>
+#include <string>
+#include <ArduinoJson.h>
 
 SensorFacade::SensorFacade() {
     sensorCommunication = SensorCommunication::create();
@@ -13,13 +16,19 @@ SensorFacade::SensorFacade() {
 }
 
 void SensorFacade::sendAllSensors() {
+    DynamicJsonDocument doc(1024);
+    JsonArray messages = doc.to<JsonArray>();
+    std::string serializedJson;
+
     for(auto const& sensor : sensors) {
-        sendSensorData(sensor);
+        messages.add(sensor->getSensorDataJson());
     }
+    serializeJson(doc, serializedJson);
+    sensorCommunication->transmit(serializedJson);
 }
 
 void SensorFacade::sendSensorData(std::unique_ptr<Sensor> const& sensor) {
-    sensorCommunication->transmit(sensor->getSensorDataJson());
+    
 }
 
 void SensorFacade::addSensor(std::unique_ptr<Sensor> sensor) {
