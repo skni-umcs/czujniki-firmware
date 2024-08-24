@@ -8,10 +8,10 @@
 class Transmit
 {
     public:
-        virtual void send(std::string message) = 0;
-        virtual void receive(std::string message) = 0;
-        virtual void notifySubscribers(std::string message) = 0;
-        virtual std::string addSubscriber(std::unique_ptr<Communication> communication) = 0;
+        virtual OperationResult send(std::string message) = 0;
+        virtual OperationResult receive(std::string message) = 0;
+        virtual OperationResult notifySubscribers(std::string message) = 0;
+        virtual OperationResult addSubscriber(std::unique_ptr<Communication> communication) = 0;
 };
 
 #endif

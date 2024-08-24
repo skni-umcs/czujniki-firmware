@@ -6,11 +6,7 @@
 #include "jsonCommunication.h"
 #include <exchange/transmits/jsonTransmit.h>
 
-class SensorCommunication : JsonCommunication {
-    public:
-        std::string getNotified(std::string message) override;
-        void subscribe(std::unique_ptr<JsonTransmit> transmit) override;
-        void unsubscribe(std::unique_ptr<JsonTransmit> transmit) override;
+class SensorCommunication : public JsonCommunication {
 };
 
 #endif

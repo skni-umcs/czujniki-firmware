@@ -2,11 +2,13 @@
 #define COMMUNICATION_H
 
 #include <string>
+#include <utils/operationResult.h>
 
 class Communication
 {
     public:
-        virtual std::string getNotified(std::string message) = 0;
+        virtual OperationResult getNotified(std::string message) = 0;
+        virtual OperationResult transmit(std::string message) = 0;
 };
 
 #endif
