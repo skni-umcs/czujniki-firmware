@@ -37,3 +37,7 @@ OperationResult JsonCommunication::unsubscribe(std::unique_ptr<JsonTransmit> tra
     }
     return OperationResult::NOT_FOUND;
 }
+
+const std::vector<std::unique_ptr<JsonTransmit>>& JsonCommunication::getTransmitTo() {
+    return transmitTo;
+}

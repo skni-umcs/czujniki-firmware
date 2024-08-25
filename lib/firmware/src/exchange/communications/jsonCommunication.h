@@ -16,6 +16,7 @@ class JsonCommunication : public Communication {
         OperationResult transmit(std::string message) override;
         OperationResult subscribe(std::unique_ptr<JsonTransmit> transmit);
         OperationResult unsubscribe(std::unique_ptr<JsonTransmit> transmit);
+        const std::vector<std::unique_ptr<JsonTransmit>>& getTransmitTo();
 };
 
 #endif
