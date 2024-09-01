@@ -13,6 +13,8 @@
 #include "sensors/subtypes/humidity_temperature_sensor.h"
 #include "sensors/subtypes/test_sensor.h"
 #include "sensors/sensorFacade.h"
+#include <sensors/subtypes/bme_280_sensor.h>
+#include <iostream>
 
 uint32_t delayMS;
 SensorFacade facade;
@@ -20,7 +22,7 @@ SensorFacade facade;
 void setup() {
   Serial.begin(9600);
   facade = SensorFacade();
-  std::unique_ptr<Sensor> h = std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor());
+  std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
   std::unique_ptr<Sensor> t = std::unique_ptr<TestSensor>(new TestSensor());
   h->setupSensor(&delayMS);
   t->setupSensor(&delayMS);
