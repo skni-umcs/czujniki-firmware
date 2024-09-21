@@ -5,6 +5,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
+#include <ArduinoJson.h>
 
 #define D5 9
 #define D6 10
@@ -43,10 +44,40 @@ void BME280Sensor::setupSensor(uint32_t* delayMS) {
 
 }
 
+struct BME280Output {
+  float humidity;
+  float temperature;
+  float pressure;
+  float altitude;
+
+  BME280Output(float humidity, float temperature, float pressure, float altitude) {
+    this->humidity = humidity;
+    this->temperature = temperature;
+    this->pressure = pressure;
+    this->altitude = altitude;
+  }
+
+  void serialize(JsonDocument& doc) {
+    JsonObject obj = doc.to<JsonObject>();
+    obj["humidity"] = this->humidity;
+    obj["temperature"] = this->temperature;
+    obj["pressure"] = this->pressure;
+    obj["altitude"] = this->altitude;
+  }
+};
+
 std::string BME280Sensor::getSensorDataJson() {
-    // Get temperature event and print its value.
     sensors_event_t event;
+    BME280Output output = BME280Output(
+      bme.readHumidity(),
+      bme.readTemperature(),
+      bme.readPressure(),
+      bme.readAltitude(SEALEVELPRESSURE_HPA)
+    );
     std::stringstream result;
-    result << "humidity: " << bme.readHumidity() << " temperature: " << bme.readTemperature() << " pressure: " << bme.readPressure() << " altitude: " << bme.readAltitude(SEALEVELPRESSURE_HPA);
+
+    JsonDocument doc;
+    output.serialize(doc);
+    serializeJson(doc, result);
     return result.str();
 }
