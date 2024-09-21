@@ -6,8 +6,19 @@
 #include <sstream>
 #include <iostream>
 
+#define D5 9
+#define D6 10
+#define D7 13
+#define D8 5
+
+#define BME_SCK D8
+#define BME_MISO D5
+#define BME_MOSI D7
+#define BME_CS D6
+
 #define SEALEVELPRESSURE_HPA (1013.25)
-Adafruit_BME280 bme; // I2C
+
+Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 
 unsigned long delayTime;
 

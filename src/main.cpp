@@ -16,7 +16,7 @@
 #include <sensors/subtypes/bme_280_sensor.h>
 #include <iostream>
 
-uint32_t delayMS;
+uint32_t delayMS = 1000;
 SensorFacade facade;
 
 void setup() {
