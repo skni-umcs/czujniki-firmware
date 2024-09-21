@@ -16,7 +16,7 @@ SensorFacade::SensorFacade() {
 }
 
 void SensorFacade::sendAllSensors() {
-    DynamicJsonDocument doc(1024);
+    JsonDocument doc;
     JsonArray messages = doc.to<JsonArray>();
     std::string serializedJson;
 
