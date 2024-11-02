@@ -15,9 +15,12 @@
 #include "sensors/sensorFacade.h"
 #include <sensors/subtypes/bme_280_sensor.h>
 #include <iostream>
+#include "time/timerUpdate.h"
+#include "time/timer.h"
 
 uint32_t delayMS = 1000;
 SensorFacade facade;
+std::shared_ptr<Timer> timer = std::shared_ptr<Timer>(new Timer());
 
 void setup() {
   Serial.begin(9600);
@@ -28,9 +31,10 @@ void setup() {
   t->setupSensor(&delayMS);
   facade.addSensor(std::move(h));
   facade.addSensor(std::move(t));
+  TimerUpdate::addSubscriber(timer);
+  timer.get()->updateTime(10,10);
 }
 
 void loop() {
-  delay(delayMS);
-  facade.sendAllSensors();
+  TimerUpdate::notifySubscribers();
 }
