@@ -11,7 +11,7 @@ void TimerUpdate::setTime(int time) {
 
 void TimerUpdate::notifySubscribers() {
     for(auto &subscriber : TimerUpdate::subscribers) {
-        subscriber.get()->onTaskDelay();
+        subscriber.get()->onTimerUpdate();
     }
 }
 
