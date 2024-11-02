@@ -24,6 +24,7 @@ void Timer::updateTime(int lastDate, int period) {
     this->lastDate = lastDate;
     this->period = period;
     this->executeFunction = printStuff;
+    // TODO: replace tasks
     // if(this->currentTask != NULL) {
     //     vTaskDelete(this->currentTask);
     // }
