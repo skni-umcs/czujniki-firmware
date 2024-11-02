@@ -36,5 +36,5 @@ void setup() {
 }
 
 void loop() {
-  TimerUpdate::notifySubscribers();
+  //TimerUpdate::notifySubscribers();
 }

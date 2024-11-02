@@ -10,21 +10,12 @@ void printStuff () {
 void timerTask(void* timerObjectRawPointer) {
     Timer* timer = (Timer*)timerObjectRawPointer;
     while(1) {
+        std::cout << "timerTask iteration" << timer->executeFunction << timer->recentlyUpdated << std::endl;
         if(timer->executeFunction != nullptr && !timer->recentlyUpdated) {
             timer->executeFunction();
         }
-        vTaskDelay(600);
-    }
-}
-
-void zadanie1(void *arg)
-{
-    while (1) {
-        printf("%s", "jeden");
-        vTaskDelay(500);
-        printf("%s", "dwa");
-        vTaskDelay(500);
-        std::flush(std::cout);
+        timer->recentlyUpdated = false;
+        vTaskDelay(2000);
     }
 }
 
@@ -38,10 +29,10 @@ void Timer::updateTime(int lastDate, int period) {
     // }
     const int bytesNeeded = 2560; //temporary value thats working
     const char* taskName = "timerTask";
-    void* taskArgument = NULL;
+    void* taskArgument = (void*)this;
     const int taskPriority = 1;
     TaskHandle_t* const taskHandle = NULL;
-    xTaskCreate(zadanie1, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
+    xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
 }
 
 void Timer::onTimerUpdate() {
