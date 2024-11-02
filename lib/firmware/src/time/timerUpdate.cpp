@@ -2,7 +2,7 @@
 #include <ESP32Time.h>
 
 ESP32Time rtc(3600);  // offset in seconds GMT+1
-std::vector<std::weak_ptr<Timer>> TimerUpdate::subscribers;
+std::vector<std::shared_ptr<Timer>> TimerUpdate::subscribers;
 
 void TimerUpdate::setTime(int time) {
     rtc.setTime(time);
@@ -11,10 +11,10 @@ void TimerUpdate::setTime(int time) {
 
 void TimerUpdate::notifySubscribers() {
     for(auto &subscriber : TimerUpdate::subscribers) {
-        subscriber.lock().get()->onTaskDelay();
+        subscriber.get()->onTaskDelay();
     }
 }
 
-void TimerUpdate::addSubscriber(std::weak_ptr<Timer> timer) {
+void TimerUpdate::addSubscriber(std::shared_ptr<Timer> timer) {
     TimerUpdate::subscribers.push_back(timer);
 }

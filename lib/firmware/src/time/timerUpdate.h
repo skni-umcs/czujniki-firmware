@@ -9,11 +9,11 @@
 class TimerUpdate
 {
     static TimerUpdate timerUpdate;
-    static std::vector<std::weak_ptr<Timer>> subscribers;
+    static std::vector<std::shared_ptr<Timer>> subscribers;
 
     public:
         static void notifySubscribers();
-        static void addSubscriber(std::weak_ptr<Timer> timer);
+        static void addSubscriber(std::shared_ptr<Timer> timer);
         static void setTime(int time);
 };
 
