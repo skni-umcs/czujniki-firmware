@@ -4,17 +4,16 @@
 
 
 void printStuff () {
-    std::cout << "elo z południańca";
+    std::cout << "elo z południańca" << std::endl;
 }
 
 void timerTask(void* timerObjectRawPointer) {
     Timer* timer = (Timer*)timerObjectRawPointer;
     while(1) {
-        std::cout << "timerTask iteration" << timer->executeFunction << timer->recentlyUpdated << std::endl;
-        if(timer->executeFunction != nullptr && !timer->recentlyUpdated) {
-            timer->executeFunction();
+        if(timer->getExecuteFunction() != nullptr && !timer->getRecentlyUpdated()) {
+            timer->getExecuteFunction()();
         }
-        timer->recentlyUpdated = false;
+        timer->setRecentlyUpdated(false);
         vTaskDelay(2000);
     }
 }
@@ -38,4 +37,16 @@ void Timer::updateTime(int lastDate, int period) {
 
 void Timer::onTimerUpdate() {
     this->recentlyUpdated = true;
+}
+
+executeFunctionType Timer::getExecuteFunction() {
+    return this->executeFunction;
+}
+
+bool Timer::getRecentlyUpdated() {
+    return this->recentlyUpdated;
+}
+
+void Timer::setRecentlyUpdated(bool recentlyUpdated) {
+    this->recentlyUpdated = recentlyUpdated;
 }
