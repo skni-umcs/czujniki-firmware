@@ -11,7 +11,7 @@
 
 void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std::unique_ptr<JsonTransmit> jsonTransmit) {
     jsonCommunication->subscribe(std::move(jsonTransmit));
-    TEST_ASSERT_EQUAL(jsonCommunication->getTransmitTo().size(), 1);
+    TEST_ASSERT_EQUAL(1, jsonCommunication->getTransmitTo().size());
 }
 
 void test_wifi_subscription() {

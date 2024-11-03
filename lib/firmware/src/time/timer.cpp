@@ -14,8 +14,20 @@ void timerTask(void* timerObjectRawPointer) {
             timer->getExecuteFunction()();
         }
         timer->setRecentlyUpdated(false);
-        vTaskDelay(2000);
+        vTaskDelay(timer->getPeriod());
     }
+}
+
+void Timer::changeTimerTask() {
+    if(this->currentTask != NULL) {
+        vTaskDelete(this->currentTask);
+    }
+    const int bytesNeeded = 2560; //temporary value thats working
+    const char* taskName = "timerTask";
+    void* taskArgument = (void*)this;
+    const int taskPriority = 1;
+    TaskHandle_t* const taskHandle = &this->currentTask;
+    xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
 }
 
 void Timer::updateTime(int lastDate, int period) {
@@ -23,16 +35,7 @@ void Timer::updateTime(int lastDate, int period) {
     this->lastDate = lastDate;
     this->period = period;
     this->executeFunction = printStuff;
-    // TODO: replace tasks
-    // if(this->currentTask != NULL) {
-    //     vTaskDelete(this->currentTask);
-    // }
-    const int bytesNeeded = 2560; //temporary value thats working
-    const char* taskName = "timerTask";
-    void* taskArgument = (void*)this;
-    const int taskPriority = 1;
-    TaskHandle_t* const taskHandle = NULL;
-    xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
+    this->changeTimerTask();
 }
 
 void Timer::onTimerUpdate() {
@@ -49,4 +52,8 @@ bool Timer::getRecentlyUpdated() {
 
 void Timer::setRecentlyUpdated(bool recentlyUpdated) {
     this->recentlyUpdated = recentlyUpdated;
+}
+
+int Timer::getPeriod() {
+    return this->period;
 }
