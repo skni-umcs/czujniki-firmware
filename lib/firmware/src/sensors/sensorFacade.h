@@ -11,6 +11,6 @@ class SensorFacade {
     public:
         SensorFacade();
         void sendAllSensors();
-        void sendSensorData(std::unique_ptr<Sensor> const& sensor);
         void addSensor(std::unique_ptr<Sensor> sensor);
+        int sensorsCount();
 };

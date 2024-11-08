@@ -11,7 +11,6 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include "sensors/subtypes/humidity_temperature_sensor.h"
-#include "sensors/subtypes/test_sensor.h"
 #include "sensors/sensorFacade.h"
 #include <sensors/subtypes/bme_280_sensor.h>
 #include <iostream>
@@ -26,11 +25,8 @@ void setup() {
   Serial.begin(9600);
   facade = SensorFacade();
   std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
-  std::unique_ptr<Sensor> t = std::unique_ptr<TestSensor>(new TestSensor());
   h->setupSensor(&delayMS);
-  t->setupSensor(&delayMS);
   facade.addSensor(std::move(h));
-  facade.addSensor(std::move(t));
   TimerUpdate::addSubscriber(timer);
   timer.get()->updateTime(10,10);
 }
