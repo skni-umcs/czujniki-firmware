@@ -8,13 +8,13 @@
 
 class JsonTransmit : public Transmit
 {
-    std::vector<std::weak_ptr<Communication>> subscribers;
+    std::vector<std::shared_ptr<Communication>> subscribers;
 
     public:
         virtual OperationResult send(std::string message) = 0;
         virtual OperationResult receive(std::string message) = 0;
         OperationResult notifySubscribers(std::string message) override;
-        OperationResult addSubscriber(std::weak_ptr<Communication> communication) override;
+        OperationResult addSubscriber(std::shared_ptr<Communication> communication) override;
 };
 
 #endif

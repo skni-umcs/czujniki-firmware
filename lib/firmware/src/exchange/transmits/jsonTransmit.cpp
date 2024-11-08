@@ -6,7 +6,7 @@ OperationResult JsonTransmit::notifySubscribers(std::string message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult JsonTransmit::addSubscriber(std::weak_ptr<Communication> communication) {
+OperationResult JsonTransmit::addSubscriber(std::shared_ptr<Communication> communication) {
     subscribers.push_back(communication);
     return OperationResult::SUCCESS;
 }

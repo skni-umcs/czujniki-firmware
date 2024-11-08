@@ -22,14 +22,14 @@ OperationResult JsonCommunication::transmit(std::string message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult JsonCommunication::subscribe(std::unique_ptr<JsonTransmit> transmit) {
+OperationResult JsonCommunication::subscribe(std::shared_ptr<JsonTransmit> transmit) {
     auto thisPtr = shared_from_this();
     transmit->addSubscriber(thisPtr);
-    transmitTo.push_back(std::move(transmit));
+    transmitTo.push_back(transmit);
     return OperationResult::SUCCESS;
 }
 
-OperationResult JsonCommunication::unsubscribe(std::unique_ptr<JsonTransmit> transmit) {
+OperationResult JsonCommunication::unsubscribe(std::shared_ptr<JsonTransmit> transmit) {
     auto index = std::find(transmitTo.begin(), transmitTo.end(), transmit);
     if (index != transmitTo.end()) {
         transmitTo.erase(index);
@@ -38,6 +38,6 @@ OperationResult JsonCommunication::unsubscribe(std::unique_ptr<JsonTransmit> tra
     return OperationResult::NOT_FOUND;
 }
 
-const std::vector<std::unique_ptr<JsonTransmit>>& JsonCommunication::getTransmitTo() {
+const std::vector<std::shared_ptr<JsonTransmit>>& JsonCommunication::getTransmitTo() {
     return transmitTo;
 }
