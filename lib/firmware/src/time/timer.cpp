@@ -1,12 +1,6 @@
 #include "timer.h"
 #include <iostream>
 
-
-
-void printStuff () {
-    std::cout << "elo z południańca" << std::endl;
-}
-
 void timerTask(void* timerObjectRawPointer) {
     Timer* timer = (Timer*)timerObjectRawPointer;
     while(1) {
