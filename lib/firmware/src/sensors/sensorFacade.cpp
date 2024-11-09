@@ -11,6 +11,8 @@ SensorFacade::SensorFacade() {
     sensorCommunication = SensorCommunication::create();
     std::unique_ptr<JsonTransmit> transmit = std::unique_ptr<LoraTransmit>(new LoraTransmit());
     sensorCommunication->subscribe(std::move(transmit));
+
+    timer.get()->updateTime(10,1000);
 }
 
 void SensorFacade::sendAllSensors() {

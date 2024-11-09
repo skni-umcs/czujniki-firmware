@@ -19,16 +19,12 @@
 
 uint32_t delayMS = 1000;
 SensorFacade facade;
-std::shared_ptr<Timer> timer = std::shared_ptr<Timer>(new Timer());
 
 void setup() {
   Serial.begin(9600);
-  facade = SensorFacade();
   std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
   h->setupSensor(&delayMS);
   facade.addSensor(std::move(h));
-  TimerUpdate::addSubscriber(timer);
-  timer.get()->updateTime(10,1000);
 }
 
 void loop() {
