@@ -12,8 +12,7 @@
 #include <time/timerUpdate.h>
 
 void testDeleteTaskAfterTimeUpdate() {
-    std::shared_ptr<Timer> timer = std::shared_ptr<Timer>(new Timer());
-    TimerUpdate::addSubscriber(timer);
+    std::shared_ptr<Timer> timer = Timer::create();
     for(int i = 0;i<50;++i) {
         timer.get()->updateTime(100000,100000);
     }
