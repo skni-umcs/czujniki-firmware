@@ -35,7 +35,6 @@ void Timer::updateTime(int lastDate, int period) {
     this->recentlyUpdated = true;
     this->lastDate = lastDate;
     this->period = period;
-    this->executeFunction = printStuff;
     this->changeTimerTask();
 }
 

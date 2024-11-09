@@ -4,8 +4,9 @@
 #include <string>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <functional>
 
-typedef void (*executeFunctionType)();
+typedef std::function<void()> executeFunctionType;
 
 class Timer
 {
