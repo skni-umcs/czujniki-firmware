@@ -47,6 +47,10 @@ executeFunctionType Timer::getExecuteFunction() {
     return this->executeFunction;
 }
 
+void Timer::setExecuteFunction(executeFunctionType executeFunction) {
+    this->executeFunction = executeFunction;
+}
+
 bool Timer::getRecentlyUpdated() {
     return this->recentlyUpdated;
 }

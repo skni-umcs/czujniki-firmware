@@ -19,9 +19,11 @@ class Timer
         void onTimerUpdate();
         void updateTime(int lastDate, int period);
         executeFunctionType getExecuteFunction();
+        void setExecuteFunction(executeFunctionType executeFunction);
         bool getRecentlyUpdated();
         void setRecentlyUpdated(bool recentlyUpdated);
         int getPeriod();
+
 };
 
 #endif
