@@ -8,7 +8,7 @@ class SensorFacade {
 
     std::vector<std::unique_ptr<Sensor>> sensors;
     std::shared_ptr<SensorCommunication> sensorCommunication;
-    std::unique_ptr<Timer> timer = std::unique_ptr<Timer>(new Timer());
+    std::shared_ptr<Timer> timer = Timer::create();
 
     public:
         SensorFacade();

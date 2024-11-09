@@ -7,7 +7,7 @@
 #include <string>
 #include <ArduinoJson.h>
 
-const int DEFAULT_SENSOR_PERIOD_MS = 60000;
+const int DEFAULT_SENSOR_PERIOD_MS = 600; //low value for testing
 
 SensorFacade::SensorFacade() {
     sensorCommunication = SensorCommunication::create();

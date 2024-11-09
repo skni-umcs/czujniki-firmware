@@ -1,5 +1,14 @@
 #include "timer.h"
 #include <iostream>
+#include "timerUpdate.h"
+
+Timer::Timer() {}
+
+std::shared_ptr<Timer> Timer::create() {
+    auto timerPtr = std::shared_ptr<Timer>(new Timer());
+    TimerUpdate::addSubscriber(timerPtr);
+    return timerPtr;
+}
 
 void timerTask(void* timerObjectRawPointer) {
     Timer* timer = (Timer*)timerObjectRawPointer;
