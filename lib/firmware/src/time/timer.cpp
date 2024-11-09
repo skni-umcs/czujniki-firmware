@@ -21,6 +21,7 @@ void timerTask(void* timerObjectRawPointer) {
 void Timer::changeTimerTask() {
     if(this->currentTask != NULL) {
         vTaskDelete(this->currentTask);
+        this->currentTask = NULL;
     }
     const int bytesNeeded = 2560; //temporary value thats working
     const char* taskName = "timerTask";
