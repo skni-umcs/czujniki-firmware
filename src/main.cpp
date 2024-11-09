@@ -28,7 +28,7 @@ void setup() {
   h->setupSensor(&delayMS);
   facade.addSensor(std::move(h));
   TimerUpdate::addSubscriber(timer);
-  timer.get()->updateTime(10,10);
+  timer.get()->updateTime(10,1000);
 }
 
 void loop() {
