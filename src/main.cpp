@@ -18,10 +18,10 @@
 #include "time/timer.h"
 
 uint32_t delayMS = 1000;
-SensorFacade facade;
 
 void setup() {
   Serial.begin(9600);
+  SensorFacade facade = SensorFacade();
   std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
   h->setupSensor(&delayMS);
   facade.addSensor(std::move(h));

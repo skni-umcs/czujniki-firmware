@@ -7,11 +7,11 @@
 #include <string>
 #include <ArduinoJson.h>
 
-const int DEFAULT_SENSOR_PERIOD_MS = 600; //low value for testing
+const int DEFAULT_SENSOR_PERIOD_MS = 6000; //low value for testing
 
 SensorFacade::SensorFacade() {
     sensorCommunication = SensorCommunication::create();
-    std::unique_ptr<JsonTransmit> transmit = std::unique_ptr<LoraTransmit>(new LoraTransmit());
+    std::shared_ptr<JsonTransmit> transmit = LoraTransmit::create();
     sensorCommunication->subscribe(std::move(transmit));
 
     timer.get()->setExecuteFunction([this]() {this->sendAllSensors();});
