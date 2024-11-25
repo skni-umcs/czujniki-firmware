@@ -8,13 +8,15 @@ void printParameters(struct Configuration configuration);
 
 // With FIXED RECEIVER configuration
 #define DESTINATION_ADDL 2
+// If you want use RSSI uncomment
+//#define ENABLE_RSSI true
 
 void LoraTransmit::setup() {
 	// Startup all pins and UART
-	this->e220ttl.begin();
+	e220ttl.begin();
 
     ResponseStructContainer c = ResponseStructContainer();
-	c = this->e220ttl.getConfiguration();
+	c = e220ttl.getConfiguration();
 	// It's important get configuration pointer before all other operation
 	Configuration configuration = *(Configuration*) c.data;
 	Serial.println(c.status.getResponseDescription());
@@ -34,13 +36,35 @@ OperationResult LoraTransmit::send(std::string message) {
 	Serial.println("Hi, I'm going to send message!");
 
 	// Send message
-	ResponseStatus rs = e220ttl.sendFixedMessage(0, DESTINATION_ADDL, 23, "Hello, world?");
+	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
     return OperationResult::SUCCESS;
 }
 
 OperationResult LoraTransmit::receive(std::string message) {
+	Serial.println("is there any message?");
+	if (e220ttl.available()>1) {
+		Serial.println("Message received!");
+
+		// read the String message
+	#ifdef ENABLE_RSSI
+		ResponseContainer rc = e220ttl.receiveMessageRSSI();
+	#else
+		ResponseContainer rc = e220ttl.receiveMessage();
+	#endif
+		// Is something goes wrong print error
+		if (rc.status.code!=1){
+			Serial.println(rc.status.getResponseDescription());
+		}else{
+			// Print the data received
+			Serial.println(rc.status.getResponseDescription());
+			Serial.println(rc.data);
+	#ifdef ENABLE_RSSI
+			Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
+	#endif
+		}
+	}
     return OperationResult::SUCCESS;
 }
 
