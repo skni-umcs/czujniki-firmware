@@ -11,7 +11,7 @@ class SensorFacade {
     std::shared_ptr<Timer> timer = Timer::create();
 
     public:
-        SensorFacade();
+        SensorFacade(std::shared_ptr<JsonTransmit>);
         void sendAllSensors();
         void addSensor(std::unique_ptr<Sensor> sensor);
         int sensorsCount();

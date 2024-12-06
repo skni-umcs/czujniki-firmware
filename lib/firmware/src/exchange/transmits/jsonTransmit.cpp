@@ -3,6 +3,9 @@
 #include <iostream>
 
 OperationResult JsonTransmit::notifySubscribers(std::string message) {
+    for(auto subscriber : subscribers) {
+        subscriber->getNotified(message);
+    }
     return OperationResult::SUCCESS;
 }
 

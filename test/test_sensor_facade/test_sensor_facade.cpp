@@ -10,11 +10,13 @@
 #include <SPI.h>
 #include "sensors/sensorFacade.h"
 #include "test_sensor.h"
+#include "test_transmit.h"
 
 uint32_t delayMS = 0;
+auto testTransmit = std::shared_ptr<TestTransmit>{new TestTransmit()};
 
 void test_add_sensor() {
-    SensorFacade sensorFacade = SensorFacade();
+    SensorFacade sensorFacade = SensorFacade(testTransmit);
     auto testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor(&delayMS);
     sensorFacade.addSensor(std::move(testSensor));
@@ -22,7 +24,7 @@ void test_add_sensor() {
 }
 
 void test_sensor_facade() {
-    SensorFacade sensorFacade = SensorFacade();
+    SensorFacade sensorFacade = SensorFacade(testTransmit);
     auto testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor(&delayMS);
     sensorFacade.addSensor(std::move(testSensor));

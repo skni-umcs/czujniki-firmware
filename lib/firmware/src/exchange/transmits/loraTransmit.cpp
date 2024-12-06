@@ -2,7 +2,7 @@
 #include "loraTransmit.h"
 #include <iostream>
 #include <LoRa_E220.h>
-
+#include "utils/stringUtils.h"
 
 void printParameters(struct Configuration configuration);
 
@@ -11,7 +11,13 @@ void printParameters(struct Configuration configuration);
 // If you want use RSSI uncomment
 //#define ENABLE_RSSI true
 
+const int DEFAULT_LORA_POLL_MS = 600;
+
 void LoraTransmit::setup() {
+	Serial.println("Setupping LoraTransmit");
+	timer.get()->setExecuteFunction([this]() {this->poll();});
+    timer.get()->updateTime(10,DEFAULT_LORA_POLL_MS);
+
 	// Startup all pins and UART
 	e220ttl.begin();
 
@@ -42,29 +48,38 @@ OperationResult LoraTransmit::send(std::string message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult LoraTransmit::receive(std::string message) {
-	Serial.println("is there any message?");
+
+
+OperationResult LoraTransmit::poll() {
 	if (e220ttl.available()>1) {
 		Serial.println("Message received!");
 
 		// read the String message
-	#ifdef ENABLE_RSSI
-		ResponseContainer rc = e220ttl.receiveMessageRSSI();
-	#else
-		ResponseContainer rc = e220ttl.receiveMessage();
-	#endif
-		// Is something goes wrong print error
-		if (rc.status.code!=1){
-			Serial.println(rc.status.getResponseDescription());
-		}else{
-			// Print the data received
-			Serial.println(rc.status.getResponseDescription());
-			Serial.println(rc.data);
-	#ifdef ENABLE_RSSI
-			Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
-	#endif
+		#ifdef ENABLE_RSSI
+			ResponseContainer rc = e220ttl.receiveMessageRSSI();
+		#else
+			ResponseContainer rc = e220ttl.receiveMessage();
+		#endif
+			// Is something goes wrong print error
+			if (rc.status.code!=1){
+				Serial.println(rc.status.getResponseDescription());
+				return OperationResult::ERROR;
+			}else{
+				// Print the data received
+				Serial.println(rc.status.getResponseDescription());
+				Serial.println(rc.data);
+
+				receive(fromWString(rc.data));
+		#ifdef ENABLE_RSSI
+				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
+		#endif
 		}
 	}
+	return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::receive(std::string message) {
+	notifySubscribers(message);
     return OperationResult::SUCCESS;
 }
 

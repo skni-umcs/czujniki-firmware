@@ -9,6 +9,7 @@ class ServiceCommunication : public JsonCommunication {
     
     public:
         static std::shared_ptr<ServiceCommunication> create();
+
 };
 
 #endif

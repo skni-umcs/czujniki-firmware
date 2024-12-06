@@ -3,13 +3,14 @@
 #include "jsonCommunication.h"
 #include <iostream>
 #include <memory>
+#include <HardwareSerial.h>
 
 std::shared_ptr<JsonCommunication> JsonCommunication::create() {
     return std::shared_ptr<JsonCommunication>{new JsonCommunication()};
 }
 
 OperationResult JsonCommunication::getNotified(std::string message) {
-    std::cout << "im notified of" << message;
+    std::cout << "im notified of" << message << "\n";
     return OperationResult::SUCCESS;
 }
 

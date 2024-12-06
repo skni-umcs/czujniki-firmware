@@ -1,5 +1,5 @@
-#ifndef LORATRANSMIT_H
-#define LORATRANSMIT_H
+#ifndef TESTTRANSMIT_T
+#define TESTTRANSMIT_T
 
 #include <string>
 #include <exchange/communications/communication.h>

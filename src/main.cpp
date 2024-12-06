@@ -16,17 +16,25 @@
 #include <iostream>
 #include "time/timerUpdate.h"
 #include "time/timer.h"
+#include <exchange/transmits/loraTransmit.h>
+#include <exchange/communications/serviceCommunication.h>
 
 uint32_t delayMS = 1000;
 
 void setup() {
   Serial.begin(9600);
-  SensorFacade facade = SensorFacade();
+  delay(1000);
+  auto transmit = LoraTransmit::create();
+  
+  Serial.println("huh?");
+  auto serviceCommunication = ServiceCommunication::create();
+  serviceCommunication.get()->subscribe(transmit);
+  SensorFacade facade = SensorFacade(transmit);
   std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
   h->setupSensor(&delayMS);
   facade.addSensor(std::move(h));
 }
 
 void loop() {
-  //TimerUpdate::notifySubscribers();
+  //disabled due to using sleep
 }

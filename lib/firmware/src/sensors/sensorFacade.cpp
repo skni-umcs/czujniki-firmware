@@ -9,9 +9,8 @@
 
 const int DEFAULT_SENSOR_PERIOD_MS = 6000; //low value for testing
 
-SensorFacade::SensorFacade() {
+SensorFacade::SensorFacade(std::shared_ptr<JsonTransmit> transmit) {
     sensorCommunication = SensorCommunication::create();
-    std::shared_ptr<JsonTransmit> transmit = LoraTransmit::create();
     sensorCommunication->subscribe(std::move(transmit));
 
     timer.get()->setExecuteFunction([this]() {this->sendAllSensors();});
