@@ -38,11 +38,12 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
-OperationResult LoraTransmit::send(std::string message, int destinationNode) {
+OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
 	Serial.println("Hi, I'm going to send message!");
 
 	// Send message
-	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
+	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
+	ResponseStatus rs = e220ttl.sendFixedMessage(0, 3, 23, "Siema świat");
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
     return OperationResult::SUCCESS;

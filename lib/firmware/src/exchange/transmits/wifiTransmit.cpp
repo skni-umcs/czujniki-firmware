@@ -2,7 +2,7 @@
 #include "wifiTransmit.h"
 #include <iostream>
 
-OperationResult WifiTransmit::send(std::string message, int destinationNode) {
+OperationResult WifiTransmit::send(std::string message, moduleAddress destinationNode) {
     std::cout << "wifi sending\n" << message << "\n" << std::flush;
     return OperationResult::SUCCESS;
 }

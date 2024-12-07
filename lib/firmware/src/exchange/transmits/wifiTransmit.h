@@ -5,11 +5,12 @@
 #include <exchange/communications/communication.h>
 #include "transmit.h"
 #include "jsonTransmit.h"
+#include "utils/storageTypes.h"
 
 class WifiTransmit : public JsonTransmit
 {
     public:
-        OperationResult send(std::string message, int destinationNode) override;
+        OperationResult send(std::string message, moduleAddress destinationNode) override;
         OperationResult receive(std::string message) override;
 };
 

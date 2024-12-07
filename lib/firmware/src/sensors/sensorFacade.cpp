@@ -7,7 +7,7 @@
 #include <string>
 #include <ArduinoJson.h>
 
-const int DEFAULT_SENSOR_PERIOD_MS = 6000; //low value for testing
+const int DEFAULT_SENSOR_PERIOD_MS = 20000; //low value for testing
 const int GATEWAY_ID = 1;
 
 SensorFacade::SensorFacade(std::shared_ptr<JsonTransmit> transmit) {

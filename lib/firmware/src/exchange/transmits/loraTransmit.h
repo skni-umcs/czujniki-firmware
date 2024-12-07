@@ -7,6 +7,7 @@
 #include "jsonTransmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"
+#include "utils/storageTypes.h"
 
 const int TX_PIN = 17;
 const int RX_PIN = 16;
@@ -23,7 +24,7 @@ class LoraTransmit : public JsonTransmit
         static std::shared_ptr<LoraTransmit> create();
         void setup();
         OperationResult poll();
-        OperationResult send(std::string message, int destinationNode) override;
+        OperationResult send(std::string message, moduleAddress destinationNode) override;
         OperationResult receive(std::string message) override;
 };
 

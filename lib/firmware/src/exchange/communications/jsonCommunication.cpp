@@ -14,7 +14,7 @@ OperationResult JsonCommunication::getNotified(std::string message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult JsonCommunication::transmit(std::string message, int destinationNode) {
+OperationResult JsonCommunication::transmit(std::string message, moduleAddress destinationNode) {
     std::cout << "generic transmitting message: \n" << message << "\n";
     for(auto const& destination : transmitTo) {
         destination->send(message, destinationNode);
