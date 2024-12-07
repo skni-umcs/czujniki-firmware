@@ -9,7 +9,7 @@
 class WifiTransmit : public JsonTransmit
 {
     public:
-        OperationResult send(std::string message) override;
+        OperationResult send(std::string message, int destinationNode) override;
         OperationResult receive(std::string message) override;
 };
 

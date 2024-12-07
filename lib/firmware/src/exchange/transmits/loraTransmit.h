@@ -23,7 +23,7 @@ class LoraTransmit : public JsonTransmit
         static std::shared_ptr<LoraTransmit> create();
         void setup();
         OperationResult poll();
-        OperationResult send(std::string message) override;
+        OperationResult send(std::string message, int destinationNode) override;
         OperationResult receive(std::string message) override;
 };
 

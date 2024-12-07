@@ -14,10 +14,10 @@ OperationResult JsonCommunication::getNotified(std::string message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult JsonCommunication::transmit(std::string message) {
+OperationResult JsonCommunication::transmit(std::string message, int destinationNode) {
     std::cout << "generic transmitting message: \n" << message << "\n";
     for(auto const& destination : transmitTo) {
-        destination->send(message);
+        destination->send(message, destinationNode);
     }
     std::cout << "finished generic transmit message\n";
     return OperationResult::SUCCESS;

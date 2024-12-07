@@ -9,7 +9,7 @@ class BigCommunication : public Communication {
     public:
         std::shared_ptr<Communication> create();
         OperationResult getNotified(std::string message) override;
-        OperationResult transmit(std::string message) override;
+        OperationResult transmit(std::string message, int destinationNode) override;
         virtual OperationResult subscribe(std::shared_ptr<BigTransmit> bigTransmit) = 0;
         virtual OperationResult unsubscribe(std::shared_ptr<BigTransmit> bigTransmit) = 0;
 };

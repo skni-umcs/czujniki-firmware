@@ -8,7 +8,7 @@
 class BigTransmit : public Transmit
 {
     public:
-        virtual OperationResult send(std::string message) = 0;
+        virtual OperationResult send(std::string message, int destinationNode) = 0;
         virtual OperationResult receive(std::string message) = 0;
         virtual OperationResult notifySubscribers(std::string message) = 0;
         virtual OperationResult addSubscriber(std::shared_ptr<Communication> communication) = 0;

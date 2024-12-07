@@ -38,7 +38,7 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
-OperationResult LoraTransmit::send(std::string message) {
+OperationResult LoraTransmit::send(std::string message, int destinationNode) {
 	Serial.println("Hi, I'm going to send message!");
 
 	// Send message
