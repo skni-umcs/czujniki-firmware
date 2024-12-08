@@ -2,7 +2,7 @@
 #include "test_transmit.h"
 #include <iostream>
 
-OperationResult TestTransmit::send(std::string message) {
+OperationResult TestTransmit::send(std::string message, moduleAddress moduleAddress) {
     std::cout << "lora sending\n" << message << "\n" << std::flush;
     return OperationResult::SUCCESS;
 }

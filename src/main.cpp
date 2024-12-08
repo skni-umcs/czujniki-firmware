@@ -18,12 +18,15 @@
 #include "time/timer.h"
 #include <exchange/transmits/loraTransmit.h>
 #include <exchange/communications/serviceCommunication.h>
+#include <Preferences.h>
+#include "utils/addressHandler.h"
 
 uint32_t delayMS = 1000;
 
 void setup() {
   Serial.begin(9600);
   delay(1000);
+  AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = LoraTransmit::create();
   
   Serial.println("huh?");
