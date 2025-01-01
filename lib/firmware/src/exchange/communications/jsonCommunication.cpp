@@ -10,16 +10,16 @@ std::shared_ptr<JsonCommunication> JsonCommunication::create() {
 }
 
 OperationResult JsonCommunication::getNotified(std::string message) {
-    std::cout << "im notified of" << message << "\n";
+    Serial.printf("im notified of %s\n", message.c_str());
     return OperationResult::SUCCESS;
 }
 
 OperationResult JsonCommunication::transmit(std::string message, moduleAddress destinationNode) {
-    std::cout << "generic transmitting message: \n" << message << "\n";
+    Serial.printf("generic transmitting message: %s\n", message.c_str());
     for(auto const& destination : transmitTo) {
         destination->send(message, destinationNode);
     }
-    std::cout << "finished generic transmit message\n";
+    Serial.println("finished generic transmit message");
     return OperationResult::SUCCESS;
 }
 
