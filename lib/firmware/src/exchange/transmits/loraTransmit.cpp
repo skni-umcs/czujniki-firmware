@@ -25,6 +25,7 @@ void LoraTransmit::setup() {
 	c = e220ttl.getConfiguration();
 	// It's important get configuration pointer before all other operation
 	Configuration configuration = *(Configuration*) c.data;
+	configuration.TRANSMISSION_MODE.fixedTransmission = FT_FIXED_TRANSMISSION; // Enable repeater mode
 	Serial.println(c.status.getResponseDescription());
 	Serial.println(c.status.code);
 
@@ -43,7 +44,7 @@ OperationResult LoraTransmit::send(std::string message, moduleAddress destinatio
 
 	// Send message
 	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
-	ResponseStatus rs = e220ttl.sendFixedMessage(0, 3, 23, "Siema świat");
+	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Siema świat");
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
     return OperationResult::SUCCESS;
