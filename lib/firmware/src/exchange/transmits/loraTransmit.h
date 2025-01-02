@@ -17,7 +17,7 @@ const int M1_PIN = 19;
 
 class LoraTransmit : public JsonTransmit
 {
-    LoRa_E220 e220ttl = LoRa_E220(TX_PIN, RX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
+    LoRa_E220 e220ttl = LoRa_E220(TX_PIN, RX_PIN, &Serial2, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
     std::shared_ptr<Timer> timer = Timer::create();
 
     public:

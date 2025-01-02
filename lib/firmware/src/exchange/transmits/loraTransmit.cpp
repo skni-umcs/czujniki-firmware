@@ -3,7 +3,6 @@
 #include <iostream>
 #include <LoRa_E220.h>
 #include "utils/stringUtils.h"
-#include "framing.h"
 
 void printParameters(struct Configuration configuration);
 
@@ -43,13 +42,9 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
 	Serial.println("Hi, I'm going to send message!");
 
-	const int payloadSize = 200;
-	bfs::FrameEncoder<payloadSize> encoder;
-	encoder.Write(reinterpret_cast<const uint8_t*>(&message[0]), sizeof(message));
-
 	// Send message
 	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
-	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, encoder.data(), encoder.size());
+	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Siema świat");
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
     return OperationResult::SUCCESS;
