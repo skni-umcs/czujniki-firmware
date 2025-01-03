@@ -62,10 +62,14 @@ std::string createPacket(std::string message, moduleAddress senderNode, moduleAd
 	
 	uint32_t crc = CRC32.crc32(
 		reinterpret_cast<const uint8_t*>(validatedPart.c_str()), 
-		message.size()
+		validatedPart.size()
 	);
 
-	return PACKET_BORDER+
+	std::stringstream hexStream;
+	hexStream << std::hex << crc;
+	Serial.println(hexStream.str().c_str());
+
+	return PACKET_BORDER+ 
 	validatedPart+
 	toHexString(crc)+
 	PACKET_BORDER;
