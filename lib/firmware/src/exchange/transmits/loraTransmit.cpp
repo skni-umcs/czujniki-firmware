@@ -5,6 +5,7 @@
 #include "utils/stringUtils.h"
 #include <FastCRC.h>
 #include <sstream>
+#include <utils/addressHandler.h>
 
 void printParameters(struct Configuration configuration);
 
@@ -44,28 +45,56 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 FastCRC32 CRC32;
 
 const char PACKET_BORDER = '~';
-const char CRC_START = '^';
+const char MAIN_JSON_BORDER = '^';
+const char NODE_BORDER = '$';
 
-std::string createPacket(std::string message) {
+template<typename T>
+std::string toHexString(T address) {
+	std::stringstream hexStream;
+	hexStream << std::hex << address;
+	return hexStream.str();
+}
+
+std::string createPacket(std::string message, moduleAddress senderNode, moduleAddress destinationNode) {
+	std::string validatedPart = 
+		toHexString(senderNode)+NODE_BORDER+toHexString(destinationNode)+
+		MAIN_JSON_BORDER+message+MAIN_JSON_BORDER;
+	
 	uint32_t crc = CRC32.crc32(
-		reinterpret_cast<const uint8_t*>(message.c_str()), 
+		reinterpret_cast<const uint8_t*>(validatedPart.c_str()), 
 		message.size()
 	);
-	std::stringstream hexStream;
-	hexStream << std::hex << crc;
 
-	return PACKET_BORDER+message+CRC_START+hexStream.str()+PACKET_BORDER;
+	return PACKET_BORDER+
+	validatedPart+
+	toHexString(crc)+
+	PACKET_BORDER;
+}
+
+moduleAddress getDestinationAddress(std::string packet) {
+	int jsonStart = packet.find(MAIN_JSON_BORDER);
+	if (jsonStart == std::string::npos) {
+		Serial.printf("Invalid packet, no message: %s\n", packet);
+		return -1;
+	}
+	int nodeAddressStart = packet.find_last_of(NODE_BORDER);
+	if (nodeAddressStart == std::string::npos) {
+		Serial.printf("Invalid packet, no destination: %s", packet);
+	}
+	int charsBetweenAddressStartAndJSON = jsonStart-nodeAddressStart-1;
+	std::string nodeSubstr = packet.substr(nodeAddressStart, charsBetweenAddressStartAndJSON);
+	return atoi(nodeSubstr.c_str());
 }
 
 std::string getPacketMessage(std::string packet) {
-	int crcStart = packet.find(CRC_START);
-	if (crcStart == -1) {
+	int JSONStart = packet.find(MAIN_JSON_BORDER);
+	int JSONEnd = packet.find_last_of(MAIN_JSON_BORDER);
+	if (JSONStart == std::string::npos || JSONEnd == std::string::npos) {
 		Serial.printf("Invalid packet, no message: %s\n",packet);
 		return "";
 	}
-	int messageStart = 1;
-	int charsBetweenBeginAndCrc = crcStart-1;
-	return packet.substr(messageStart, charsBetweenBeginAndCrc);
+	int JSONChars = JSONEnd-JSONStart-1;
+	return packet.substr(JSONStart, JSONChars);
 }
 
 OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
@@ -73,7 +102,7 @@ OperationResult LoraTransmit::send(std::string message, moduleAddress destinatio
 
 	// Send message
 	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
-	std::string packet = createPacket(message);
+	std::string packet = createPacket(message, AddressHandler::getInstance().get()->readAddress(), destinationNode);
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, packet.c_str());
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
@@ -99,6 +128,8 @@ OperationResult LoraTransmit::poll() {
 				Serial.println(rc.status.getResponseDescription());
 				Serial.println(rc.data);
 
+				Serial.println("dest:");
+				Serial.println(getDestinationAddress(fromWString(rc.data)));
 				receive(getPacketMessage(fromWString(rc.data)));
 		#ifdef ENABLE_RSSI
 				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);

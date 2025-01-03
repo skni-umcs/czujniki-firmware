@@ -22,7 +22,7 @@ class AddressHandler {
         static std::shared_ptr<AddressHandler> getInstance();
         void saveAddress(moduleAddress address);
         moduleAddress readAddress();
-        moduleAddress getUserAddress();
+        moduleAddress getAddressFromUser();
         void initializeAddress();
 };
 

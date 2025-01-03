@@ -24,7 +24,7 @@ moduleAddress AddressHandler::readAddress() {
     return preferences.getUShort(PREFERENCES_ADDRESS_KEY);
 }
 
-moduleAddress AddressHandler::getUserAddress() {
+moduleAddress AddressHandler::getAddressFromUser() {
     String input = "";
     char character;
     while(true) {
@@ -55,7 +55,7 @@ void AddressHandler::initializeAddress() {
             MIN_MODULE_ADDRESS, 
             MAX_MODULE_ADDRESS 
         );
-        moduleAddress newAddress = getUserAddress();
+        moduleAddress newAddress = getAddressFromUser();
         address = newAddress;
         saveAddress(newAddress);
     }
