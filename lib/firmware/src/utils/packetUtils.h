@@ -3,6 +3,20 @@
 
 #include <string>
 #include "storageTypes.h"
+#include <ArduinoJson.h>
+
+enum class MessageType : char {
+    RESET = 'r'
+};
+
+class PacketMessage {
+    MessageType type;
+    std::string message;
+
+    public:
+        PacketMessage(MessageType type, std::string message);
+        std::string getJson();
+};
 
 template<typename T>
 std::string toHexString(T address);

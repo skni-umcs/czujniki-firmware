@@ -2,12 +2,31 @@
 #include <sstream>
 #include <HardwareSerial.h>
 #include "storageTypes.h"
+#include "packetUtils.h"
 
 FastCRC32 CRC32;
 
 const char PACKET_BORDER = '~';
 const char MAIN_JSON_BORDER = '^';
 const char NODE_BORDER = '$';
+
+PacketMessage::PacketMessage(MessageType type, std::string message) {
+    this->type = type;
+    this->message = message;
+}
+
+std::string PacketMessage::getJson() {
+    JsonDocument doc;
+    JsonObject root = doc.to<JsonObject>();
+    std::string serializedJson;
+
+    root["t"] = std::string(1, (char)type);
+    root["m"] = message;
+
+    serializeJson(doc, serializedJson);
+
+    return serializedJson;
+}
 
 template<typename T>
 std::string toHexString(T address) {

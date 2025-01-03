@@ -4,6 +4,7 @@
 #include <rom/rtc.h>
 #include <sstream>
 #include <ArduinoJson.h>
+#include "utils/packetUtils.h"
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto s = new ServiceCommunication();
@@ -16,7 +17,6 @@ void ServiceCommunication::sendResetReason() {
     std::string serializedJson;
 
     std::string reset_reasons[] = {
-        "r",
         std::to_string(rtc_get_reset_reason(0)), 
         std::to_string(rtc_get_reset_reason(1))
     };
@@ -25,5 +25,8 @@ void ServiceCommunication::sendResetReason() {
     }
 
     serializeJson(doc, serializedJson);
-    this->transmit(serializedJson, SERVER_ADDRESS);
+
+    PacketMessage packetMessage = PacketMessage(MessageType::RESET, serializedJson);
+
+    this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
