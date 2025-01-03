@@ -83,7 +83,7 @@ moduleAddress getDestinationAddress(std::string packet) {
 		return -1;
 	}
 	int charsBetweenAddressStartAndJSON = jsonStart-nodeAddressStart-1;
-	std::string nodeSubstr = packet.substr(nodeAddressStart, charsBetweenAddressStartAndJSON);
+	std::string nodeSubstr = packet.substr(nodeAddressStart+1, charsBetweenAddressStartAndJSON);
 	return atoi(nodeSubstr.c_str());
 }
 
@@ -95,7 +95,7 @@ std::string getPacketMessage(std::string packet) {
 		return "";
 	}
 	int JSONChars = JSONEnd-JSONStart-1;
-	return packet.substr(JSONStart, JSONChars);
+	return packet.substr(JSONStart+1, JSONChars);
 }
 
 OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
