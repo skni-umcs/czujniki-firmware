@@ -3,6 +3,8 @@
 #include <iostream>
 #include <LoRa_E220.h>
 #include "utils/stringUtils.h"
+#include <FastCRC.h>
+#include <sstream>
 
 void printParameters(struct Configuration configuration);
 
@@ -39,8 +41,17 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
+FastCRC32 CRC32;
+
 std::string createPacket(std::string message) {
-	return "~"+message+"CRC"+"~";
+	uint32_t crc = CRC32.crc32(
+		reinterpret_cast<const uint8_t*>(message.c_str()), 
+		message.size()
+	);
+	std::stringstream hexStream;
+	hexStream << std::hex << crc;
+
+	return "~"+message+hexStream.str()+"~";
 }
 
 OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
@@ -54,8 +65,6 @@ OperationResult LoraTransmit::send(std::string message, moduleAddress destinatio
 	Serial.println(rs.getResponseDescription());
     return OperationResult::SUCCESS;
 }
-
-
 
 OperationResult LoraTransmit::poll() {
 	if (e220ttl.available()>1) {
