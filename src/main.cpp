@@ -26,12 +26,14 @@ uint32_t delayMS = 1000;
 void setup() {
   Serial.begin(9600);
   delay(1000);
+
   AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = LoraTransmit::create();
   
-  Serial.println("huh?");
   auto serviceCommunication = ServiceCommunication::create();
   serviceCommunication.get()->subscribe(transmit);
+  serviceCommunication.get()->sendResetReason();
+
   SensorFacade facade = SensorFacade(transmit);
   std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
   h->setupSensor(&delayMS);
