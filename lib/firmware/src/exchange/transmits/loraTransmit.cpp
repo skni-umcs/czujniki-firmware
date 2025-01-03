@@ -80,6 +80,7 @@ moduleAddress getDestinationAddress(std::string packet) {
 	int nodeAddressStart = packet.find_last_of(NODE_BORDER);
 	if (nodeAddressStart == std::string::npos) {
 		Serial.printf("Invalid packet, no destination: %s", packet);
+		return -1;
 	}
 	int charsBetweenAddressStartAndJSON = jsonStart-nodeAddressStart-1;
 	std::string nodeSubstr = packet.substr(nodeAddressStart, charsBetweenAddressStartAndJSON);
