@@ -43,6 +43,9 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 
 FastCRC32 CRC32;
 
+const char PACKET_BORDER = '~';
+const char CRC_START = '^';
+
 std::string createPacket(std::string message) {
 	uint32_t crc = CRC32.crc32(
 		reinterpret_cast<const uint8_t*>(message.c_str()), 
@@ -51,7 +54,18 @@ std::string createPacket(std::string message) {
 	std::stringstream hexStream;
 	hexStream << std::hex << crc;
 
-	return "~"+message+hexStream.str()+"~";
+	return PACKET_BORDER+message+CRC_START+hexStream.str()+PACKET_BORDER;
+}
+
+std::string getPacketMessage(std::string packet) {
+	int crcStart = packet.find(CRC_START);
+	if (crcStart == -1) {
+		Serial.printf("Invalid packet, no message: %s\n",packet);
+		return "";
+	}
+	int messageStart = 1;
+	int charsBetweenBeginAndCrc = crcStart-1;
+	return packet.substr(messageStart, charsBetweenBeginAndCrc);
 }
 
 OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
@@ -85,7 +99,7 @@ OperationResult LoraTransmit::poll() {
 				Serial.println(rc.status.getResponseDescription());
 				Serial.println(rc.data);
 
-				receive(fromWString(rc.data));
+				receive(getPacketMessage(fromWString(rc.data)));
 		#ifdef ENABLE_RSSI
 				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
 		#endif
