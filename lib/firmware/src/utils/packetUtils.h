@@ -5,16 +5,20 @@
 #include "storageTypes.h"
 #include <ArduinoJson.h>
 
-enum class MessageType : char {
-    RESET = 'r'
+enum class TransmissionCode : char {
+    RESET = 'r',
+    MESSAGE_TYPE = 't',
+    MESSAGE = 'm'
 };
 
+std::string transmissionCodeFromEnum(TransmissionCode transmissionCode);
+
 class PacketMessage {
-    MessageType type;
+    TransmissionCode type;
     std::string message;
 
     public:
-        PacketMessage(MessageType type, std::string message);
+        PacketMessage(TransmissionCode type, std::string message);
         std::string getJson();
 };
 

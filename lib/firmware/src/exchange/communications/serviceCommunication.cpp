@@ -26,7 +26,7 @@ void ServiceCommunication::sendResetReason() {
 
     serializeJson(doc, serializedJson);
 
-    PacketMessage packetMessage = PacketMessage(MessageType::RESET, serializedJson);
+    PacketMessage packetMessage = PacketMessage(TransmissionCode::RESET, serializedJson);
 
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
