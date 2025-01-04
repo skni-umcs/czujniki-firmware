@@ -43,12 +43,16 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
-OperationResult LoraTransmit::send(std::string message, moduleAddress destinationNode) {
+OperationResult LoraTransmit::send(std::string content, moduleAddress destinationNode) {
 	Serial.println("Hi, I'm going to send message!");
 
 	// Send message
 	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
-	std::string packet = createPacket(message, AddressHandler::getInstance().get()->readAddress(), destinationNode);
+	Message message = Message();
+	message.sender = AddressHandler::getInstance().get()->readAddress();
+	message.destination = destinationNode;
+	message.content = content;
+	std::string packet = createPacket(message);
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, packet.c_str());
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
@@ -70,12 +74,6 @@ OperationResult LoraTransmit::poll() {
 				Serial.println(rc.status.getResponseDescription());
 				return OperationResult::ERROR;
 			}else{
-				// Print the data received
-				Serial.println(rc.status.getResponseDescription());
-				Serial.println(rc.data);
-
-				Serial.println("dest:");
-				Serial.println(getDestinationAddress(fromWString(rc.data)));
 				receive(getPacketMessage(fromWString(rc.data)));
 		#ifdef ENABLE_RSSI
 				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
@@ -85,7 +83,7 @@ OperationResult LoraTransmit::poll() {
 	return OperationResult::SUCCESS;
 }
 
-OperationResult LoraTransmit::receive(std::string message) {
+OperationResult LoraTransmit::receive(Message message) {
 	notifySubscribers(message);
     return OperationResult::SUCCESS;
 }

@@ -11,7 +11,7 @@ class WifiTransmit : public JsonTransmit
 {
     public:
         OperationResult send(std::string message, moduleAddress destinationNode) override;
-        OperationResult receive(std::string message) override;
+        OperationResult receive(Message message) override;
 };
 
 #endif

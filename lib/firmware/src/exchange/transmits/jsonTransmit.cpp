@@ -2,7 +2,7 @@
 #include "jsonTransmit.h"
 #include <iostream>
 
-OperationResult JsonTransmit::notifySubscribers(std::string message) {
+OperationResult JsonTransmit::notifySubscribers(Message message) {
     for(auto subscriber : subscribers) {
         subscriber->getNotified(message);
     }

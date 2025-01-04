@@ -62,26 +62,49 @@ std::string createPacket(Message message) {
 	PACKET_BORDER;
 }
 
-moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
+std::string getNthLastAdressTableElement(std::string packet, unsigned char n) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	if (jsonStart == std::string::npos) {
 		Serial.printf("Invalid packet, no message: %s\n", packet);
-		return INVALID_ADDRESS;
+		return "";
 	}
 	int nodeAddressStart = std::string::npos;
 	for(int i = 0;i<=n;++i) {
-		nodeAddressStart = packet.find_last_of(NODE_BORDER, nodeAddressStart);
+		int indexBeforeCurrentAddress = nodeAddressStart-1;
+		nodeAddressStart = packet.find_last_of(NODE_BORDER, indexBeforeCurrentAddress);
 	}
 	if (nodeAddressStart == std::string::npos) {
 		Serial.printf("Invalid packet, no destination: %s", packet);
-		return INVALID_ADDRESS;
+		return "";
 	}
 	int charsBetweenAddressStartAndJSON = jsonStart-nodeAddressStart-1;
 	std::string nodeSubstr = packet.substr(nodeAddressStart+1, charsBetweenAddressStartAndJSON);
-	return atoi(nodeSubstr.c_str());
+	return nodeSubstr.c_str();
 }
 
-std::string getPacketMessage(std::string packet) {
+moduleAddress stringToAddress(std::string string) {
+	if (string.empty()) {
+		return INVALID_ADDRESS;
+	}
+	else {
+		return atoi(string.c_str());
+	}
+}
+
+moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
+	unsigned char startAddresses[] = {0,1};
+	if (std::find(std::begin(startAddresses), std::end(startAddresses), n)) {
+		return stringToAddress(getNthLastAdressTableElement(packet, n));
+	}
+	else {
+		unsigned char firstMapped = 3;
+		unsigned char jump = (n-2)*2;
+		unsigned char mappedPosition = firstMapped+jump;
+		return stringToAddress(getNthLastAdressTableElement(packet, mappedPosition));
+	}
+}
+
+std::string getPacketContent(std::string packet) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
 	if (jsonStart == std::string::npos || jsonEnd == std::string::npos) {
@@ -92,9 +115,10 @@ std::string getPacketMessage(std::string packet) {
 	return packet.substr(jsonStart+1, jsonChars);
 }
 
-Message getMessage(std::string packet) {
+Message getPacketMessage(std::string packet) {
 	Message result = Message();
 	result.destination = getNthLastAddress(packet, DESTINATION_INDEX);
 	result.sender = getNthLastAddress(packet, SENDER_INDEX);
-	result.content = getPacketMessage(packet);
+	result.content = getPacketContent(packet);
+	return result;
 }

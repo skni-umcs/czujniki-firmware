@@ -13,8 +13,8 @@ class JsonTransmit : public Transmit
 
     public:
         virtual OperationResult send(std::string message, moduleAddress destinationNode) = 0;
-        virtual OperationResult receive(std::string message) = 0;
-        OperationResult notifySubscribers(std::string message) override;
+        virtual OperationResult receive(Message message) = 0;
+        OperationResult notifySubscribers(Message message) override;
         OperationResult addSubscriber(std::shared_ptr<Communication> communication) override;
 };
 

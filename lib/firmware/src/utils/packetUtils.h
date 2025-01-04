@@ -23,8 +23,8 @@ class PacketMessage {
 template<typename T>
 std::string toHexString(T address);
 std::string transmissionCodeFromEnum(TransmissionCode transmissionCode);
-std::string createPacket(std::string message, moduleAddress senderNode, moduleAddress destinationNode);
+std::string createPacket(Message message);
 moduleAddress getDestinationAddress(std::string packet);
-std::string getPacketMessage(std::string packet);
+Message getPacketMessage(std::string packet);
 
 #endif

@@ -7,6 +7,6 @@ OperationResult WifiTransmit::send(std::string message, moduleAddress destinatio
     return OperationResult::SUCCESS;
 }
 
-OperationResult WifiTransmit::receive(std::string message) {
+OperationResult WifiTransmit::receive(Message message) {
     return OperationResult::SUCCESS;
 }
