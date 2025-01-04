@@ -49,6 +49,8 @@ void nth_last_address_table_element_check() {
     }
 }
 
+// TODO: Integrity check tests
+
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(create_packet_from_message);
