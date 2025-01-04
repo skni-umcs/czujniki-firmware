@@ -3,6 +3,7 @@
 #include <HardwareSerial.h>
 #include "storageTypes.h"
 #include "packetUtils.h"
+#include <set>
 
 FastCRC32 CRC32;
 
@@ -95,8 +96,8 @@ moduleAddress stringToAddress(std::string string) {
 }
 
 moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
-	unsigned char startAddresses[] = {0,1};
-	if (std::find(std::begin(startAddresses), std::end(startAddresses), n)) {
+	std::set<unsigned char> startAddresses{0,1};
+	if (startAddresses.find(n) != startAddresses.end()) {
 		return stringToAddress(getNthLastAdressTableElement(packet, n));
 	}
 	else {

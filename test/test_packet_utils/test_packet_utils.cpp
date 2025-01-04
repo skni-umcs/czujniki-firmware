@@ -34,11 +34,9 @@ void nth_last_address_check() {
     const int num_elements = 4;
     std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
     moduleAddress expectedAddresses[] = {1, 55, 33, 155};
-    moduleAddress out[] = {0,0,0,0};
     for(int i = 0;i<num_elements;++i) {
-        out[i] = getNthLastAddress(packet, i);
+        TEST_ASSERT_EQUAL(expectedAddresses[i], getNthLastAddress(packet, i));
     }
-   TEST_ASSERT_EQUAL_INT_ARRAY(expectedAddresses, out, num_elements);
 }
 
 void nth_last_address_table_element_check() {
