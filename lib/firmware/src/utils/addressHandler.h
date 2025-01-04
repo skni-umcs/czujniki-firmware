@@ -5,7 +5,7 @@
 #include <memory>
 #include <exchange/communications/sensorCommunication.h>
 #include "time/timer.h"
-#include "storageTypes.h"
+#include "types/loraTypes.h"
 #include <limits>
 #include <memory>
 

@@ -4,7 +4,7 @@
 #include <string>
 #include <exchange/communications/communication.h>
 #include "exchange/transmits/jsonTransmit.h"
-#include "utils/storageTypes.h"
+#include "types/loraTypes.h"
 
 class TestTransmit : public JsonTransmit
 {

@@ -7,7 +7,7 @@
 #include "jsonTransmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"
-#include "utils/storageTypes.h"
+#include "types/loraTypes.h"
 
 const int TX_PIN = 17;
 const int RX_PIN = 16;

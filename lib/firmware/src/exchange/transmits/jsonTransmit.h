@@ -5,7 +5,7 @@
 #include <vector>
 #include <exchange/communications/communication.h>
 #include "transmit.h"
-#include "utils/storageTypes.h"
+#include "types/loraTypes.h"
 
 class JsonTransmit : public Transmit
 {

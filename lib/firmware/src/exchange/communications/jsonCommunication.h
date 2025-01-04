@@ -5,7 +5,7 @@
 #include <exchange/transmits/jsonTransmit.h>
 #include "communication.h"
 #include <memory>
-#include "utils/storageTypes.h"
+#include "types/loraTypes.h"
 
 class JsonCommunication : public Communication {
     
@@ -13,8 +13,8 @@ class JsonCommunication : public Communication {
         std::vector<std::shared_ptr<JsonTransmit>> transmitTo;
     public:
         static std::shared_ptr<JsonCommunication> create();
-        OperationResult getNotified(std::string message) override;
-        OperationResult transmit(std::string message, moduleAddress destinationNode) override;
+        OperationResult getNotified(Message message) override;
+        OperationResult transmit(Message message) override;
         OperationResult subscribe(std::shared_ptr<JsonTransmit> transmit);
         OperationResult unsubscribe(std::shared_ptr<JsonTransmit> transmit);
         const std::vector<std::shared_ptr<JsonTransmit>>& getTransmitTo();

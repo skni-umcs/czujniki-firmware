@@ -5,7 +5,7 @@
 #include <exchange/communications/communication.h>
 #include "transmit.h"
 #include "jsonTransmit.h"
-#include "utils/storageTypes.h"
+#include "types/loraTypes.h"
 
 class WifiTransmit : public JsonTransmit
 {

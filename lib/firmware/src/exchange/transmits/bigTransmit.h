@@ -4,7 +4,7 @@
 #include <string>
 #include <exchange/communications/communication.h>
 #include "transmit.h"
-#include "utils/storageTypes.h"
+#include "types/loraTypes.h"
 
 class BigTransmit : public Transmit
 {

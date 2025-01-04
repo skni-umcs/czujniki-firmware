@@ -1,7 +1,7 @@
 #include <FastCRC.h>
 #include <sstream>
 #include <HardwareSerial.h>
-#include "storageTypes.h"
+#include "types/loraTypes.h"
 #include "packetUtils.h"
 
 FastCRC32 CRC32;
