@@ -1,6 +1,8 @@
 #ifndef STORAGETYPES_H
 #define STORAGETYPES_H
 
+#include <string>
+
 #define INVALID_ADDRESS -1
 
 typedef unsigned short moduleAddress;

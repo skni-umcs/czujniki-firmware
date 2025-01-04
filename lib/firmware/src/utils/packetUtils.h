@@ -25,6 +25,8 @@ std::string toHexString(T address);
 std::string transmissionCodeFromEnum(TransmissionCode transmissionCode);
 std::string createPacket(Message message);
 moduleAddress getDestinationAddress(std::string packet);
+std::string getNthLastAdressTableElement(std::string packet, unsigned char n);
+moduleAddress getNthLastAddress(std::string packet, unsigned char n);
 Message getPacketMessage(std::string packet);
 
 #endif

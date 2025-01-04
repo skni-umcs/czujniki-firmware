@@ -68,8 +68,9 @@ std::string getNthLastAdressTableElement(std::string packet, unsigned char n) {
 		Serial.printf("Invalid packet, no message: %s\n", packet);
 		return "";
 	}
-	int nodeAddressStart = std::string::npos;
+	int nodeAddressStart = jsonStart;
 	for(int i = 0;i<=n;++i) {
+		jsonStart = nodeAddressStart;
 		int indexBeforeCurrentAddress = nodeAddressStart-1;
 		nodeAddressStart = packet.find_last_of(NODE_BORDER, indexBeforeCurrentAddress);
 	}
@@ -87,7 +88,9 @@ moduleAddress stringToAddress(std::string string) {
 		return INVALID_ADDRESS;
 	}
 	else {
-		return atoi(string.c_str());
+		int hexadecimalBase = 16;
+		auto trackInvalidPosition = nullptr;
+		return stoi(string, trackInvalidPosition, hexadecimalBase);
 	}
 }
 
