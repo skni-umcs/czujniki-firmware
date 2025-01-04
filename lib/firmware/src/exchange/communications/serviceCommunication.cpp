@@ -16,9 +16,9 @@ void ServiceCommunication::sendResetReason() {
     JsonArray messages = doc.to<JsonArray>();
     std::string serializedJson;
 
-    std::string reset_reasons[] = {
-        std::to_string(rtc_get_reset_reason(0)), 
-        std::to_string(rtc_get_reset_reason(1))
+    int reset_reasons[] = {
+        rtc_get_reset_reason(0), 
+        rtc_get_reset_reason(1)
     };
     for (const auto& reason : reset_reasons) {
         messages.add(reason);
