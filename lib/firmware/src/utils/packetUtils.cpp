@@ -10,6 +10,9 @@ const char PACKET_BORDER = '~';
 const char MAIN_JSON_BORDER = '^';
 const char NODE_BORDER = '$';
 
+const unsigned char DESTINATION_INDEX = 0;
+const unsigned char SENDER_INDEX = 1;
+
 PacketMessage::PacketMessage(TransmissionCode type, std::string message) {
     this->type = type;
     this->message = message;
@@ -39,10 +42,10 @@ std::string toHexString(T address) {
 	return hexStream.str();
 }
 
-std::string createPacket(std::string message, moduleAddress senderNode, moduleAddress destinationNode) {
+std::string createPacket(Message message) {
 	std::string validatedPart = 
-		toHexString(senderNode)+NODE_BORDER+toHexString(destinationNode)+
-		MAIN_JSON_BORDER+message+MAIN_JSON_BORDER;
+		toHexString(message.sender)+NODE_BORDER+toHexString(message.destination)+
+		MAIN_JSON_BORDER+message.content+MAIN_JSON_BORDER;
 	
 	uint32_t crc = CRC32.crc32(
 		reinterpret_cast<const uint8_t*>(validatedPart.c_str()), 
@@ -59,13 +62,16 @@ std::string createPacket(std::string message, moduleAddress senderNode, moduleAd
 	PACKET_BORDER;
 }
 
-moduleAddress getDestinationAddress(std::string packet) {
+moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	if (jsonStart == std::string::npos) {
 		Serial.printf("Invalid packet, no message: %s\n", packet);
 		return INVALID_ADDRESS;
 	}
-	int nodeAddressStart = packet.find_last_of(NODE_BORDER);
+	int nodeAddressStart = std::string::npos;
+	for(int i = 0;i<=n;++i) {
+		nodeAddressStart = packet.find_last_of(NODE_BORDER, nodeAddressStart);
+	}
 	if (nodeAddressStart == std::string::npos) {
 		Serial.printf("Invalid packet, no destination: %s", packet);
 		return INVALID_ADDRESS;
@@ -84,4 +90,11 @@ std::string getPacketMessage(std::string packet) {
 	}
 	int jsonChars = jsonEnd-jsonStart-1;
 	return packet.substr(jsonStart+1, jsonChars);
+}
+
+Message getMessage(std::string packet) {
+	Message result = Message();
+	result.destination = getNthLastAddress(packet, DESTINATION_INDEX);
+	result.sender = getNthLastAddress(packet, SENDER_INDEX);
+	result.content = getPacketMessage(packet);
 }
