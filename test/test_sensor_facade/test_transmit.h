@@ -10,7 +10,7 @@ class TestTransmit : public JsonTransmit
 {
     public:
         OperationResult send(std::string message, moduleAddress moduleAddress) override;
-        OperationResult receive(std::string message) override;
+        OperationResult receive(Message message) override;
 };
 
 #endif

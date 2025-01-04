@@ -7,6 +7,6 @@ OperationResult TestTransmit::send(std::string message, moduleAddress moduleAddr
     return OperationResult::SUCCESS;
 }
 
-OperationResult TestTransmit::receive(std::string message) {
+OperationResult TestTransmit::receive(Message message) {
     return OperationResult::SUCCESS;
 }
