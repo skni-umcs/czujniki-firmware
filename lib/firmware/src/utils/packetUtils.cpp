@@ -76,12 +76,12 @@ moduleAddress getDestinationAddress(std::string packet) {
 }
 
 std::string getPacketMessage(std::string packet) {
-	int JSONStart = packet.find(MAIN_JSON_BORDER);
-	int JSONEnd = packet.find_last_of(MAIN_JSON_BORDER);
-	if (JSONStart == std::string::npos || JSONEnd == std::string::npos) {
+	int jsonStart = packet.find(MAIN_JSON_BORDER);
+	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
+	if (jsonStart == std::string::npos || jsonEnd == std::string::npos) {
 		Serial.printf("Invalid packet, no message: %s\n",packet);
 		return "";
 	}
-	int JSONChars = JSONEnd-JSONStart-1;
-	return packet.substr(JSONStart+1, JSONChars);
+	int jsonChars = jsonEnd-jsonStart-1;
+	return packet.substr(jsonStart+1, jsonChars);
 }
