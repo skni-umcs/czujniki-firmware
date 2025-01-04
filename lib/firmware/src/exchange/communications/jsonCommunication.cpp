@@ -9,12 +9,12 @@ std::shared_ptr<JsonCommunication> JsonCommunication::create() {
     return std::shared_ptr<JsonCommunication>{new JsonCommunication()};
 }
 
-OperationResult JsonCommunication::getNotified(Message message) {
+OperationResult JsonCommunication::getNotified(std::string message) {
     Serial.printf("im notified of %s\n", message.c_str());
     return OperationResult::SUCCESS;
 }
 
-OperationResult JsonCommunication::transmit(Message message) {
+OperationResult JsonCommunication::transmit(std::string message, moduleAddress destinationNode) {
     Serial.printf("generic transmitting message: %s\n", message.c_str());
     for(auto const& destination : transmitTo) {
         destination->send(message, destinationNode);

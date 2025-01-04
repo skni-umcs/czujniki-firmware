@@ -2,7 +2,7 @@
 #define PACKETUTILS_H
 
 #include <string>
-#include "types/loraTypes.h"
+#include "storageTypes.h"
 #include <ArduinoJson.h>
 
 enum class TransmissionCode : char {
