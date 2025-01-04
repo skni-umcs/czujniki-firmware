@@ -44,7 +44,7 @@ std::string toHexString(T address) {
 
 std::string createPacket(Message message) {
 	std::string validatedPart = 
-		toHexString(message.sender)+NODE_BORDER+toHexString(message.destination)+
+		NODE_BORDER+toHexString(message.sender)+NODE_BORDER+toHexString(message.destination)+
 		MAIN_JSON_BORDER+message.content+MAIN_JSON_BORDER;
 	
 	uint32_t crc = CRC32.crc32(
@@ -116,6 +116,7 @@ std::string getPacketContent(std::string packet) {
 }
 
 Message getPacketMessage(std::string packet) {
+	Serial.printf("getting message from: %s\n", packet.c_str());
 	Message result = Message();
 	result.destination = getNthLastAddress(packet, DESTINATION_INDEX);
 	result.sender = getNthLastAddress(packet, SENDER_INDEX);
