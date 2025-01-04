@@ -40,11 +40,13 @@ void nth_last_address_check() {
 }
 
 void nth_last_address_table_element_check() {
+    const int num_elements = 6;
     std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
-    std::string out = getNthLastAdressTableElement(packet, 4);
-    std::string expected = "RSSI21";
+    std::string expected[] = {"1", "37", "RSSI37", "21", "RSSI21", "9B"};
 
-    TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
+    for(int i = 0;i<num_elements;++i) {
+        TEST_ASSERT_EQUAL_STRING(expected[i].c_str(), getNthLastAdressTableElement(packet, i).c_str());
+    }
 }
 
 void setup() {
