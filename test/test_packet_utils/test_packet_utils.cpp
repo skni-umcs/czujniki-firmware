@@ -39,6 +39,53 @@ void nth_last_address_check() {
     }
 }
 
+void incorrect_nth_last_address() {
+    const int num_elements = 4;
+    std::string packet = "~$RSSI0$RSSI21$21$RSSI37$37$1^test^40672562~";
+    moduleAddress address = getNthLastAddress(packet, 3);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, address);
+}
+
+void something_that_isnt_even_packet() {
+    std::string packet = "~s$ema test ~_~";
+    Message message = getPacketMessage(packet);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.sender);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.destination);
+    TEST_ASSERT_EQUAL_STRING("", message.content.c_str());
+
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
+void only_crc() {
+    std::string packet = "^~";
+    Message message = getPacketMessage(packet);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.sender);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.destination);
+    TEST_ASSERT_EQUAL_STRING("", message.content.c_str());
+
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
+void random_corruption() {
+    std::string packet = "~$9Be&!*&$%!JSAFT@!%!&#HFA(T#@QUNst^40672562~";
+    Message message = getPacketMessage(packet);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.sender);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.destination);
+    TEST_ASSERT_EQUAL_STRING("", message.content.c_str());
+
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
+void random_corruption_but_crc_is_correct() {
+    std::string packet = "~$9Be&!*&$%!JSAFT@!%!&#HFA(T#@QUNst^0dab27ed~";
+    Message message = getPacketMessage(packet);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.sender);
+    TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.destination);
+    TEST_ASSERT_EQUAL_STRING("", message.content.c_str());
+
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
 void nth_last_address_table_element_check() {
     const int num_elements = 6;
     std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
@@ -81,10 +128,21 @@ void packet_correct() {
     TEST_ASSERT_FALSE(isPacketCorrect(inside));
 }
 
+void also_accept_hops() {
+    std::string packet = "~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~";
+    TEST_ASSERT_TRUE(isPacketCorrect(packet));
+}
+
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(create_packet_from_message);
     RUN_TEST(decode_message_from_packet);
+    RUN_TEST(something_that_isnt_even_packet);
+    RUN_TEST(only_crc);
+    RUN_TEST(random_corruption);
+    RUN_TEST(random_corruption_but_crc_is_correct);
+    RUN_TEST(also_accept_hops);
+    RUN_TEST(incorrect_nth_last_address);
     RUN_TEST(nth_last_address_check);
     RUN_TEST(nth_last_address_table_element_check);
     RUN_TEST(get_validated_part_correct);

@@ -5,7 +5,7 @@
 
 #define INVALID_ADDRESS -1
 
-typedef unsigned short moduleAddress;
+typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;
 
 struct Message {

@@ -4,6 +4,8 @@
 #include "storageTypes.h"
 #include "packetUtils.h"
 #include <set>
+#include <iostream>
+#include <regex>
 
 FastCRC32 CRC32;
 
@@ -93,9 +95,15 @@ moduleAddress stringToAddress(std::string string) {
 		return INVALID_ADDRESS;
 	}
 	else {
-		int hexadecimalBase = 16;
-		auto trackInvalidPosition = nullptr;
-		return stoi(string, trackInvalidPosition, hexadecimalBase);
+        int hexadecimalBase = 16;
+        char* invalidPosition = 0;
+       	moduleAddress address = INVALID_ADDRESS;
+        address = strtol(string.c_str(), &invalidPosition, hexadecimalBase);
+        std::cout << invalidPosition << std::endl << string;
+        if (*invalidPosition != '\0') {
+            return INVALID_ADDRESS;
+        }
+        return address;
 	}
 }
 
@@ -114,17 +122,17 @@ std::string getValidatedPart(std::string packet) {
 	int partLength = rightBorder-leftBorder;
 	return packet.substr(partStart, partLength);
 }
-
+const uint32_t INVALID_CRC = -1;
 uint32_t getPacketCrc(std::string packet) {
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
 	if (jsonEnd == std::string::npos) {
 		Serial.printf("Invalid packet, no crc %s\n", packet.c_str());
-		return 0;
+		return INVALID_CRC;
 	}
 	int packetEnd = packet.find_last_of(PACKET_BORDER);
 	if (packetEnd == std::string::npos) {
 		Serial.printf("Invalid packet, no end border %s\n", packet.c_str());
-		return 0;
+		return INVALID_CRC;
 	}
 	int crcStart = jsonEnd+1;
 	int crcLength = packetEnd-jsonEnd-1;
@@ -150,7 +158,7 @@ moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
 std::string getPacketContent(std::string packet) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
-	if (jsonStart == std::string::npos || jsonEnd == std::string::npos) {
+	if (jsonStart == std::string::npos || jsonEnd == std::string::npos || jsonEnd <= jsonStart) {
 		Serial.printf("Invalid packet, no message: %s\n",packet.c_str());
 		return "";
 	}
@@ -168,10 +176,11 @@ Message getPacketMessage(std::string packet) {
 }
 
 bool isCrcCorrect(std::string packet) {
-	Message message = getPacketMessage(packet);
-
 	uint32_t oldCrc = getPacketCrc(packet);
 	uint32_t newCrc = getCrc(getValidatedPart(packet));
+
+	std::cout << "validated part " << getValidatedPart(packet) << std::endl;
+	std::cout << "crc comp " << oldCrc << " " << newCrc << " it is " << (oldCrc == newCrc) << std::endl;
 
 	return oldCrc == newCrc;
 }
@@ -180,6 +189,15 @@ bool isBorderCorrect(std::string packet) {
 	return packet.find(PACKET_BORDER) == 0 && packet.find_last_of(PACKET_BORDER) == packet.size()-1;
 }
 
+bool isRegexCorrect(std::string packet) {
+	std::string validatedPart = "(\\$[^\\$]*)*";
+	std::string jsonPart = "\\^.*\\^";
+	std::string crcPart = ".*";
+	std::regex re(PACKET_BORDER+validatedPart+jsonPart+crcPart+PACKET_BORDER);
+	std::smatch foundValue;
+	return std::regex_match(packet, foundValue, re);
+}
+
 bool isPacketCorrect(std::string packet) {
-	return isBorderCorrect(packet) && isCrcCorrect(packet);
+	return isRegexCorrect(packet) && isCrcCorrect(packet);
 }
