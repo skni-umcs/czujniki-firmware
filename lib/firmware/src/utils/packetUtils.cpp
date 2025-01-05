@@ -167,11 +167,20 @@ Message getPacketMessage(std::string packet) {
 	return result;
 }
 
-bool isPacketCorrect(std::string packet) {
+
+bool isCrcCorrect(std::string packet) {
 	Message message = getPacketMessage(packet);
 
 	uint32_t oldCrc = getPacketCrc(packet);
 	uint32_t newCrc = getCrc(getValidatedPart(packet));
 
 	return oldCrc == newCrc;
+}
+
+bool isBorderCorrect(std::string packet) {
+	return packet.find(PACKET_BORDER) == 0 && packet.find_last_of(PACKET_BORDER) == packet.size()-1;
+}
+
+bool isPacketCorrect(std::string packet) {
+	return isBorderCorrect(packet) && isCrcCorrect(packet);
 }

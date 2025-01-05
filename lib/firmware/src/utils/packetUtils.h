@@ -29,6 +29,7 @@ std::string getNthLastAdressTableElement(std::string packet, unsigned char n);
 moduleAddress getNthLastAddress(std::string packet, unsigned char n);
 Message getPacketMessage(std::string packet);
 std::string getValidatedPart(std::string packet);
+bool isCrcCorrect(std::string packet);
 bool isPacketCorrect(std::string packet);
 
 #endif

@@ -57,19 +57,29 @@ void get_validated_part_correct() {
     TEST_ASSERT_EQUAL_STRING(expectedValidatedPart.c_str(), validatedPart.c_str());
 }
 
-void packet_correct() {
+void crc_correct() {
     std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^79c08850~";
-    TEST_ASSERT_TRUE(isPacketCorrect(packet));
+    TEST_ASSERT_TRUE(isCrcCorrect(packet));
 
     std::string brokenAdress = "~$9B$RSSI21$22$RSSI37$37$1^test^79c08850~";
     std::string brokenMessage = "~$9B$RSSI21$21$RSSI37$37$1^trol^79c08850~";
     std::string brokenCRC = "~$9B$RSSI21$21$RSSI37$37$1^test^69c08850~";
-    TEST_ASSERT_FALSE(isPacketCorrect(brokenAdress));
-    TEST_ASSERT_FALSE(isPacketCorrect(brokenMessage));
-    TEST_ASSERT_FALSE(isPacketCorrect(brokenCRC));
+    TEST_ASSERT_FALSE(isCrcCorrect(brokenAdress));
+    TEST_ASSERT_FALSE(isCrcCorrect(brokenMessage));
+    TEST_ASSERT_FALSE(isCrcCorrect(brokenCRC));
 }
 
-// TODO: Integrity check tests
+void packet_correct() {
+    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^79c08850~";
+    TEST_ASSERT_TRUE(isPacketCorrect(packet));
+
+    std::string leftBorder = "/$9B$RSSI21$21$RSSI37$37$1^test^79c08850~";
+    std::string rightBorder = "~$9B$RSSI21$21$RSSI37$37$1^test^79c0885~0";
+    std::string inside = "~$9B$RSSI21$21$RSSI37$37$1@test^79c08850~";
+    TEST_ASSERT_FALSE(isPacketCorrect(leftBorder));
+    TEST_ASSERT_FALSE(isPacketCorrect(rightBorder));
+    TEST_ASSERT_FALSE(isPacketCorrect(inside));
+}
 
 void setup() {
     UNITY_BEGIN();
@@ -78,6 +88,7 @@ void setup() {
     RUN_TEST(nth_last_address_check);
     RUN_TEST(nth_last_address_table_element_check);
     RUN_TEST(get_validated_part_correct);
+    RUN_TEST(crc_correct);
     RUN_TEST(packet_correct);
     UNITY_END();
 }
