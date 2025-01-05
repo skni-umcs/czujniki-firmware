@@ -190,10 +190,14 @@ bool isBorderCorrect(std::string packet) {
 }
 
 bool isRegexCorrect(std::string packet) {
-	std::string validatedPart = "(\\$[^\\$]*)*";
-	std::string jsonPart = "\\^.*\\^";
+	std::stringstream validatedPart;
+	validatedPart << "(\\" << NODE_BORDER << "[^\\" << NODE_BORDER << "]*)*";
+	std::stringstream jsonPart;
+	jsonPart << "\\" << MAIN_JSON_BORDER << ".*\\" << MAIN_JSON_BORDER;
 	std::string crcPart = ".*";
-	std::regex re(PACKET_BORDER+validatedPart+jsonPart+crcPart+PACKET_BORDER);
+
+	std::string pattern = PACKET_BORDER+validatedPart.str()+jsonPart.str()+crcPart+PACKET_BORDER;
+	std::regex re(pattern);
 	std::smatch foundValue;
 	return std::regex_match(packet, foundValue, re);
 }
