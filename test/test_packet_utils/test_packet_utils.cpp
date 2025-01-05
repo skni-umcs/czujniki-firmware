@@ -49,6 +49,26 @@ void nth_last_address_table_element_check() {
     }
 }
 
+void get_validated_part_correct() {
+    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^79c08850~";
+    std::string validatedPart = getValidatedPart(packet);
+    std::string expectedValidatedPart = "$9B$RSSI21$21$RSSI37$37$1^test^";
+
+    TEST_ASSERT_EQUAL_STRING(expectedValidatedPart.c_str(), validatedPart.c_str());
+}
+
+void packet_correct() {
+    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^79c08850~";
+    TEST_ASSERT_TRUE(isPacketCorrect(packet));
+
+    std::string brokenAdress = "~$9B$RSSI21$22$RSSI37$37$1^test^79c08850~";
+    std::string brokenMessage = "~$9B$RSSI21$21$RSSI37$37$1^trol^79c08850~";
+    std::string brokenCRC = "~$9B$RSSI21$21$RSSI37$37$1^test^69c08850~";
+    TEST_ASSERT_FALSE(isPacketCorrect(brokenAdress));
+    TEST_ASSERT_FALSE(isPacketCorrect(brokenMessage));
+    TEST_ASSERT_FALSE(isPacketCorrect(brokenCRC));
+}
+
 // TODO: Integrity check tests
 
 void setup() {
@@ -57,6 +77,8 @@ void setup() {
     RUN_TEST(decode_message_from_packet);
     RUN_TEST(nth_last_address_check);
     RUN_TEST(nth_last_address_table_element_check);
+    RUN_TEST(get_validated_part_correct);
+    RUN_TEST(packet_correct);
     UNITY_END();
 }
 

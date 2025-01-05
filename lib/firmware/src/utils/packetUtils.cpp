@@ -43,15 +43,19 @@ std::string toHexString(T address) {
 	return hexStream.str();
 }
 
+uint32_t getCrc(std::string string) {
+	return CRC32.crc32(
+		reinterpret_cast<const uint8_t*>(string.c_str()), 
+		string.size()
+	);
+}
+
 std::string createPacket(Message message) {
 	std::string validatedPart = 
 		NODE_BORDER+toHexString(message.sender)+NODE_BORDER+toHexString(message.destination)+
 		MAIN_JSON_BORDER+message.content+MAIN_JSON_BORDER;
 	
-	uint32_t crc = CRC32.crc32(
-		reinterpret_cast<const uint8_t*>(validatedPart.c_str()), 
-		validatedPart.size()
-	);
+	uint32_t crc = getCrc(validatedPart);
 
 	std::stringstream hexStream;
 	hexStream << std::hex << crc;
@@ -66,7 +70,7 @@ std::string createPacket(Message message) {
 std::string getNthLastAdressTableElement(std::string packet, unsigned char n) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	if (jsonStart == std::string::npos) {
-		Serial.printf("Invalid packet, no message: %s\n", packet);
+		Serial.printf("Invalid packet, no message: %s\n", packet.c_str());
 		return "";
 	}
 	int nodeAddressStart = jsonStart;
@@ -76,7 +80,7 @@ std::string getNthLastAdressTableElement(std::string packet, unsigned char n) {
 		nodeAddressStart = packet.find_last_of(NODE_BORDER, indexBeforeCurrentAddress);
 	}
 	if (nodeAddressStart == std::string::npos) {
-		Serial.printf("Invalid packet, no destination: %s", packet);
+		Serial.printf("Invalid packet, no destination: %s", packet.c_str());
 		return "";
 	}
 	int charsBetweenAddressStartAndJSON = jsonStart-nodeAddressStart-1;
@@ -93,6 +97,41 @@ moduleAddress stringToAddress(std::string string) {
 		auto trackInvalidPosition = nullptr;
 		return stoi(string, trackInvalidPosition, hexadecimalBase);
 	}
+}
+
+std::string getValidatedPart(std::string packet) {
+	int leftBorder = packet.find(PACKET_BORDER);
+	if (leftBorder == std::string::npos) {
+		Serial.printf("Invalid packet, no left border %s\n", packet.c_str());
+		return "";
+	}
+	int rightBorder = packet.find_last_of(MAIN_JSON_BORDER);
+	if (rightBorder == std::string::npos) {
+		Serial.printf("Invalid packet, no JSON borders %s\n", packet.c_str());
+		return "";
+	}
+	int partStart = leftBorder+1;
+	int partLength = rightBorder-leftBorder;
+	return packet.substr(partStart, partLength);
+}
+
+uint32_t getPacketCrc(std::string packet) {
+	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
+	if (jsonEnd == std::string::npos) {
+		Serial.printf("Invalid packet, no crc %s\n", packet.c_str());
+		return 0;
+	}
+	int packetEnd = packet.find_last_of(PACKET_BORDER);
+	if (packetEnd == std::string::npos) {
+		Serial.printf("Invalid packet, no end border %s\n", packet.c_str());
+		return 0;
+	}
+	int crcStart = jsonEnd+1;
+	int crcLength = packetEnd-jsonEnd-1;
+	std::string crcSubstring = packet.substr(crcStart, crcLength);
+	auto errorDestination = nullptr;
+	int hexadecimalBase = 16;
+	return stoi(crcSubstring, errorDestination, hexadecimalBase);
 }
 
 moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
@@ -112,7 +151,7 @@ std::string getPacketContent(std::string packet) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
 	if (jsonStart == std::string::npos || jsonEnd == std::string::npos) {
-		Serial.printf("Invalid packet, no message: %s\n",packet);
+		Serial.printf("Invalid packet, no message: %s\n",packet.c_str());
 		return "";
 	}
 	int jsonChars = jsonEnd-jsonStart-1;
@@ -126,4 +165,13 @@ Message getPacketMessage(std::string packet) {
 	result.sender = getNthLastAddress(packet, SENDER_INDEX);
 	result.content = getPacketContent(packet);
 	return result;
+}
+
+bool isPacketCorrect(std::string packet) {
+	Message message = getPacketMessage(packet);
+
+	uint32_t oldCrc = getPacketCrc(packet);
+	uint32_t newCrc = getCrc(getValidatedPart(packet));
+
+	return oldCrc == newCrc;
 }
