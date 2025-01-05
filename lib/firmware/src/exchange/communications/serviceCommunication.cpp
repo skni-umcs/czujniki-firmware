@@ -23,12 +23,8 @@ void ServiceCommunication::sendResetReason() {
     for (const auto& reason : reset_reasons) {
         messages.add(reason);
     }
-
     serializeJson(doc, serializedJson);
-
     PacketMessage packetMessage = PacketMessage(TransmissionCode::RESET, serializedJson);
-
-
 
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }

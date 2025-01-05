@@ -167,7 +167,6 @@ Message getPacketMessage(std::string packet) {
 	return result;
 }
 
-
 bool isCrcCorrect(std::string packet) {
 	Message message = getPacketMessage(packet);
 
