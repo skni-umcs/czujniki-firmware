@@ -5,6 +5,9 @@
 #include <vector>
 
 #define INVALID_ADDRESS -1
+#define INVALID_CRC -1;
+#define INVALID_STRING "";
+#define INVALID_SENDERS {};
 
 typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;

@@ -35,14 +35,14 @@ void nth_last_address_check() {
     std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
     moduleAddress expectedAddresses[] = {1, 55, 33, 155};
     for(int i = 0;i<num_elements;++i) {
-        TEST_ASSERT_EQUAL(expectedAddresses[i], getNthLastAddress(getAllAddressTableElements(packet), i));
+        TEST_ASSERT_EQUAL(expectedAddresses[i], nthLastAddress(allAddressTableElements(packet), i));
     }
 }
 
 void incorrect_nth_last_address() {
     const int num_elements = 4;
     std::string packet = "~$RSSI0$RSSI21$21$RSSI37$37$1^test^40672562~";
-    moduleAddress address = getNthLastAddress(getAllAddressTableElements(packet), 3);
+    moduleAddress address = nthLastAddress(allAddressTableElements(packet), 3);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, address);
 }
 
@@ -92,7 +92,7 @@ void nth_last_address_table_element_check() {
     std::string expected[] = {"1", "37", "RSSI37", "21", "RSSI21", "9B"};
 
     for(int i = 0;i<num_elements;++i) {
-        TEST_ASSERT_EQUAL_STRING(expected[i].c_str(), getNthLastAddressTableElement(getAllAddressTableElements(packet), i).c_str());
+        TEST_ASSERT_EQUAL_STRING(expected[i].c_str(), nthLastAddressTableElement(allAddressTableElements(packet), i).c_str());
     }
 }
 
@@ -101,7 +101,7 @@ void get_all_senders_correctly() {
     Message message = getPacketMessage(packet);
 
     std::vector<moduleAddress> expectedSenders = {248, 32767, 9, 256};
-    std::vector<moduleAddress> out = getSenders(getAllAddressTableElements(packet));
+    std::vector<moduleAddress> out = getSenders(allAddressTableElements(packet));
     for(int i = 0;i<expectedSenders.size();++i) {
         TEST_ASSERT_EQUAL(expectedSenders.at(i), out.at(i));
     }
