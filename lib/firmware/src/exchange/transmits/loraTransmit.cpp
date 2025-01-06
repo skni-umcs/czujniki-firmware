@@ -48,11 +48,14 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 
 	// Send message
 	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
-	Message message = Message();
-	message.sender = AddressHandler::getInstance().get()->readAddress();
-	message.destination = destinationNode;
-	message.content = content;
+	auto senders = std::vector<moduleAddress>{AddressHandler::getInstance().get()->readAddress()};
+	Message message = Message(
+		senders,
+		destinationNode,
+		content
+	);
 	std::string packet = createPacket(message);
+	Serial.println(packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, packet.c_str());
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());

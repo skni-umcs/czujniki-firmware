@@ -14,7 +14,7 @@ const char MAIN_JSON_BORDER = '^';
 const char NODE_BORDER = '$';
 
 const unsigned char DESTINATION_INDEX = 0;
-const unsigned char SENDER_INDEX = 1;
+const unsigned char ORIGINAL_SENDER_INDEX = 1;
 
 PacketMessage::PacketMessage(TransmissionCode type, std::string message) {
     this->type = type;
@@ -54,8 +54,8 @@ uint32_t getCrc(std::string string) {
 
 std::string createPacket(Message message) {
 	std::string validatedPart = 
-		NODE_BORDER+toHexString(message.sender)+NODE_BORDER+toHexString(message.destination)+
-		MAIN_JSON_BORDER+message.content+MAIN_JSON_BORDER;
+		NODE_BORDER+toHexString(message.getOriginalSender())+NODE_BORDER+toHexString(message.getDestination())+
+		MAIN_JSON_BORDER+message.getContent()+MAIN_JSON_BORDER;
 	
 	uint32_t crc = getCrc(validatedPart);
 
@@ -69,25 +69,41 @@ std::string createPacket(Message message) {
 	PACKET_BORDER;
 }
 
-std::string getNthLastAdressTableElement(std::string packet, unsigned char n) {
+std::vector<std::string> getAllAddressTableElements(std::string packet) {
+	int addressesStart = packet.find(NODE_BORDER);
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
-	if (jsonStart == std::string::npos) {
+	if (addressesStart == std::string::npos || jsonStart == std::string::npos || addressesStart >= jsonStart) {
 		Serial.printf("Invalid packet, no message: %s\n", packet.c_str());
+		return {};
+	}
+	std::vector<std::string> result;
+
+	int addressesSize = jsonStart-addressesStart-1;
+	std::string substr = packet.substr(addressesStart+1, addressesSize);
+
+	std::stringstream s(substr);
+	std::string temp;
+	while(getline(s, temp, NODE_BORDER)) {
+		result.push_back(temp);
+	}
+
+	return result;
+}
+
+std::string getNthLastAddressTableElement(std::vector<std::string> elements, unsigned char n) {
+	size_t index = elements.size()-n-1;
+	std::cout << "HALO HSALO CZY NAS SLYSZCIE";
+	std::cout << elements.size() << " zabija " << index;
+	for(auto t : elements) {
+		std::cout << "elemet: " << t << std::endl;
+	}
+	std::cout << elements.size() << " zabija " << index;
+	if(elements.empty() || index < 0 || index > elements.size()-1) {
+		Serial.printf("Can't get address table element: %i\n", n);
 		return "";
 	}
-	int nodeAddressStart = jsonStart;
-	for(int i = 0;i<=n;++i) {
-		jsonStart = nodeAddressStart;
-		int indexBeforeCurrentAddress = nodeAddressStart-1;
-		nodeAddressStart = packet.find_last_of(NODE_BORDER, indexBeforeCurrentAddress);
-	}
-	if (nodeAddressStart == std::string::npos) {
-		Serial.printf("Invalid packet, no destination: %s", packet.c_str());
-		return "";
-	}
-	int charsBetweenAddressStartAndJSON = jsonStart-nodeAddressStart-1;
-	std::string nodeSubstr = packet.substr(nodeAddressStart+1, charsBetweenAddressStartAndJSON);
-	return nodeSubstr.c_str();
+	std::cout << elements.size() << " zabija " << index;
+	return elements.at(index);
 }
 
 moduleAddress stringToAddress(std::string string) {
@@ -142,17 +158,44 @@ uint32_t getPacketCrc(std::string packet) {
 	return stoi(crcSubstring, errorDestination, hexadecimalBase);
 }
 
-moduleAddress getNthLastAddress(std::string packet, unsigned char n) {
+template<typename T>
+bool setContains(std::set<T> set, T element) {
+	return set.find(element) != set.end();
+}
+
+moduleAddress getNthLastAddress(std::vector<std::string> addressTableElements, unsigned char n) {
 	std::set<unsigned char> startAddresses{0,1};
-	if (startAddresses.find(n) != startAddresses.end()) {
-		return stringToAddress(getNthLastAdressTableElement(packet, n));
+	if (setContains(startAddresses, n)) {
+		return stringToAddress(getNthLastAddressTableElement(addressTableElements, n));
 	}
 	else {
 		unsigned char firstMapped = 3;
 		unsigned char jump = (n-2)*2;
 		unsigned char mappedPosition = firstMapped+jump;
-		return stringToAddress(getNthLastAdressTableElement(packet, mappedPosition));
+		return stringToAddress(getNthLastAddressTableElement(addressTableElements, mappedPosition));
 	}
+}
+
+std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
+	std::cout << "to je koniec?";
+	if(addressTable.size() <= 1) {
+		Serial.println("Incorrect addressTable, no original sender found!");
+		return {};
+	}
+	std::cout << "nie?";
+	int originalSenderAndDestinationCount = 2;
+	int otherElements = addressTable.size()-originalSenderAndDestinationCount;
+	int otherSendersCount = (otherElements)/2;
+
+	std::vector<moduleAddress> result = {getNthLastAddress(addressTable, ORIGINAL_SENDER_INDEX)};
+	for(int i = 0;i<otherSendersCount;++i) {
+		result.push_back(getNthLastAddress(addressTable, i+originalSenderAndDestinationCount));
+	}
+	for(auto t : result) {
+		std::cout << t << std::endl;
+	}
+	std::cout << "dozylem?" << result.size() << std::endl;
+	return result;
 }
 
 std::string getPacketContent(std::string packet) {
@@ -168,10 +211,15 @@ std::string getPacketContent(std::string packet) {
 
 Message getPacketMessage(std::string packet) {
 	Serial.printf("getting message from: %s\n", packet.c_str());
-	Message result = Message();
-	result.destination = getNthLastAddress(packet, DESTINATION_INDEX);
-	result.sender = getNthLastAddress(packet, SENDER_INDEX);
-	result.content = getPacketContent(packet);
+	std::vector<std::string> addressTable = getAllAddressTableElements(packet);
+	std::cout << packet << " the adresowanie: " << addressTable.size() << std::endl;
+	auto senders = getSenders(addressTable);
+	Message result = Message(
+		senders,
+		getNthLastAddress(addressTable, DESTINATION_INDEX),
+		getPacketContent(packet)
+	);
+	std::cout << "postadresowanie" << std::flush;
 	return result;
 }
 

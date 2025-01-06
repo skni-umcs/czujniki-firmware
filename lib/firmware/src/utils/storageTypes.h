@@ -2,16 +2,24 @@
 #define STORAGETYPES_H
 
 #include <string>
+#include <vector>
 
 #define INVALID_ADDRESS -1
 
 typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;
 
-struct Message {
-    moduleAddress sender;
+class Message {
+    std::vector<moduleAddress> senders;
     moduleAddress destination;
     std::string content;
+
+    public:
+        Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content);
+        std::vector<moduleAddress> getSenders();
+        moduleAddress getDestination();
+        std::string getContent();
+        moduleAddress getOriginalSender();
 };
 
 #endif
