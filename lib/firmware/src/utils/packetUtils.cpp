@@ -92,17 +92,10 @@ std::vector<std::string> getAllAddressTableElements(std::string packet) {
 
 std::string getNthLastAddressTableElement(std::vector<std::string> elements, unsigned char n) {
 	size_t index = elements.size()-n-1;
-	std::cout << "HALO HSALO CZY NAS SLYSZCIE";
-	std::cout << elements.size() << " zabija " << index;
-	for(auto t : elements) {
-		std::cout << "elemet: " << t << std::endl;
-	}
-	std::cout << elements.size() << " zabija " << index;
 	if(elements.empty() || index < 0 || index > elements.size()-1) {
 		Serial.printf("Can't get address table element: %i\n", n);
 		return "";
 	}
-	std::cout << elements.size() << " zabija " << index;
 	return elements.at(index);
 }
 
@@ -115,7 +108,6 @@ moduleAddress stringToAddress(std::string string) {
         char* invalidPosition = 0;
        	moduleAddress address = INVALID_ADDRESS;
         address = strtol(string.c_str(), &invalidPosition, hexadecimalBase);
-        std::cout << invalidPosition << std::endl << string;
         if (*invalidPosition != '\0') {
             return INVALID_ADDRESS;
         }
@@ -177,12 +169,10 @@ moduleAddress getNthLastAddress(std::vector<std::string> addressTableElements, u
 }
 
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
-	std::cout << "to je koniec?";
 	if(addressTable.size() <= 1) {
 		Serial.println("Incorrect addressTable, no original sender found!");
 		return {};
 	}
-	std::cout << "nie?";
 	int originalSenderAndDestinationCount = 2;
 	int otherElements = addressTable.size()-originalSenderAndDestinationCount;
 	int otherSendersCount = (otherElements)/2;
@@ -191,10 +181,6 @@ std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 	for(int i = 0;i<otherSendersCount;++i) {
 		result.push_back(getNthLastAddress(addressTable, i+originalSenderAndDestinationCount));
 	}
-	for(auto t : result) {
-		std::cout << t << std::endl;
-	}
-	std::cout << "dozylem?" << result.size() << std::endl;
 	return result;
 }
 
@@ -212,23 +198,17 @@ std::string getPacketContent(std::string packet) {
 Message getPacketMessage(std::string packet) {
 	Serial.printf("getting message from: %s\n", packet.c_str());
 	std::vector<std::string> addressTable = getAllAddressTableElements(packet);
-	std::cout << packet << " the adresowanie: " << addressTable.size() << std::endl;
-	auto senders = getSenders(addressTable);
 	Message result = Message(
-		senders,
+		getSenders(addressTable),
 		getNthLastAddress(addressTable, DESTINATION_INDEX),
 		getPacketContent(packet)
 	);
-	std::cout << "postadresowanie" << std::flush;
 	return result;
 }
 
 bool isCrcCorrect(std::string packet) {
 	uint32_t oldCrc = getPacketCrc(packet);
 	uint32_t newCrc = getCrc(getValidatedPart(packet));
-
-	std::cout << "validated part " << getValidatedPart(packet) << std::endl;
-	std::cout << "crc comp " << oldCrc << " " << newCrc << " it is " << (oldCrc == newCrc) << std::endl;
 
 	return oldCrc == newCrc;
 }
