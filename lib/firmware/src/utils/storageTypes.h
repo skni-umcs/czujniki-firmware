@@ -7,7 +7,7 @@
 #define INVALID_ADDRESS -1
 #define INVALID_CRC -1;
 #define INVALID_STRING "";
-#define INVALID_SENDERS {};
+#define INVALID_VECTOR {};
 
 typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;

@@ -91,7 +91,7 @@ std::vector<std::string> allAddressTableElements(std::string packet) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	if (addressesStart == std::string::npos || jsonStart == std::string::npos || addressesStart >= jsonStart) {
 		Serial.printf("Invalid packet, no message: %s\n", packet.c_str());
-		return {};
+		return INVALID_VECTOR;
 	}
 	std::vector<std::string> result;
 
@@ -168,7 +168,7 @@ uint32_t getPacketCrc(std::string packet) {
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 	if(addressTable.size() <= 1) {
 		Serial.println("Incorrect addressTable, no original sender found!");
-		return INVALID_SENDERS;
+		return INVALID_VECTOR;
 	}
 	int originalSenderAndDestinationCount = 2;
 	int otherElements = addressTable.size()-originalSenderAndDestinationCount;
