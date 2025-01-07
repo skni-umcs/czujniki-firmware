@@ -25,4 +25,8 @@ class Message {
         moduleAddress getOriginalSender();
 };
 
+class LoraMessage : Message {
+
+};
+
 #endif
