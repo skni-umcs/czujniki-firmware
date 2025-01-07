@@ -30,6 +30,8 @@ void LoraTransmit::setup() {
 	// It's important get configuration pointer before all other operation
 	Configuration configuration = *(Configuration*) c.data;
 	configuration.TRANSMISSION_MODE.fixedTransmission = FT_FIXED_TRANSMISSION; // Enable repeater mode
+	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
+	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
 	Serial.println(c.status.getResponseDescription());
 	Serial.println(c.status.code);
 
