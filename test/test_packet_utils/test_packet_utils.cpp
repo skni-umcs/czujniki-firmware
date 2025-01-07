@@ -19,7 +19,7 @@ void create_packet_from_message() {
 
 void decode_message_from_packet() {
     std::string packet = "~$37$1^test^40672562~";
-    Message out = getPacketMessage(packet);
+    Message out = Message(packet);
 
     moduleAddress expectedSender = 55;
     moduleAddress expectedDestination = 1;
@@ -48,7 +48,7 @@ void incorrect_nth_last_address() {
 
 void something_that_isnt_even_packet() {
     std::string packet = "~s$ema test ~_~";
-    Message message = getPacketMessage(packet);
+    Message message = Message(packet);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -58,7 +58,7 @@ void something_that_isnt_even_packet() {
 
 void only_crc() {
     std::string packet = "^~";
-    Message message = getPacketMessage(packet);
+    Message message = Message(packet);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -68,7 +68,7 @@ void only_crc() {
 
 void random_corruption() {
     std::string packet = "~$9Be&!*&$%!JSAFT@!%!&#HFA(T#@QUNst^40672562~";
-    Message message = getPacketMessage(packet);
+    Message message = Message(packet);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -78,7 +78,7 @@ void random_corruption() {
 
 void random_corruption_but_crc_is_correct() {
     std::string packet = "~$9Be&!*&$%!JSAFT@!%!&#HFA(T#@QUNst^0dab27ed~";
-    Message message = getPacketMessage(packet);
+    Message message = Message(packet);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -98,7 +98,7 @@ void nth_last_address_table_element_check() {
 
 void get_all_senders_correctly() {
     std::string packet = "~HOP$100$RSSI9$9$RSSIffff$ffff$RSSIf8$f8$1^test^79c08850~";
-    Message message = getPacketMessage(packet);
+    Message message = Message(packet);
 
     std::vector<moduleAddress> expectedSenders = {248, 32767, 9, 256};
     std::vector<moduleAddress> out = getSenders(allAddressTableElements(packet));

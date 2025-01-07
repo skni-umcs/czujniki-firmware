@@ -1,4 +1,12 @@
 #include "storageTypes.h"
+#include "packetUtils.h"
+
+Message::Message(std::string packet) {
+    std::vector<std::string> addressTable = allAddressTableElements(packet);
+	this->senders = ::getSenders(addressTable);
+	this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
+	this->content =	getPacketContent(packet);
+}
 
 Message::Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content) {
     this->senders = senders;
@@ -24,3 +32,8 @@ moduleAddress Message::getOriginalSender() {
     }
     return senders.at(0);
 }
+
+LoraMessage::LoraMessage(std::string packet) : Message(packet) {
+}
+
+    

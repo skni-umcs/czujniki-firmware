@@ -1,4 +1,3 @@
-#include <FastCRC.h>
 #include <sstream>
 #include <HardwareSerial.h>
 #include "storageTypes.h"
@@ -9,13 +8,6 @@
 #include "otherUtils.h"
 
 FastCRC32 CRC32;
-
-const char PACKET_BORDER = '~';
-const char MAIN_JSON_BORDER = '^';
-const char NODE_BORDER = '$';
-
-const unsigned char DESTINATION_INDEX = 0;
-const unsigned char ORIGINAL_SENDER_INDEX = 1;
 
 PacketMessage::PacketMessage(TransmissionCode type, std::string message) {
     this->type = type;
@@ -190,17 +182,6 @@ std::string getPacketContent(std::string packet) {
 	}
 	int jsonChars = jsonEnd-jsonStart-1;
 	return packet.substr(jsonStart+1, jsonChars);
-}
-
-Message getPacketMessage(std::string packet) {
-	Serial.printf("getting message from: %s\n", packet.c_str());
-	std::vector<std::string> addressTable = allAddressTableElements(packet);
-	Message result = Message(
-		getSenders(addressTable),
-		nthLastAddress(addressTable, DESTINATION_INDEX),
-		getPacketContent(packet)
-	);
-	return result;
 }
 
 bool isCrcCorrect(std::string packet) {

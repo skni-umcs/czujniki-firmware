@@ -13,11 +13,13 @@ typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;
 
 class Message {
+    protected:
     std::vector<moduleAddress> senders;
     moduleAddress destination;
     std::string content;
 
     public:
+        Message(std::string packet);
         Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content);
         std::vector<moduleAddress> getSenders();
         moduleAddress getDestination();
@@ -25,8 +27,9 @@ class Message {
         moduleAddress getOriginalSender();
 };
 
-class LoraMessage : Message {
-
+class LoraMessage : public Message {
+    public:
+    LoraMessage(std::string packet);
 };
 
 #endif
