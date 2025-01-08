@@ -10,10 +10,11 @@ Message::Message(std::string packet) {
 	this->content =	getPacketContent(packet);
 }
 
-Message::Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content) {
+Message::Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi) {
     this->senders = senders;
     this->destination = destination;
     this->content = content;
+    this->rssi = rssi;
 }
 
 std::vector<moduleAddress> Message::getSenders() {
@@ -60,11 +61,10 @@ LoraMessage::LoraMessage(
     std::vector<moduleAddress> senders, 
     moduleAddress destination, 
     std::string content,
-    byte currentRssi,
     std::vector<std::string> rssi,
+    byte currentRssi,
     int hopLimit
-) : Message(senders, destination, content) {
+) : Message(senders, destination, content, rssi) {
     this->currentRssi = currentRssi;
-    this->rssi = rssi;
     this->hopLimit = hopLimit;
 }

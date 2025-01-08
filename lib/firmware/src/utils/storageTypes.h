@@ -20,10 +20,11 @@ class Message {
     std::vector<moduleAddress> senders;
     moduleAddress destination;
     std::string content;
+    std::vector<std::string> rssi;
 
     public:
         Message(std::string packet);
-        Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content);
+        Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi);
         std::vector<moduleAddress> getSenders();
         moduleAddress getDestination();
         std::string getContent();
@@ -33,11 +34,10 @@ class Message {
 
 class LoraMessage : public Message {
     byte currentRssi;
-    std::vector<std::string> rssi;
     int hopLimit;
     public:
     LoraMessage(std::string packet, byte rssi);
-    LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, byte currentRssi, std::vector<std::string> rssi, int hopLimit);
+    LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, byte currentRssi, int hopLimit);
 };
 
 #endif

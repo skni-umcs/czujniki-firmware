@@ -9,7 +9,8 @@
 
 void create_packet_from_message() {
     auto senders = std::vector<moduleAddress>{55};
-    Message message = Message(senders, 1, "test");
+    auto rssi = std::vector<std::string>();
+    Message message = Message(senders, 1, "test", rssi);
 
     std::string out = message.createPacket();
 
@@ -19,7 +20,8 @@ void create_packet_from_message() {
 
 void create_packet_from_message_multiple_senders() {
     auto senders = std::vector<moduleAddress>{55, 133, 28};
-    Message message = Message(senders, 1, "test");
+    auto rssi = std::vector<std::string>();
+    Message message = Message(senders, 1, "test", rssi);
 
     std::string out = message.createPacket();
 
@@ -32,7 +34,7 @@ void create_packet_from_loramessage_multiple_senders() {
     auto hopLimit = 2;
     auto rssi = std::vector<std::string>{"RSSI37"};
     byte currentRssi = 20;
-    LoraMessage message = LoraMessage(senders, 1, "test", currentRssi, rssi, hopLimit);
+    LoraMessage message = LoraMessage(senders, 1, "test", rssi, currentRssi, hopLimit);
 
     std::string out = message.createPacket();
 
