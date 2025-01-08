@@ -52,13 +52,15 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
 	auto senders = std::vector<moduleAddress>{AddressHandler::getInstance().get()->readAddress()};
 	auto rssi = std::vector<std::string>();
-	Message message = Message(
+	std::shared_ptr<LoraMessage> message = std::shared_ptr<LoraMessage>(new LoraMessage(
 		senders,
 		destinationNode,
 		content,
-		rssi
-	);
-	std::string packet = message.createPacket();
+		rssi,
+		0,
+		0
+	));
+	std::string packet = message.get()->createPacket();
 	Serial.println(packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, packet.c_str());
 	// Check If there is some problem of succesfully send
@@ -68,7 +70,7 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 
 OperationResult LoraTransmit::poll() {
 	if (e220ttl.available()>1) {
-		Serial.println("Message received!");
+		Serial.println("std::shared_ptr<Message> received!");
 
 		// read the String message
 		#ifdef ENABLE_RSSI
@@ -82,7 +84,8 @@ OperationResult LoraTransmit::poll() {
 				return OperationResult::ERROR;
 			}else{
 				byte rssi = rc.rssi;
-				receive(LoraMessage(fromWString(rc.data), rssi));
+				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi));
+				receive(loraMessage);
 		#ifdef ENABLE_RSSI
 				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
 		#endif
@@ -91,7 +94,7 @@ OperationResult LoraTransmit::poll() {
 	return OperationResult::SUCCESS;
 }
 
-OperationResult LoraTransmit::receive(Message message) {
+OperationResult LoraTransmit::receive(std::shared_ptr<Message> message) {
 	notifySubscribers(message);
     return OperationResult::SUCCESS;
 }

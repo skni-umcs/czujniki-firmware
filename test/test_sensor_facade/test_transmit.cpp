@@ -7,6 +7,6 @@ OperationResult TestTransmit::send(std::string message, moduleAddress moduleAddr
     return OperationResult::SUCCESS;
 }
 
-OperationResult TestTransmit::receive(Message message) {
+OperationResult TestTransmit::receive(std::shared_ptr<Message> message) {
     return OperationResult::SUCCESS;
 }

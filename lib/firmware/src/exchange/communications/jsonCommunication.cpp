@@ -9,8 +9,8 @@ std::shared_ptr<JsonCommunication> JsonCommunication::create() {
     return std::shared_ptr<JsonCommunication>{new JsonCommunication()};
 }
 
-OperationResult JsonCommunication::getNotified(Message message) {
-    Serial.printf("im notified of %s from %i to %i\n", message.getContent().c_str(), message.getOriginalSender(), message.getDestination());
+OperationResult JsonCommunication::getNotified(std::shared_ptr<Message> message) {
+    Serial.printf("im notified of %s from %i to %i\n", message.get()->getContent().c_str(), message.get()->getOriginalSender(), message.get()->getDestination());
     return OperationResult::SUCCESS;
 }
 
