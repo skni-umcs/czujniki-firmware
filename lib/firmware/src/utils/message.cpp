@@ -2,6 +2,7 @@
 #include "packetUtils.h"
 
 Message::Message(std::string packet) {
+    this->packet = packet;
     std::vector<std::string> addressTable = allAddressTableElements(packet);
 	this->senders = ::getSenders(addressTable);
 	this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
@@ -33,7 +34,8 @@ moduleAddress Message::getOriginalSender() {
     return senders.at(0);
 }
 
-LoraMessage::LoraMessage(std::string packet) : Message(packet) {
+LoraMessage::LoraMessage(std::string packet, byte rssi) : Message(packet) {
+    this->rssi = rssi;
 }
 
     

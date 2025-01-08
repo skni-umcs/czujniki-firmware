@@ -79,7 +79,8 @@ OperationResult LoraTransmit::poll() {
 				Serial.println(rc.status.getResponseDescription());
 				return OperationResult::ERROR;
 			}else{
-				receive(Message(fromWString(rc.data)));
+				byte rssi = rc.rssi;
+				receive(LoraMessage(fromWString(rc.data), rssi));
 		#ifdef ENABLE_RSSI
 				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
 		#endif

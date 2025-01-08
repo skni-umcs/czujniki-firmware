@@ -7,6 +7,7 @@ class PassthroughCommunication : public JsonCommunication {
     
     public:
         static std::shared_ptr<PassthroughCommunication> create();
+        OperationResult getNotified(Message message) override;
 };
 
 #endif
