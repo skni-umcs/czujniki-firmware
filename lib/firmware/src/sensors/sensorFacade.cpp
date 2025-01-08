@@ -8,7 +8,6 @@
 #include <ArduinoJson.h>
 
 const int DEFAULT_SENSOR_PERIOD_MS = 20000; //low value for testing
-const int GATEWAY_ID = 1;
 
 SensorFacade::SensorFacade(std::shared_ptr<JsonTransmit> transmit) {
     sensorCommunication = SensorCommunication::create();
@@ -27,7 +26,7 @@ void SensorFacade::sendAllSensors() {
         messages.add(sensor->getSensorDataJson());
     }
     serializeJson(doc, serializedJson);
-    sensorCommunication->transmit(serializedJson, GATEWAY_ID);
+    sensorCommunication->transmit(serializedJson, SERVER_ADDRESS);
 }
 
 void SensorFacade::addSensor(std::unique_ptr<Sensor> sensor) {

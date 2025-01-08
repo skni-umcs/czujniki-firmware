@@ -13,7 +13,7 @@ void printParameters(struct Configuration configuration);
 // With FIXED RECEIVER configuration
 #define DESTINATION_ADDL 2
 // If you want use RSSI uncomment
-//#define ENABLE_RSSI true
+#define ENABLE_RSSI true
 
 const int DEFAULT_LORA_POLL_MS = 600;
 
@@ -70,7 +70,7 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 
 OperationResult LoraTransmit::poll() {
 	if (e220ttl.available()>1) {
-		Serial.println("std::shared_ptr<Message> received!");
+		Serial.println("Message received!");
 
 		// read the String message
 		#ifdef ENABLE_RSSI
