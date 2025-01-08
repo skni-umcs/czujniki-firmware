@@ -56,7 +56,7 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 		destinationNode,
 		content
 	);
-	std::string packet = createPacket(message);
+	std::string packet = message.createPacket();
 	Serial.println(packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, packet.c_str());
 	// Check If there is some problem of succesfully send

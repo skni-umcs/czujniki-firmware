@@ -16,6 +16,7 @@ const moduleAddress SERVER_ADDRESS = 0;
 class Message {
     protected:
     std::string packet;
+    std::vector<std::string> addressTable;
     std::vector<moduleAddress> senders;
     moduleAddress destination;
     std::string content;
@@ -27,12 +28,16 @@ class Message {
         moduleAddress getDestination();
         std::string getContent();
         moduleAddress getOriginalSender();
+        std::string createPacket();
 };
 
 class LoraMessage : public Message {
-    byte rssi;
+    byte currentRssi;
+    std::vector<std::string> rssi;
+    int hopLimit;
     public:
     LoraMessage(std::string packet, byte rssi);
+    LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, byte currentRssi, std::vector<std::string> rssi, int hopLimit);
 };
 
 #endif

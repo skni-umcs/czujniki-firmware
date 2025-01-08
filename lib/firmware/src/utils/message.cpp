@@ -1,9 +1,10 @@
 #include "storageTypes.h"
 #include "packetUtils.h"
+#include <sstream>
 
 Message::Message(std::string packet) {
     this->packet = packet;
-    std::vector<std::string> addressTable = allAddressTableElements(packet);
+    this->addressTable = allAddressTableElements(packet);
 	this->senders = ::getSenders(addressTable);
 	this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
 	this->content =	getPacketContent(packet);
@@ -34,8 +35,36 @@ moduleAddress Message::getOriginalSender() {
     return senders.at(0);
 }
 
-LoraMessage::LoraMessage(std::string packet, byte rssi) : Message(packet) {
-    this->rssi = rssi;
+std::string Message::createPacket() {
+	std::string validatedPart = 
+		NODE_BORDER+toHexString(getOriginalSender())+NODE_BORDER+toHexString(getDestination())+
+		MAIN_JSON_BORDER+getContent()+MAIN_JSON_BORDER;
+	
+	uint32_t crc = getCrc(validatedPart);
+
+	std::stringstream hexStream;
+	hexStream << std::hex << crc;
+	Serial.println(hexStream.str().c_str());
+
+	return PACKET_BORDER+ 
+	validatedPart+
+	toHexString(crc)+
+	PACKET_BORDER;
 }
 
-    
+LoraMessage::LoraMessage(std::string packet, byte currentRssi) : Message(packet) {
+    this->currentRssi = currentRssi;
+}
+
+LoraMessage::LoraMessage(
+    std::vector<moduleAddress> senders, 
+    moduleAddress destination, 
+    std::string content,
+    byte currentRssi,
+    std::vector<std::string> rssi,
+    int hopLimit
+) : Message(senders, destination, content) {
+    this->currentRssi = currentRssi;
+    this->rssi = rssi;
+    this->hopLimit = hopLimit;
+}

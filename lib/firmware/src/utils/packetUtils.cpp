@@ -31,35 +31,11 @@ std::string PacketMessage::getJson() {
     return serializedJson;
 }
 
-template<typename T>
-std::string toHexString(T address) {
-	std::stringstream hexStream;
-	hexStream << std::hex << address;
-	return hexStream.str();
-}
-
 uint32_t getCrc(std::string string) {
 	return CRC32.crc32(
 		reinterpret_cast<const uint8_t*>(string.c_str()), 
 		string.size()
 	);
-}
-
-std::string createPacket(Message message) {
-	std::string validatedPart = 
-		NODE_BORDER+toHexString(message.getOriginalSender())+NODE_BORDER+toHexString(message.getDestination())+
-		MAIN_JSON_BORDER+message.getContent()+MAIN_JSON_BORDER;
-	
-	uint32_t crc = getCrc(validatedPart);
-
-	std::stringstream hexStream;
-	hexStream << std::hex << crc;
-	Serial.println(hexStream.str().c_str());
-
-	return PACKET_BORDER+ 
-	validatedPart+
-	toHexString(crc)+
-	PACKET_BORDER;
 }
 
 moduleAddress stringToAddress(std::string string) {
@@ -136,7 +112,6 @@ std::string getValidatedPart(std::string packet) {
 	int partLength = rightBorder-leftBorder;
 	return packet.substr(partStart, partLength);
 }
-
 
 uint32_t getPacketCrc(std::string packet) {
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);

@@ -5,6 +5,7 @@
 #include "storageTypes.h"
 #include <ArduinoJson.h>
 #include <FastCRC.h>
+#include <sstream>
 
 const char PACKET_BORDER = '~';
 const char MAIN_JSON_BORDER = '^';
@@ -29,9 +30,14 @@ class PacketMessage {
 };
 
 template<typename T>
-std::string toHexString(T address);
+std::string toHexString(T address) {
+	std::stringstream hexStream;
+	hexStream << std::hex << address;
+	return hexStream.str();
+}
+
 std::string transmissionCodeFromEnum(TransmissionCode transmissionCode);
-std::string createPacket(Message message);
+uint32_t getCrc(std::string string);
 moduleAddress getDestinationAddress(std::string packet);
 std::vector<std::string> allAddressTableElements(std::string packet);
 std::string nthLastAddressTableElement(std::vector<std::string> addressTableElements, unsigned char n);
