@@ -166,10 +166,6 @@ bool isCrcCorrect(std::string packet) {
 	return oldCrc == newCrc;
 }
 
-bool isBorderCorrect(std::string packet) {
-	return packet.find(PACKET_BORDER) == 0 && packet.find_last_of(PACKET_BORDER) == packet.size()-1;
-}
-
 bool isRegexCorrect(std::string packet) {
 	std::stringstream validatedPart;
 	validatedPart << "(\\" << NODE_BORDER << "[^\\" << NODE_BORDER << "]*)*";
