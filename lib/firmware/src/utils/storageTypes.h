@@ -29,7 +29,10 @@ class Message {
         moduleAddress getDestination();
         std::string getContent();
         moduleAddress getOriginalSender();
-        std::string createPacket();
+        std::string createAddressTable();
+        std::string createOwnAddressTable();
+        std::string createPacket(bool addSelf = false);
+        std::string createPacketForSending();
 };
 
 class LoraMessage : public Message {
@@ -38,6 +41,8 @@ class LoraMessage : public Message {
     public:
     LoraMessage(std::string packet, byte rssi);
     LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, byte currentRssi, int hopLimit);
+    std::string createAddressTable();
+    std::string createOwnAddressTable();
 };
 
 #endif

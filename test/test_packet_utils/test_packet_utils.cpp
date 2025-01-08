@@ -25,20 +25,33 @@ void create_packet_from_message_multiple_senders() {
 
     std::string out = message.createPacket();
 
-    std::string expected = "~$1C$$85$$37$1^test^f436c290~";
+    std::string expected = "~$1c$$85$$37$1^test^da95f06a~";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
 void create_packet_from_loramessage_multiple_senders() {
-    auto senders = std::vector<moduleAddress>{55, 133, 28};
-    auto hopLimit = 2;
+    auto senders = std::vector<moduleAddress>{55, 133};
+    auto hopLimit = 3;
     auto rssi = std::vector<std::string>{"RSSI37"};
     byte currentRssi = 20;
     LoraMessage message = LoraMessage(senders, 1, "test", rssi, currentRssi, hopLimit);
 
     std::string out = message.createPacket();
 
-    std::string expected = "~2$1C$14$85$RSSI37$37$1^test^0cd516b4~";
+    std::string expected = "~3$85$RSSI37$37$1^test^bcfb5868~";
+    TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
+}
+
+void create_own_packet_from_loramessage_multiple_senders() {
+    auto senders = std::vector<moduleAddress>{55, 133};
+    auto hopLimit = 2;
+    auto rssi = std::vector<std::string>{"RSSI37"};
+    byte currentRssi = 20;
+    LoraMessage message = LoraMessage(senders, 1, "test", rssi, currentRssi, hopLimit);
+
+    std::string out = message.createPacketForSending();
+
+    std::string expected = "~2$1c$14$85$RSSI37$37$1^test^bcfb5868~";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
@@ -175,6 +188,7 @@ void setup() {
     RUN_TEST(create_packet_from_message);
     RUN_TEST(create_packet_from_message_multiple_senders);
     RUN_TEST(create_packet_from_loramessage_multiple_senders);
+    RUN_TEST(create_own_packet_from_loramessage_multiple_senders);
     RUN_TEST(decode_message_from_packet);
     RUN_TEST(something_that_isnt_even_packet);
     RUN_TEST(only_crc);
