@@ -20,8 +20,9 @@ class AddressHandler {
 
     public:
         static std::shared_ptr<AddressHandler> getInstance();
+        static void _DEBUG_setInstance(std::shared_ptr<AddressHandler> addressHandler);
         void saveAddress(moduleAddress address);
-        moduleAddress readAddress();
+        virtual moduleAddress readAddress();
         moduleAddress getAddressFromUser();
         void initializeAddress();
 };

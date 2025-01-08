@@ -2,6 +2,7 @@
 #include "packetUtils.h"
 #include <sstream>
 #include "addressHandler.h"
+#include <iostream>
 
 LoraMessage::LoraMessage(std::string packet, byte currentRssi) {
     this->packet = packet;
@@ -47,8 +48,8 @@ moduleAddress LoraMessage::getOriginalSender() {
     return senders.at(0);
 }
 
-std::string LoraMessage::createAddressTable() {
-    std::string result = NODE_BORDER+toHexString(hopLimit); 
+std::string LoraMessage::addressTableWithoutHopLimit() {
+    std::string result = "";
     for(int i = 0;i < senders.size()-1; ++i) {
         int rssiIndex = rssi.size()-1-i;
         int senderIndex = senders.size()-1-i;
@@ -62,6 +63,11 @@ std::string LoraMessage::createAddressTable() {
     }
     result += NODE_BORDER+toHexString(getOriginalSender())+NODE_BORDER+toHexString(getDestination());
     return result;
+}
+
+std::string LoraMessage::createAddressTable() {
+    std::string hopLimitString = NODE_BORDER+toHexString((int)hopLimit);
+    return hopLimitString+addressTableWithoutHopLimit();
 }
 
 std::string LoraMessage::createPacket(bool addSelf) {
@@ -90,5 +96,5 @@ std::string LoraMessage::createOwnAddressTable() {
     return NODE_BORDER+toHexString(hopLimit)+NODE_BORDER+
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
     toHexString((int)currentRssi)+
-    createAddressTable();
+    addressTableWithoutHopLimit();
 }

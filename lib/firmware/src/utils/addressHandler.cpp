@@ -16,6 +16,10 @@ std::shared_ptr<AddressHandler> AddressHandler::getInstance() {
     return instance;
 }
 
+void AddressHandler::_DEBUG_setInstance(std::shared_ptr<AddressHandler> addressHandler) {
+    instance = addressHandler;
+}
+
 void AddressHandler::saveAddress(moduleAddress address) {
     preferences.putUShort(PREFERENCES_ADDRESS_KEY, address);
 }

@@ -8,6 +8,21 @@
 #include <iostream>
 #include "utils/addressHandler.h"
 
+const moduleAddress TEST_MODULE_ADDRESS = 28;
+
+class MockAddressHandler : public AddressHandler {
+    public:
+        moduleAddress readAddress() override;
+};
+
+moduleAddress MockAddressHandler::readAddress() {
+    return TEST_MODULE_ADDRESS;
+}
+
+void setupAddressHandler() {
+    AddressHandler::_DEBUG_setInstance(std::shared_ptr<AddressHandler>(new MockAddressHandler()));
+}
+
 void create_packet_from_message() {
     auto senders = std::vector<moduleAddress>{55};
     auto rssi = std::vector<std::string>();
@@ -52,7 +67,7 @@ void create_own_packet_from_loramessage_multiple_senders() {
 
     std::string out = message.createPacketForSending();
 
-    std::string expected = "~$2$1c$14$85$RSSI37$37$1^test^bcfb5868~";
+    std::string expected = "~$2$1c$14$85$RSSI37$37$1^test^b651943d~";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
@@ -186,7 +201,7 @@ void also_accept_hops() {
 
 void setup() {
     UNITY_BEGIN();
-    address_setup();
+    setupAddressHandler();
     RUN_TEST(create_packet_from_message);
     RUN_TEST(create_packet_from_message_multiple_senders);
     RUN_TEST(create_packet_from_loramessage_multiple_senders);

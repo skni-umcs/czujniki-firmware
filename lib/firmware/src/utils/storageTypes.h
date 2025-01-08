@@ -43,6 +43,7 @@ class LoraMessage : public Message {
     std::string getContent() override;
     moduleAddress getOriginalSender() override;
     std::string createAddressTable() override;
+    std::string addressTableWithoutHopLimit();
     std::string createOwnAddressTable() override;
     std::string createPacket(bool addSelf = false) override;
     std::string createPacketForSending() override;
