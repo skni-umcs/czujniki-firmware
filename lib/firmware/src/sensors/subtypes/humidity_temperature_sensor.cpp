@@ -2,9 +2,10 @@
 #include <string>
 #include <Adafruit_Sensor.h>
 #include <DHT.h>
-#include <DHT_U.h>
 #include <string>
 #include <sstream>
+
+#define DHT_POWER_PIN 3
 
 #define DHTPIN 40     // Digital pin connected to the DHT sensor 
 // Feather HUZZAH ESP8266 note: use pins 3, 4, 5, 12, 13 or 14 --
@@ -18,42 +19,22 @@
 // See guide for details on sensor wiring and usage:
 //   https://learn.adafruit.com/dht/overview
 
-DHT_Unified humidityTemperatureDht(DHTPIN, DHTTYPE);
+DHT dht(DHTPIN, DHTTYPE);
 
 void HumidityTemperatureSensor::setupSensor(uint32_t* delayMS) {
-    humidityTemperatureDht.begin();
-    sensor_t sensor;
-    humidityTemperatureDht.temperature().getSensor(&sensor);
-    Serial.println(F("------------------------------------"));
-    Serial.println(F("Temperature Sensor"));
-    Serial.print  (F("Sensor Type: ")); Serial.println(sensor.name);
-    Serial.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
-    Serial.print  (F("Unique ID:   ")); Serial.println(sensor.sensor_id);
-    Serial.print  (F("Max Value:   ")); Serial.print(sensor.max_value); Serial.println(F("°C"));
-    Serial.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("°C"));
-    Serial.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("°C"));
-    Serial.println(F("------------------------------------"));
-    // Print humidity sensor details.
-    humidityTemperatureDht.humidity().getSensor(&sensor);
-    Serial.println(F("Humidity Sensor"));
-    Serial.print  (F("Sensor Type: ")); Serial.println(sensor.name);
-    Serial.print  (F("Driver Ver:  ")); Serial.println(sensor.version);
-    Serial.print  (F("Unique ID:   ")); Serial.println(sensor.sensor_id);
-    Serial.print  (F("Max Value:   ")); Serial.print(sensor.max_value); Serial.println(F("%"));
-    Serial.print  (F("Min Value:   ")); Serial.print(sensor.min_value); Serial.println(F("%"));
-    Serial.print  (F("Resolution:  ")); Serial.print(sensor.resolution); Serial.println(F("%"));
-    Serial.println(F("------------------------------------"));
-
-    // Set delay between sensor readings based on sensor details.
-    *delayMS = sensor.min_delay / 1000;
-
+    pinMode(DHT_POWER_PIN, OUTPUT);
+    digitalWrite(DHT_POWER_PIN, LOW);
 }
 
 std::string HumidityTemperatureSensor::getSensorDataJson() {
+    digitalWrite(DHT_POWER_PIN, HIGH);
+    delay(1000);
     // Get temperature event and print its value.
+    dht.begin();
+    delay(2000);
     sensors_event_t event;
     std::stringstream result;
-    humidityTemperatureDht.temperature().getEvent(&event);
-    result << "humidity: " << event.relative_humidity << " temperature: " << event.temperature;
+    result << "humidity: " << dht.readHumidity() << " temperature: " << dht.readTemperature();
+    digitalWrite(DHT_POWER_PIN, LOW);
     return result.str();
 }

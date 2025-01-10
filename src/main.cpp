@@ -35,11 +35,6 @@ void setup() {
   Serial.begin(9600);
   delay(1000);
 
-  pinMode(3, OUTPUT);
-  pinMode(4, OUTPUT);
-  digitalWrite(3, HIGH);
-  digitalWrite(4, HIGH);
-
   AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = LoraTransmit::create();
   
