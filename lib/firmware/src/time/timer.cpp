@@ -11,13 +11,13 @@ std::shared_ptr<Timer> Timer::create() {
 }
 
 void timerTask(void* timerObjectRawPointer) {
-    Timer* timer = (Timer*)timerObjectRawPointer;
+    std::shared_ptr<Timer>* timerPtr = static_cast<std::shared_ptr<Timer>*>(timerObjectRawPointer);
     while(1) {
-        if(timer->getExecuteFunction() != nullptr && !timer->getRecentlyUpdated()) {
-            timer->getExecuteFunction()();
+        if(timerPtr->get()->getExecuteFunction() != nullptr && !timerPtr->get()->getRecentlyUpdated()) {
+            timerPtr->get()->getExecuteFunction()();
         }
-        timer->setRecentlyUpdated(false);
-        vTaskDelay(timer->getPeriod());
+        timerPtr->get()->setRecentlyUpdated(false);
+        vTaskDelay(timerPtr->get()->getPeriod());
     }
 }
 
@@ -26,9 +26,13 @@ void Timer::changeTimerTask() {
         vTaskDelete(this->currentTask);
         this->currentTask = NULL;
     }
-    const int bytesNeeded = 2560; //temporary value thats working
+
+    // Tworzymy kopię shared_ptr na stercie
+    auto* taskPtr = new std::shared_ptr<Timer>(shared_from_this());
+
+    const int bytesNeeded = 25600; //temporary value thats working
     const char* taskName = "timerTask";
-    void* taskArgument = (void*)this;
+    void* taskArgument = static_cast<void*>(taskPtr);
     const int taskPriority = 1;
     TaskHandle_t* const taskHandle = &this->currentTask;
     xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);

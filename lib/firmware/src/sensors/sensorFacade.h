@@ -4,14 +4,15 @@
 #include <exchange/communications/sensorCommunication.h>
 #include "time/timer.h"
 
-class SensorFacade {
+class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
 
     std::vector<std::unique_ptr<Sensor>> sensors;
     std::shared_ptr<SensorCommunication> sensorCommunication;
     std::shared_ptr<Timer> timer = Timer::create();
-
+    int h;
+    SensorFacade();
     public:
-        SensorFacade(std::shared_ptr<JsonTransmit>);
+        static std::shared_ptr<SensorFacade> create(std::shared_ptr<JsonTransmit> transmit);
         void sendAllSensors();
         void addSensor(std::unique_ptr<Sensor> sensor);
         int sensorsCount();

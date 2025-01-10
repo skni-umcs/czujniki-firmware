@@ -9,7 +9,7 @@
 
 typedef std::function<void()> executeFunctionType;
 
-class Timer
+class Timer : public std::enable_shared_from_this<Timer>
 {
     int lastDate = 0; //TODO: remove since it might be useless
     int period = 60;

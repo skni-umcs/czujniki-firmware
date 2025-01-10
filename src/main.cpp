@@ -12,7 +12,7 @@
 #include <DHT_U.h>
 #include "sensors/subtypes/humidity_temperature_sensor.h"
 #include "sensors/sensorFacade.h"
-#include <sensors/subtypes/bme_280_sensor.h>
+#include <sensors/subtypes/test_sensor.h>
 #include <iostream>
 #include "time/timerUpdate.h"
 #include "time/timer.h"
@@ -20,6 +20,8 @@
 #include <exchange/communications/serviceCommunication.h>
 #include <Preferences.h>
 #include "utils/addressHandler.h"
+#include <Adafruit_I2CDevice.h>
+#include <SPI.h>
 
 uint32_t delayMS = 1000;
 
@@ -34,10 +36,10 @@ void setup() {
   serviceCommunication.get()->subscribe(transmit);
   serviceCommunication.get()->sendResetReason();
 
-  SensorFacade facade = SensorFacade(transmit);
-  std::unique_ptr<Sensor> h = std::unique_ptr<BME280Sensor>(new BME280Sensor());
+  std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
+  std::unique_ptr<Sensor> h = std::unique_ptr<TestSensor>(new TestSensor());
   h->setupSensor(&delayMS);
-  facade.addSensor(std::move(h));
+  facade->addSensor(std::move(h));
 }
 
 void loop() {
