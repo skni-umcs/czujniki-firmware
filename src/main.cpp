@@ -25,9 +25,20 @@
 
 uint32_t delayMS = 1000;
 
+#ifdef esp32firebeetle || test
+#define SENSOR_TYPE TestSensor
+#else
+#define SENSOR_TYPE HumidityTemperatureSensor
+#endif
+
 void setup() {
   Serial.begin(9600);
   delay(1000);
+
+  pinMode(3, OUTPUT);
+  pinMode(4, OUTPUT);
+  digitalWrite(3, HIGH);
+  digitalWrite(4, HIGH);
 
   AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = LoraTransmit::create();
@@ -37,7 +48,7 @@ void setup() {
   serviceCommunication.get()->sendResetReason();
 
   std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
-  std::unique_ptr<Sensor> h = std::unique_ptr<TestSensor>(new TestSensor());
+  std::unique_ptr<Sensor> h = std::unique_ptr<SENSOR_TYPE>(new SENSOR_TYPE());
   h->setupSensor(&delayMS);
   facade->addSensor(std::move(h));
 }
