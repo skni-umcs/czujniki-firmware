@@ -16,7 +16,7 @@ void printParameters(struct Configuration configuration);
 #define ENABLE_RSSI true
 
 const int DEFAULT_LORA_POLL_MS = 600;
-const int CHANNEL = 23;
+const int CHANNEL = 39;
 
 void LoraTransmit::setup() {
 	Serial.println("Setupping LoraTransmit");
@@ -38,10 +38,12 @@ void LoraTransmit::setup() {
 	configuration.CHAN = CHANNEL;
 	configuration.ADDL = address & 0x00ff;
 	configuration.ADDH = address & 0xff00;
+	ResponseStatus rs = e220ttl.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
+
 	Serial.println(c.status.getResponseDescription());
 	Serial.println(c.status.code);
-
 	printParameters(configuration);
+
 	c.close();
 }
 
