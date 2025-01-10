@@ -14,7 +14,7 @@ before_script:
 build:
   stage: build
   script:
-    - pio run -e esp32dev --without-uploading
+    - pio run -e esp32dev 
   artifacts:
     paths:
       - .pio/build
@@ -22,7 +22,7 @@ build:
 test:
   stage: test
   script:
-    - pio test -e esp32dev
+    - pio test -e esp32dev --without-uploading
 
 # deploy:
 #   stage: deploy
