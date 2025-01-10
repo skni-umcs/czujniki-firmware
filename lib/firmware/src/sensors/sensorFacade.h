@@ -9,7 +9,7 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
     std::vector<std::unique_ptr<Sensor>> sensors;
     std::shared_ptr<SensorCommunication> sensorCommunication;
     std::shared_ptr<Timer> timer = Timer::create();
-    int h;
+    
     SensorFacade();
     public:
         static std::shared_ptr<SensorFacade> create(std::shared_ptr<JsonTransmit> transmit);

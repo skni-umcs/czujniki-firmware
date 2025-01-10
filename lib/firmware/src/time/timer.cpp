@@ -27,7 +27,6 @@ void Timer::changeTimerTask() {
         this->currentTask = NULL;
     }
 
-    // Tworzymy kopię shared_ptr na stercie
     auto* taskPtr = new std::shared_ptr<Timer>(shared_from_this());
 
     const int bytesNeeded = 25600; //temporary value thats working
