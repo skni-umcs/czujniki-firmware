@@ -25,6 +25,8 @@ void LoraTransmit::setup() {
 	// Startup all pins and UART
 	e220ttl.begin();
 
+	moduleAddress address = AddressHandler::getInstance()->readAddress();
+
     ResponseStructContainer c = ResponseStructContainer();
 	c = e220ttl.getConfiguration();
 	// It's important get configuration pointer before all other operation
@@ -32,6 +34,9 @@ void LoraTransmit::setup() {
 	configuration.TRANSMISSION_MODE.fixedTransmission = FT_FIXED_TRANSMISSION; // Enable repeater mode
 	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
+	configuration.CHAN = 39;
+	configuration.ADDL = address & 0x00ff;
+	configuration.ADDH = address & 0xff00;
 	Serial.println(c.status.getResponseDescription());
 	Serial.println(c.status.code);
 
