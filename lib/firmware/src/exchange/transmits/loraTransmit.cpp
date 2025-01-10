@@ -16,6 +16,7 @@ void printParameters(struct Configuration configuration);
 #define ENABLE_RSSI true
 
 const int DEFAULT_LORA_POLL_MS = 600;
+const int CHANNEL = 23;
 
 void LoraTransmit::setup() {
 	Serial.println("Setupping LoraTransmit");
@@ -34,7 +35,7 @@ void LoraTransmit::setup() {
 	configuration.TRANSMISSION_MODE.fixedTransmission = FT_FIXED_TRANSMISSION; // Enable repeater mode
 	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
-	configuration.CHAN = 39;
+	configuration.CHAN = CHANNEL;
 	configuration.ADDL = address & 0x00ff;
 	configuration.ADDH = address & 0xff00;
 	Serial.println(c.status.getResponseDescription());
@@ -53,8 +54,6 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 OperationResult LoraTransmit::send(std::string content, moduleAddress destinationNode) {
 	Serial.println("Hi, I'm going to send message!");
 
-	// Send message
-	//ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, "Hello, world?");
 	auto senders = std::vector<moduleAddress>{AddressHandler::getInstance().get()->readAddress()};
 	auto rssi = std::vector<std::string>();
 	std::shared_ptr<LoraMessage> message = std::shared_ptr<LoraMessage>(new LoraMessage(
@@ -67,7 +66,7 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 	));
 	std::string packet = message.get()->createPacket();
 	Serial.println(packet.c_str());
-	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(23, packet.c_str());
+	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
 	// Check If there is some problem of succesfully send
 	Serial.println(rs.getResponseDescription());
     return OperationResult::SUCCESS;
