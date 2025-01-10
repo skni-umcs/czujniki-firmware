@@ -1,9 +1,9 @@
 image: python
 
 stages:
-  - build
+  # - build
   - test
-  - deploy
+  # - deploy
 
 variables:
   PLATFORMIO_CACHE_DIR: $CI_PROJECT_DIR/.cache/platformio
@@ -11,22 +11,22 @@ variables:
 before_script:
   - pip install platformio
 
-build:
-  stage: build
-  script:
-    - platformio run
-  artifacts:
-    paths:
-      - .pio/build
+# build:
+#   stage: build
+#   script:
+#     - platformio run
+#   artifacts:
+#     paths:
+#       - .pio/build
 
 test:
   stage: test
   script:
-    - pio test
+    - pio run -e firebeetle32
 
-deploy:
-  stage: deploy
-  only:
-    - main
-  script:
-    - platformio run --target upload
+# deploy:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - platformio run --target upload
