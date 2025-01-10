@@ -9,13 +9,13 @@
 #include "time/timer.h"
 #include "utils/storageTypes.h"
 
-#ifdef esp32firebeetle
+#if defined(esp32firebeetle)
 #define ESP_RX_PIN 17
 #define ESP_TX_PIN 16
 #define AUX_PIN 18
 #define M0_PIN 21
 #define M1_PIN 19
-#elif test
+#elif defined(mini_test)
 #define ESP_RX_PIN 16
 #define ESP_TX_PIN 17
 #define AUX_PIN 18
