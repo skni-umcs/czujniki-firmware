@@ -25,7 +25,7 @@
 
 uint32_t delayMS = 1000;
 
-#ifdef esp32firebeetle || test
+#if defined(esp32firebeetle) || defined(test)
 #define SENSOR_TYPE TestSensor
 #else
 #define SENSOR_TYPE HumidityTemperatureSensor
