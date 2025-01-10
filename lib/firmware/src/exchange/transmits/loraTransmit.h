@@ -10,20 +10,20 @@
 #include "utils/storageTypes.h"
 
 #ifdef esp32firebeetle
-#define TX_PIN 17
-#define RX_PIN 16
+#define ESP_RX_PIN 17
+#define ESP_TX_PIN 16
 #define AUX_PIN 18
 #define M0_PIN 21
 #define M1_PIN 19
 #elif test
-#define TX_PIN 16
-#define RX_PIN 17
+#define ESP_RX_PIN 16
+#define ESP_TX_PIN 17
 #define AUX_PIN 18
 #define M0_PIN 21
 #define M1_PIN 12
 #else
-#define TX_PIN 6
-#define RX_PIN 7
+#define ESP_RX_PIN 6
+#define ESP_TX_PIN 7
 #define AUX_PIN 5
 #define M0_PIN 1
 #define M1_PIN 2
@@ -31,7 +31,7 @@
 
 class LoraTransmit : public JsonTransmit
 {
-  LoRa_E220 e220ttl = LoRa_E220(TX_PIN, RX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
+  LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
   std::shared_ptr<Timer> timer = Timer::create();
 
   public:
