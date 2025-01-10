@@ -22,7 +22,7 @@ build:
 test:
   stage: test
   script:
-    - platformio test
+    - pio test
 
 deploy:
   stage: deploy
