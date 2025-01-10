@@ -3,7 +3,7 @@ image: python
 stages:
   - build
   - test
-  - deploy
+  # - deploy
 
 variables:
   PLATFORMIO_CACHE_DIR: $CI_PROJECT_DIR/.cache/platformio
@@ -14,7 +14,7 @@ before_script:
 build:
   stage: build
   script:
-    - platformio run
+    - pio run -e esp32dev 
   artifacts:
     paths:
       - .pio/build
@@ -22,11 +22,11 @@ build:
 test:
   stage: test
   script:
-    - platformio test
+    - pio test -e esp32dev --without-uploading
 
-deploy:
-  stage: deploy
-  only:
-    - main
-  script:
-    - platformio run --target upload
+# deploy:
+#   stage: deploy
+#   only:
+#     - main
+#   script:
+#     - platformio run --target upload
