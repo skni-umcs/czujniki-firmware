@@ -22,8 +22,8 @@
 #define M0_PIN 21
 #define M1_PIN 12
 #else
-#define ESP_RX_PIN 6
-#define ESP_TX_PIN 7
+#define ESP_RX_PIN 7
+#define ESP_TX_PIN 6
 #define AUX_PIN 5
 #define M0_PIN 1
 #define M1_PIN 2
