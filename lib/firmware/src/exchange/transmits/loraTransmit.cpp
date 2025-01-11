@@ -18,6 +18,24 @@ void printParameters(struct Configuration configuration);
 const int DEFAULT_LORA_POLL_MS = 600;
 const int CHANNEL = 39;
 
+OperationResult LoraTransmit::updateNoise() {
+	const byte readNoiseCommand[] = {0xC0, 0xC1, 0xC2, 0xC3, 0x00, 0x01};
+	Serial1.write(readNoiseCommand, sizeof(readNoiseCommand));
+	delay(100);
+	int localNoise = Serial1.read();
+	delay(100);
+	const byte resetCommand[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	Serial1.write(resetCommand, sizeof(resetCommand));
+
+	if (noise == -1) {
+		Serial.println("Invalid noise");
+		return OperationResult::ERROR;
+	}
+	noise = localNoise;
+
+	return OperationResult::SUCCESS;
+}
+
 void LoraTransmit::setup() {
 	Serial.println("Setupping LoraTransmit");
 	timer.get()->setExecuteFunction([this]() {this->poll();});
@@ -45,6 +63,8 @@ void LoraTransmit::setup() {
 	printParameters(configuration);
 
 	c.close();
+
+	updateNoise();
 }
 
 std::shared_ptr<LoraTransmit> LoraTransmit::create() {
@@ -89,6 +109,7 @@ OperationResult LoraTransmit::poll() {
 				Serial.println(rc.status.getResponseDescription());
 				return OperationResult::ERROR;
 			}else{
+				Serial.println(rc.data);
 				byte rssi = rc.rssi;
 				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi));
 				receive(loraMessage);
