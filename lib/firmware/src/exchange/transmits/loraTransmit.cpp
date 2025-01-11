@@ -27,13 +27,24 @@ OperationResult LoraTransmit::updateNoise() {
 	const byte resetCommand[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 	Serial1.write(resetCommand, sizeof(resetCommand));
 
-	if (noise == -1) {
+	if (localNoise == -1) {
 		Serial.println("Invalid noise");
 		return OperationResult::ERROR;
 	}
-	noise = localNoise;
+	realNoise = -((256)-localNoise);
+	Serial.printf("Real noise: %i\n",realNoise);
 
 	return OperationResult::SUCCESS;
+}
+
+double LoraTransmit::getSnr(int readRssi) {
+	int realRssi = -((256)-readRssi);
+	Serial.println(realRssi);
+	if(realNoise == 0) {
+		Serial.println("Error, realNoise is 0");
+		return -1;
+	}
+	return (double)realRssi-(double)realNoise;
 }
 
 void LoraTransmit::setup() {
@@ -111,6 +122,7 @@ OperationResult LoraTransmit::poll() {
 			}else{
 				Serial.println(rc.data);
 				byte rssi = rc.rssi;
+				Serial.printf("SNR: %f\n",getSnr((int)rssi));
 				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi));
 				receive(loraMessage);
 		#ifdef ENABLE_RSSI
