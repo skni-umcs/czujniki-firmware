@@ -122,7 +122,7 @@ OperationResult LoraTransmit::poll() {
 			}else{
 				Serial.println(rc.data);
 				byte rssi = rc.rssi;
-				Serial.printf("SNR: %f\n",getSnr((int)rssi));
+				Serial.printf("SNR: %i\n",getSnr((int)rssi));
 				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi));
 				receive(loraMessage);
 		#ifdef ENABLE_RSSI
