@@ -171,7 +171,7 @@ bool isRegexCorrect(std::string packet) {
 	validatedPart << "(\\" << NODE_BORDER << "[^\\" << NODE_BORDER << "]*)*";
 	std::stringstream jsonPart;
 	jsonPart << "\\" << MAIN_JSON_BORDER << ".*\\" << MAIN_JSON_BORDER;
-	std::string crcPart = ".*";
+	std::string crcPart = ".+";
 
 	std::string pattern = PACKET_BORDER+validatedPart.str()+jsonPart.str()+crcPart+PACKET_BORDER;
 	std::regex re(pattern);

@@ -110,6 +110,11 @@ void something_that_isnt_even_packet() {
     TEST_ASSERT_FALSE(isPacketCorrect(packet));
 }
 
+void no_crc_packet() {
+    std::string packet = "~$1C$14$85$RSSI37$37$1^test^~";
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
 void only_crc() {
     std::string packet = "^~";
     LoraMessage message = LoraMessage(packet, 0);
@@ -209,6 +214,7 @@ void setup() {
     RUN_TEST(decode_message_from_packet);
     RUN_TEST(something_that_isnt_even_packet);
     RUN_TEST(only_crc);
+    RUN_TEST(no_crc_packet);
     RUN_TEST(random_corruption);
     RUN_TEST(random_corruption_but_crc_is_correct);
     RUN_TEST(also_accept_hops);
