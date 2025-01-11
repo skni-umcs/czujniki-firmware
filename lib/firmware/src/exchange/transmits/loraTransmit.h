@@ -42,7 +42,7 @@ class LoraTransmit : public JsonTransmit
     OperationResult send(std::string message, moduleAddress destinationNode) override;
     OperationResult receive(std::shared_ptr<Message> message) override;
     OperationResult updateNoise();
-    double getSnr(int readRssi);
+    int getSnr(int readRssi);
 };
 
 #endif

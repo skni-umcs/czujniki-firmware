@@ -37,14 +37,14 @@ OperationResult LoraTransmit::updateNoise() {
 	return OperationResult::SUCCESS;
 }
 
-double LoraTransmit::getSnr(int readRssi) {
+int LoraTransmit::getSnr(int readRssi) {
 	int realRssi = -((256)-readRssi);
 	Serial.println(realRssi);
 	if(realNoise == 0) {
 		Serial.println("Error, realNoise is 0");
 		return -1;
 	}
-	return (double)realRssi-(double)realNoise;
+	return realRssi-realNoise;
 }
 
 void LoraTransmit::setup() {
