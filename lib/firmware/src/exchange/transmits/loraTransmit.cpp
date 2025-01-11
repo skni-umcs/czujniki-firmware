@@ -64,6 +64,7 @@ void LoraTransmit::setup() {
 	configuration.TRANSMISSION_MODE.fixedTransmission = FT_FIXED_TRANSMISSION; // Enable repeater mode
 	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
+	configuration.OPTION.transmissionPower = POWER_10;
 	configuration.CHAN = CHANNEL;
 	configuration.ADDL = address & 0x00ff;
 	configuration.ADDH = address & 0xff00;
