@@ -33,7 +33,7 @@ class LoraTransmit : public JsonTransmit
 {
   LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
   std::shared_ptr<Timer> timer = Timer::create();
-  int realNoise;
+  int noisedB;
 
   public:
     static std::shared_ptr<LoraTransmit> create();
