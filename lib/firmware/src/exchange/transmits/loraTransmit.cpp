@@ -24,7 +24,7 @@ OperationResult LoraTransmit::updateNoise() {
 	delay(100);
 	int localNoise = Serial1.read();
 	delay(100);
-	const byte resetCommand[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+	const byte resetCommand[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; //temporary
 	Serial1.write(resetCommand, sizeof(resetCommand));
 
 	if (localNoise == -1) {
