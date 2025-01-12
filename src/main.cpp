@@ -49,7 +49,7 @@ void setup() {
   facade->addSensor(std::move(h));
 
   auto passthroughCommunication = PassthroughCommunication::create();
-  serviceCommunication.get()->subscribe(transmit);
+  passthroughCommunication.get()->subscribe(transmit);
 }
 
 void loop() {
