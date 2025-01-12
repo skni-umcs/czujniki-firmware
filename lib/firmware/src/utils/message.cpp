@@ -4,13 +4,30 @@
 #include "addressHandler.h"
 #include <iostream>
 
-LoraMessage::LoraMessage(std::string packet, byte currentRssi) {
+Message::Message() {}
+
+Message::Message(
+    std::vector<moduleAddress> senders, 
+    moduleAddress destination, 
+    std::string content,
+    std::vector<std::string> rssi,
+    unsigned char hopLimit
+) {
+    this->senders = senders;
+    this->destination = destination;
+    this->content = content;
+    this->rssi = rssi;
+    this->hopLimit = hopLimit;
+}
+
+LoraMessage::LoraMessage(std::string packet, byte currentRssiByte, int snr) {
     this->packet = packet;
     this->addressTable = allAddressTableElements(packet);
 	this->senders = ::getSenders(addressTable);
 	this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
 	this->content =	getPacketContent(packet);
-    this->currentRssi = currentRssi;
+    this->currentRssiByte = currentRssiByte;
+    this->snr = snr;
 }
 
 LoraMessage::LoraMessage(
@@ -18,37 +35,44 @@ LoraMessage::LoraMessage(
     moduleAddress destination, 
     std::string content,
     std::vector<std::string> rssi,
+    unsigned char hopLimit,
     byte currentRssi,
-    int hopLimit
-) {
-    this->senders = senders;
-    this->destination = destination;
-    this->content = content;
-    this->rssi = rssi;
-    this->currentRssi = currentRssi;
-    this->hopLimit = hopLimit;
+    int snr
+) : Message(senders, destination, content, rssi, hopLimit) {
+    this->currentRssiByte = currentRssi;
+    this->snr = snr;
 }
 
-std::vector<moduleAddress> LoraMessage::getSenders() {
+GeneratedMessage::GeneratedMessage(
+    std::vector<moduleAddress> senders, 
+    moduleAddress destination, 
+    std::string content,
+    std::vector<std::string> rssi,
+    unsigned char hopLimit
+) : Message(senders, destination, content, rssi, hopLimit) {
+
+}
+
+std::vector<moduleAddress> Message::getSenders() {
     return senders;
 }
 
-moduleAddress LoraMessage::getDestination() {
+moduleAddress Message::getDestination() {
     return destination;
 }
 
-std::string LoraMessage::getContent() {
+std::string Message::getContent() {
     return content;
 }
 
-moduleAddress LoraMessage::getOriginalSender() {
+moduleAddress Message::getOriginalSender() {
     if(senders.size() <= 0) {
         return INVALID_ADDRESS;
     }
     return senders.at(0);
 }
 
-std::string LoraMessage::addressTableWithoutHopLimit() {
+std::string Message::createAddressTableWithoutHop() {
     std::string result = "";
     for(int i = 0;i < senders.size()-1; ++i) {
         int rssiIndex = rssi.size()-1-i;
@@ -65,13 +89,20 @@ std::string LoraMessage::addressTableWithoutHopLimit() {
     return result;
 }
 
-std::string LoraMessage::createAddressTable() {
+std::string Message::createAddressTable() {
+    std::cout << "fDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDD" << hopLimit << std::endl;
     std::string hopLimitString = NODE_BORDER+toHexString((int)hopLimit);
-    return hopLimitString+addressTableWithoutHopLimit();
+    return hopLimitString+createAddressTableWithoutHop();
 }
 
-std::string LoraMessage::createPacket(bool addSelf) {
-    std::string addressTable = addSelf ? this->createOwnAddressTable() : this->createAddressTable();
+std::string Message::createOwnAddressTable() {
+    return NODE_BORDER+toHexString((int)hopLimit)+NODE_BORDER+
+    toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
+    createAddressTable();
+}
+
+std::string Message::createPacket(bool addSelf) {
+    std::string addressTable = addSelf ? createOwnAddressTable() : createAddressTable();
 	std::string validatedPart = 
 		addressTable+
 		MAIN_JSON_BORDER+getContent()+MAIN_JSON_BORDER;
@@ -88,13 +119,13 @@ std::string LoraMessage::createPacket(bool addSelf) {
 	PACKET_BORDER;
 }
 
-std::string LoraMessage::createPacketForSending() {
+std::string Message::createPacketForSending() {
     return createPacket(true);
 }
 
 std::string LoraMessage::createOwnAddressTable() {
-    return NODE_BORDER+toHexString(hopLimit)+NODE_BORDER+
+    return NODE_BORDER+toHexString((int)hopLimit)+NODE_BORDER+
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
-    toHexString((int)currentRssi)+
-    addressTableWithoutHopLimit();
+    toHexString((int)currentRssiByte)+
+    Message::createAddressTableWithoutHop();
 }

@@ -17,6 +17,8 @@ void printParameters(struct Configuration configuration);
 
 const int DEFAULT_LORA_POLL_MS = 600;
 const int CHANNEL = 39;
+const unsigned char HOP_START_LIMIT = 2;
+const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
 	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
@@ -89,13 +91,12 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 
 	auto senders = std::vector<moduleAddress>{AddressHandler::getInstance().get()->readAddress()};
 	auto rssi = std::vector<std::string>();
-	std::shared_ptr<LoraMessage> message = std::shared_ptr<LoraMessage>(new LoraMessage(
+	std::shared_ptr<GeneratedMessage> message = std::shared_ptr<GeneratedMessage>(new GeneratedMessage(
 		senders,
 		destinationNode,
 		content,
 		rssi,
-		0,
-		0
+		HOP_START_LIMIT
 	));
 	std::string packet = message.get()->createPacket();
 	Serial.println(packet.c_str());
@@ -122,8 +123,9 @@ OperationResult LoraTransmit::poll() {
 			}else{
 				Serial.println(rc.data);
 				byte rssi = rc.rssi;
-				Serial.printf("SNR: %i\n",getSnr((int)rssi));
-				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi));
+				int snr = getSnr((int)rssi);
+				Serial.printf("SNR: %i\n",snr);
+				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi, snr));
 				receive(loraMessage);
 		#ifdef ENABLE_RSSI
 				Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);

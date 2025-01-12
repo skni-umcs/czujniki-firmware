@@ -14,39 +14,41 @@ typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;
 
 class Message {
-    public:
-        virtual std::vector<moduleAddress> getSenders();
-        virtual moduleAddress getDestination();
-        virtual std::string getContent();
-        virtual moduleAddress getOriginalSender();
-        virtual std::string createAddressTable();
-        virtual std::string createOwnAddressTable();
-        virtual std::string createPacket(bool addSelf = false);
-        virtual std::string createPacketForSending();
-};
-
-class LoraMessage : public Message {
+    protected:
     std::string packet;
     std::vector<std::string> addressTable;
     std::vector<moduleAddress> senders;
     moduleAddress destination;
     std::string content;
     std::vector<std::string> rssi;
-    byte currentRssi;
-    int hopLimit;
+    unsigned char hopLimit;
+    public:
+        Message();
+        Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
+        virtual std::vector<moduleAddress> getSenders();
+        virtual moduleAddress getDestination();
+        virtual std::string getContent();
+        virtual moduleAddress getOriginalSender();
+        virtual std::string createAddressTable();
+        virtual std::string createAddressTableWithoutHop();
+        virtual std::string createOwnAddressTable();
+        virtual std::string createPacket(bool addSelf = false);
+        virtual std::string createPacketForSending();
+};
+
+class LoraMessage : public Message {
+    byte currentRssiByte;
+    int snr;
 
     public:
-    LoraMessage(std::string packet, byte rssi);
-    LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, byte currentRssi, int hopLimit);
-    std::vector<moduleAddress> getSenders() override;
-    moduleAddress getDestination() override;
-    std::string getContent() override;
-    moduleAddress getOriginalSender() override;
-    std::string createAddressTable() override;
-    std::string addressTableWithoutHopLimit();
+    LoraMessage(std::string packet, byte rssi, int snr);
+    LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit, byte currentRssiByte, int snr);
     std::string createOwnAddressTable() override;
-    std::string createPacket(bool addSelf = false) override;
-    std::string createPacketForSending() override;
+};
+
+class GeneratedMessage : public Message {
+    public:
+    GeneratedMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
 };
 
 #endif

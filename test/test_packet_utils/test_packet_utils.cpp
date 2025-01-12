@@ -26,22 +26,26 @@ void setupAddressHandler() {
 void create_packet_from_message() {
     auto senders = std::vector<moduleAddress>{55};
     auto rssi = std::vector<std::string>();
-    LoraMessage message = LoraMessage(senders, 1, "test", rssi, 0, 0);
+    int hopLimit = 4;
+    LoraMessage message = LoraMessage(senders, 1, "test", rssi, hopLimit, 0, 0);
+
+    std::cout << "fFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" << hopLimit << std::endl;
 
     std::string out = message.createPacket();
 
-    std::string expected = "~$0$37$1^test^437ac56b~";
+    std::string expected = "~$4$37$1^test^407cfe14~";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
 void create_packet_from_message_multiple_senders() {
     auto senders = std::vector<moduleAddress>{55, 133, 28};
     auto rssi = std::vector<std::string>();
-    LoraMessage message = LoraMessage(senders, 1, "test", rssi, 0, 0);
+    int hopLimit = 5;
+    LoraMessage message = LoraMessage(senders, 1, "test", rssi, hopLimit, 0, 0);
 
     std::string out = message.createPacket();
 
-    std::string expected = "~$0$1c$$85$$37$1^test^3e9226c3~";
+    std::string expected = "~$5$1c$$85$$37$1^test^1518f6dc~";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
@@ -49,8 +53,9 @@ void create_packet_from_loramessage_multiple_senders() {
     auto senders = std::vector<moduleAddress>{55, 133};
     auto hopLimit = 3;
     auto rssi = std::vector<std::string>{"RSSI37"};
-    byte currentRssi = 20;
-    LoraMessage message = LoraMessage(senders, 1, "test", rssi, currentRssi, hopLimit);
+    auto snr = -90;
+    int currentRssi = -60;
+    LoraMessage message = LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr);
 
     std::string out = message.createPacket();
 
@@ -62,18 +67,31 @@ void create_own_packet_from_loramessage_multiple_senders() {
     auto senders = std::vector<moduleAddress>{55, 133};
     auto hopLimit = 2;
     auto rssi = std::vector<std::string>{"RSSI37"};
-    byte currentRssi = 20;
-    LoraMessage message = LoraMessage(senders, 1, "test", rssi, currentRssi, hopLimit);
+    auto snr = -90;
+    int currentRssi = 250;
+    LoraMessage message = LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr);
 
     std::string out = message.createPacketForSending();
 
-    std::string expected = "~$2$1c$14$85$RSSI37$37$1^test^b651943d~";
+    std::string expected = "~$2$1c$fa$85$RSSI37$37$1^test^ec600da9~";
+    TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
+}
+
+void create_generatedMessage() {
+    auto senders = std::vector<moduleAddress>{55};
+    auto rssi = std::vector<std::string>{};
+    auto hopLimit = 100;
+    auto message = GeneratedMessage(senders, 1, "test", rssi, hopLimit);
+
+    std::string out = message.createPacket();
+
+    std::string expected = "~$64$37$1^test^9e202503~";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
 void decode_message_from_packet() {
     std::string packet = "~$37$1^test^40672562~";
-    LoraMessage out = LoraMessage(packet, 0);
+    LoraMessage out = LoraMessage(packet, 0, 0);
 
     moduleAddress expectedSender = 55;
     moduleAddress expectedDestination = 1;
@@ -102,7 +120,7 @@ void incorrect_nth_last_address() {
 
 void something_that_isnt_even_packet() {
     std::string packet = "~s$ema test ~_~";
-    LoraMessage message = LoraMessage(packet, 0);
+    LoraMessage message = LoraMessage(packet, 0, 0);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -117,7 +135,7 @@ void no_crc_packet() {
 
 void only_crc() {
     std::string packet = "^~";
-    LoraMessage message = LoraMessage(packet, 0);
+    LoraMessage message = LoraMessage(packet, 0, 0);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -127,7 +145,7 @@ void only_crc() {
 
 void random_corruption() {
     std::string packet = "~$9Be&!*&$%!JSAFT@!%!&#HFA(T#@QUNst^40672562~";
-    LoraMessage message = LoraMessage(packet, 0);
+    LoraMessage message = LoraMessage(packet, 0, 0);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -137,7 +155,7 @@ void random_corruption() {
 
 void random_corruption_but_crc_is_correct() {
     std::string packet = "~$9Be&!*&$%!JSAFT@!%!&#HFA(T#@QUNst^0dab27ed~";
-    LoraMessage message = LoraMessage(packet, 0);
+    LoraMessage message = LoraMessage(packet, 0, 0);
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getOriginalSender());
     TEST_ASSERT_EQUAL(INVALID_ADDRESS, message.getDestination());
     TEST_ASSERT_EQUAL_STRING("", message.getContent().c_str());
@@ -157,7 +175,7 @@ void nth_last_address_table_element_check() {
 
 void get_all_senders_correctly() {
     std::string packet = "~HOP$100$RSSI9$9$RSSIffff$ffff$RSSIf8$f8$1^test^79c08850~";
-    LoraMessage message = LoraMessage(packet, 0);
+    LoraMessage message = LoraMessage(packet, 0, 0);
 
     std::vector<moduleAddress> expectedSenders = {248, 32767, 9, 256};
     std::vector<moduleAddress> out = getSenders(allAddressTableElements(packet));
@@ -211,6 +229,7 @@ void setup() {
     RUN_TEST(create_packet_from_message_multiple_senders);
     RUN_TEST(create_packet_from_loramessage_multiple_senders);
     RUN_TEST(create_own_packet_from_loramessage_multiple_senders);
+    RUN_TEST(create_generatedMessage);
     RUN_TEST(decode_message_from_packet);
     RUN_TEST(something_that_isnt_even_packet);
     RUN_TEST(only_crc);
