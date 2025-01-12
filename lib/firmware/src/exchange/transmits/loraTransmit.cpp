@@ -19,13 +19,8 @@ const int DEFAULT_LORA_POLL_MS = 600;
 const int CHANNEL = 39;
 
 OperationResult LoraTransmit::updateNoise() {
-	const byte readNoiseCommand[] = {0xC0, 0xC1, 0xC2, 0xC3, 0x00, 0x01};
-	Serial1.write(readNoiseCommand, sizeof(readNoiseCommand));
-	delay(100);
-	int localNoise = Serial1.read();
-	delay(100);
-	const byte resetCommand[] = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00}; //temporary
-	Serial1.write(resetCommand, sizeof(resetCommand));
+	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
+	byte localNoise = RSSIAmbient >> 8;
 
 	if (localNoise == -1) {
 		Serial.println("Invalid noise");
