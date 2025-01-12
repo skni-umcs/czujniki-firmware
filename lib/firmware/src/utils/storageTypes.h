@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include <Arduino.h>
+#include <memory>
 
 #define INVALID_ADDRESS -1
 #define INVALID_CRC -1;
@@ -12,6 +13,11 @@
 
 typedef short moduleAddress;
 const moduleAddress SERVER_ADDRESS = 0;
+
+enum class MessageType {
+    LoraMessage,
+    GeneratedMessage
+};
 
 class Message {
     protected:
@@ -34,6 +40,8 @@ class Message {
         virtual std::string createOwnAddressTable();
         virtual std::string createPacket(bool addSelf = false);
         virtual std::string createPacketForSending();
+        virtual bool isSameMessage(std::shared_ptr<Message> message);
+        virtual MessageType type() const = 0;
 };
 
 class LoraMessage : public Message {
@@ -44,11 +52,18 @@ class LoraMessage : public Message {
     LoraMessage(std::string packet, byte rssi, int snr);
     LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit, byte currentRssiByte, int snr);
     std::string createOwnAddressTable() override;
+    int getSnr();
+    MessageType type() const override {
+        return MessageType::LoraMessage;
+    }
 };
 
 class GeneratedMessage : public Message {
     public:
     GeneratedMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
+    MessageType type() const override {
+        return MessageType::GeneratedMessage;
+    }
 };
 
 #endif

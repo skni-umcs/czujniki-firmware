@@ -13,7 +13,7 @@ class JsonCommunication : public Communication {
         std::vector<std::shared_ptr<JsonTransmit>> transmitTo;
     public:
         static std::shared_ptr<JsonCommunication> create();
-        OperationResult getNotified(std::shared_ptr<Message> message) override;
+        virtual OperationResult getNotified(std::shared_ptr<Message> message) override;
         OperationResult transmit(std::string message, moduleAddress destinationNode) override;
         OperationResult subscribe(std::shared_ptr<JsonTransmit> transmit);
         OperationResult unsubscribe(std::shared_ptr<JsonTransmit> transmit);

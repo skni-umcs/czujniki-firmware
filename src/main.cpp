@@ -18,6 +18,7 @@
 #include "time/timer.h"
 #include <exchange/transmits/loraTransmit.h>
 #include <exchange/communications/serviceCommunication.h>
+#include <exchange/communications/passthroughCommunication.h>
 #include <Preferences.h>
 #include "utils/addressHandler.h"
 #include <Adafruit_I2CDevice.h>
@@ -46,6 +47,9 @@ void setup() {
   std::unique_ptr<Sensor> h = std::unique_ptr<SENSOR_TYPE>(new SENSOR_TYPE());
   h->setupSensor(&delayMS);
   facade->addSensor(std::move(h));
+
+  auto passthroughCommunication = PassthroughCommunication::create();
+  serviceCommunication.get()->subscribe(transmit);
 }
 
 void loop() {

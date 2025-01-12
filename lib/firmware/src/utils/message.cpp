@@ -72,6 +72,12 @@ moduleAddress Message::getOriginalSender() {
     return senders.at(0);
 }
 
+bool Message::isSameMessage(std::shared_ptr<Message> message) {
+    return message->getOriginalSender() == getOriginalSender() &&
+    message->getDestination() == getDestination() &&
+    message->getContent() == getContent(); 
+}
+
 std::string Message::createAddressTableWithoutHop() {
     std::string result = "";
     for(int i = 0;i < senders.size()-1; ++i) {
@@ -127,4 +133,8 @@ std::string LoraMessage::createOwnAddressTable() {
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
     toHexString((int)currentRssiByte)+
     Message::createAddressTableWithoutHop();
+}
+
+int LoraMessage::getSnr() {
+    return snr;
 }
