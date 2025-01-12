@@ -49,8 +49,6 @@ int LoraTransmit::getSnr(int readRssi) {
 
 void LoraTransmit::setup() {
 	Serial.println("Setupping LoraTransmit");
-	timer.get()->setExecuteFunction([this]() {this->poll();});
-    timer.get()->updateTime(10,DEFAULT_LORA_POLL_MS);
 
 	// Startup all pins and UART
 	e220ttl.begin();
@@ -81,6 +79,12 @@ void LoraTransmit::setup() {
 
 std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     auto loraTransmit = new LoraTransmit();
+
+    loraTransmit->timer.get()->setExecuteFunction([loraTransmit]() {
+       loraTransmit->poll();
+    });
+    loraTransmit->timer.get()->updateTime(10,DEFAULT_LORA_POLL_MS);
+
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }

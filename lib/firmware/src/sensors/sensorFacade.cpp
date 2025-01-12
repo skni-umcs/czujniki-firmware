@@ -17,10 +17,10 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
     facade->sensorCommunication = SensorCommunication::create();
     facade->sensorCommunication->subscribe(std::move(transmit));
 
-    std::weak_ptr<SensorFacade> weakFacade(facade);
     facade->timer.get()->setExecuteFunction([facade]() {
        facade->sendAllSensors();
     });
+    
     facade->timer.get()->updateTime(10,DEFAULT_SENSOR_PERIOD_MS);
     return facade;
 }
