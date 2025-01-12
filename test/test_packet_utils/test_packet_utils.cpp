@@ -28,9 +28,7 @@ void create_packet_from_message() {
     auto rssi = std::vector<std::string>();
     int hopLimit = 4;
     LoraMessage message = LoraMessage(senders, 1, "test", rssi, hopLimit, 0, 0);
-
-    std::cout << "fFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" << hopLimit << std::endl;
-
+    
     std::string out = message.createPacket();
 
     std::string expected = "~$4$37$1^test^407cfe14~";

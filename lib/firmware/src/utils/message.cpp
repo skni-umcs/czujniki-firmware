@@ -90,7 +90,6 @@ std::string Message::createAddressTableWithoutHop() {
 }
 
 std::string Message::createAddressTable() {
-    std::cout << "fDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDDfDDDDDDDDDDDDDDDDDD" << hopLimit << std::endl;
     std::string hopLimitString = NODE_BORDER+toHexString((int)hopLimit);
     return hopLimitString+createAddressTableWithoutHop();
 }
