@@ -11,8 +11,6 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 }
 
 OperationResult PassthroughCommunication::rebroadcastMessage(std::shared_ptr<LoraMessage> message) {
-    Serial.println("siema z pasfru");
-    Serial.println(message->getHopLimit());
     message->decrementHopLimit();
     if(message->getHopLimit() > 0) {
         transmit(message);
@@ -47,8 +45,6 @@ OperationResult PassthroughCommunication::removeMessage(std::set<std::shared_ptr
 }
 
 OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> message) {
-    Serial.println("siema z getnotified");
-    Serial.println(message->getHopLimit());
     if (message->type() != MessageType::LoraMessage) {
         Serial.println("Passthrough got non-lora message, discarding");
         return OperationResult::ERROR;

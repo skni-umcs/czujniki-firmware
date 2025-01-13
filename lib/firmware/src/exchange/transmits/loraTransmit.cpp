@@ -110,7 +110,6 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 		HOP_START_LIMIT
 	));
 	std::string packet = message.get()->createPacketForSending();
-	Serial.println("Hi, I'm wdadcwacwa!");
 	Serial.println(packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
 	// Check If there is some problem of succesfully send
