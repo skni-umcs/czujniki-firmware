@@ -47,7 +47,7 @@ void test_passthrough_no_message_in_set() {
     int currentRssi = 250;
     auto message = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr));
     std::set<std::shared_ptr<LoraMessage>> set;
-    passthroughCommunication->removeMessage(set, message);
+    passthroughCommunication->removeSameMessages(set, message);
 }
 
 void setup() {

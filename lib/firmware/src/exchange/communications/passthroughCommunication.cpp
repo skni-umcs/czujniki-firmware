@@ -11,13 +11,13 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
     return std::shared_ptr<PassthroughCommunication>{s};
 }
 
-OperationResult PassthroughCommunication::rebroadcastMessage(std::shared_ptr<LoraMessage> message) {
+OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
     message->decrementHopLimit();
     transmit(message);
     return OperationResult::SUCCESS;
 }
 
-OperationResult messageAlreadyRebroadcasted() {
+OperationResult alreadyRebroadcasted() {
     Serial.println("already rebro");
     return OperationResult::SUCCESS;
 }
@@ -34,7 +34,7 @@ std::set<std::shared_ptr<LoraMessage>> PassthroughCommunication::getSameMessages
     return result;
 }
 
-OperationResult PassthroughCommunication::removeMessage(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
+OperationResult PassthroughCommunication::removeSameMessages(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
     Serial.println("removing message");
     messageSet.erase(message);
     for (auto rebroadcastedMessage : rebroadcastedMessages) {
@@ -43,7 +43,7 @@ OperationResult PassthroughCommunication::removeMessage(std::set<std::shared_ptr
     return OperationResult::SUCCESS;
 }
 
-bool isMessageRebroadcastMaterial(std::shared_ptr<LoraMessage> message) {
+bool PassthroughCommunication::shouldRebroadcast(std::shared_ptr<LoraMessage> message) {
     return message->getHopLimit() > 0 && 
     !message->isCurrentModuleSenderPresent() && 
     message->getDestination() != AddressHandler::getInstance()->readAddress();
@@ -56,22 +56,22 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
     }
     std::shared_ptr<LoraMessage> loraMessage = std::static_pointer_cast<LoraMessage>(message);
 
-    if (isMessageRebroadcastMaterial(loraMessage)) {
+    if (shouldRebroadcast(loraMessage)) {
         messageSet.emplace(loraMessage);
         int passDelay = loraMessage->getSnr()*SNR_WAIT_MULTIPLIER;
         Serial.printf("czekam %i\n", passDelay);
         delay(passDelay);
 
         if (!setContains(messageSet, loraMessage)) {
-            return messageAlreadyRebroadcasted();
+            return alreadyRebroadcasted();
         }
 
         std::set<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
 
         if (sameMessages.empty()) {
-            rebroadcastMessage(loraMessage);
+            rebroadcast(loraMessage);
         }
-        removeMessage(sameMessages, loraMessage);
+        removeSameMessages(sameMessages, loraMessage);
         return OperationResult::SUCCESS;
     }
     return OperationResult::OPERATION_IGNORED;
