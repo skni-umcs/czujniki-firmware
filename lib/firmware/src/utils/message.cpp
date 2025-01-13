@@ -138,6 +138,10 @@ std::string Message::createPacket(bool addSelf) {
 }
 
 std::string Message::createPacketForSending() {
+    if(senders.size() == 0) {
+        senders.push_back(AddressHandler::getInstance().get()->readAddress());
+        return createPacket(false);
+    }
     return createPacket(true);
 }
 
