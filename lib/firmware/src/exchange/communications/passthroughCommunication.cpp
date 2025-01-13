@@ -10,12 +10,6 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
     return std::shared_ptr<PassthroughCommunication>{s};
 }
 
-void PassthroughCommunication::handleQueueMessages() {
-    if (messageSet.empty()) {
-        return;
-    }
-}
-
 OperationResult rebroadcastMessage(std::shared_ptr<LoraMessage> message) {
     Serial.println("rebro");
     return OperationResult::SUCCESS;
