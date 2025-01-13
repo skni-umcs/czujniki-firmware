@@ -17,7 +17,7 @@ void printParameters(struct Configuration configuration);
 
 const int DEFAULT_LORA_POLL_MS = 600;
 const int CHANNEL = 39;
-const unsigned char HOP_START_LIMIT = 2;
+const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
@@ -102,7 +102,6 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 
 	auto senders = std::vector<moduleAddress>();
 	auto rssi = std::vector<std::string>();
-	Serial.println("Hi, I'm goin!");
 	std::shared_ptr<GeneratedMessage> message = std::shared_ptr<GeneratedMessage>(new GeneratedMessage(
 		senders,
 		destinationNode,
