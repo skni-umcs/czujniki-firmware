@@ -43,6 +43,7 @@ std::vector<std::string> allAddressTableElements(std::string packet);
 std::string nthLastAddressTableElement(std::vector<std::string> addressTableElements, unsigned char n);
 moduleAddress nthLastAddress(std::vector<std::string> addressTableElements, unsigned char n);
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable);
+unsigned char getHopLimit(std::vector<std::string> addressTable);
 std::string getPacketContent(std::string packet);
 std::string getValidatedPart(std::string packet);
 bool isCrcCorrect(std::string packet);

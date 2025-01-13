@@ -27,6 +27,7 @@ LoraMessage::LoraMessage(std::string packet, byte currentRssiByte, int snr) {
 	this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
 	this->content =	getPacketContent(packet);
     this->currentRssiByte = currentRssiByte;
+    this->hopLimit = ::getHopLimit(addressTable);
     this->snr = snr;
 }
 

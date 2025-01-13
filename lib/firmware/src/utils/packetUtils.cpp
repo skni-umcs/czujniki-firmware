@@ -148,6 +148,19 @@ std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 	return result;
 }
 
+unsigned char getHopLimit(std::vector<std::string> addressTable) {
+	if(addressTable.size() == 0) {
+		return 0;
+	}
+	char* invalidPosition = 0;
+	char hopLimit = 0;
+	hopLimit = strtol(addressTable.at(0).c_str(), &invalidPosition, HEX);
+	if (*invalidPosition != '\0') {
+		return 0;
+	}
+	return hopLimit;
+}
+
 std::string getPacketContent(std::string packet) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
