@@ -4,7 +4,8 @@
 enum class OperationResult {
     SUCCESS,
     ERROR,
-    NOT_FOUND
+    NOT_FOUND,
+    OPERATION_IGNORED
 };
 
 #endif

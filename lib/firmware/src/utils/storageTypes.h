@@ -33,6 +33,8 @@ class Message {
         Message();
         Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
         virtual std::vector<moduleAddress> getSenders();
+        virtual bool isSenderPresent(moduleAddress sender);
+        virtual bool isCurrentModuleSenderPresent();
         virtual moduleAddress getDestination();
         virtual std::string getContent();
         virtual moduleAddress getOriginalSender();

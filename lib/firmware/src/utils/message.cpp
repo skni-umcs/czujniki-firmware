@@ -86,6 +86,19 @@ OperationResult Message::decrementHopLimit() {
     return OperationResult::SUCCESS;
 }
 
+bool Message::isSenderPresent(moduleAddress sender) {
+    for(auto includedSender : getSenders()) {
+        if(includedSender == sender) {
+            return true;
+        }
+    }
+    return false;
+}
+
+bool Message::isCurrentModuleSenderPresent() {
+    return isSenderPresent(AddressHandler::getInstance()->readAddress());
+}
+
 bool Message::isSameMessage(std::shared_ptr<Message> message) {
     return message->getOriginalSender() == getOriginalSender() &&
     message->getDestination() == getDestination() &&
