@@ -10,8 +10,9 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
     return std::shared_ptr<PassthroughCommunication>{s};
 }
 
-OperationResult rebroadcastMessage(std::shared_ptr<LoraMessage> message) {
-    Serial.println("rebro");
+OperationResult PassthroughCommunication::rebroadcastMessage(std::shared_ptr<LoraMessage> message) {
+    message->decrementHopLimit();
+    //transmit(message);
     return OperationResult::SUCCESS;
 }
 

@@ -31,7 +31,7 @@ void test_lora_subscription() {
 
 auto passthroughCommunication = PassthroughCommunication::create();
 
-void test_wrong_message_type() {
+void test_passthrough_wrong_message_type() {
     auto senders = std::vector<moduleAddress>{55};
     auto rssi = std::vector<std::string>{};
     auto hopLimit = 100;
@@ -39,7 +39,7 @@ void test_wrong_message_type() {
     TEST_ASSERT_EQUAL(OperationResult::ERROR, passthroughCommunication->getNotified(message));
 }
 
-void test_no_message_in_set() {
+void test_passthrough_no_message_in_set() {
     auto senders = std::vector<moduleAddress>{55, 133};
     auto hopLimit = 2;
     auto rssi = std::vector<std::string>{"RSSI37"};
@@ -54,8 +54,8 @@ void setup() {
     UNITY_BEGIN();
     RUN_TEST(test_wifi_subscription);
     RUN_TEST(test_lora_subscription);
-    RUN_TEST(test_wrong_message_type);
-    RUN_TEST(test_no_message_in_set);
+    RUN_TEST(test_passthrough_wrong_message_type);
+    RUN_TEST(test_passthrough_no_message_in_set);
     UNITY_END();
 }
 

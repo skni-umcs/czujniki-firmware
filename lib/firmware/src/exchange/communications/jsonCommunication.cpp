@@ -23,6 +23,15 @@ OperationResult JsonCommunication::transmit(std::string message, moduleAddress d
     return OperationResult::SUCCESS;
 }
 
+OperationResult JsonCommunication::transmit(std::shared_ptr<Message> message) {
+    Serial.printf("generic transmitting message from ready message: %s\n", message->getContent().c_str());
+    for(auto const& destination : transmitTo) {
+        destination->send(message);
+    }
+    Serial.println("finished generic transmit message from ready message");
+    return OperationResult::SUCCESS;
+}
+
 OperationResult JsonCommunication::subscribe(std::shared_ptr<JsonTransmit> transmit) {
     auto thisPtr = shared_from_this();
     transmit->addSubscriber(thisPtr);

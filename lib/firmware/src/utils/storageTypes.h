@@ -5,6 +5,7 @@
 #include <vector>
 #include <Arduino.h>
 #include <memory>
+#include "operationResult.h"
 
 #define INVALID_ADDRESS -1
 #define INVALID_CRC -1;
@@ -35,6 +36,7 @@ class Message {
         virtual moduleAddress getDestination();
         virtual std::string getContent();
         virtual moduleAddress getOriginalSender();
+        virtual OperationResult decrementHopLimit();
         virtual std::string createAddressTable();
         virtual std::string createAddressTableWithoutHop();
         virtual std::string createOwnAddressTable();

@@ -15,6 +15,7 @@ class JsonCommunication : public Communication {
         static std::shared_ptr<JsonCommunication> create();
         virtual OperationResult getNotified(std::shared_ptr<Message> message) override;
         OperationResult transmit(std::string message, moduleAddress destinationNode) override;
+        virtual OperationResult transmit(std::shared_ptr<Message> message) override;
         OperationResult subscribe(std::shared_ptr<JsonTransmit> transmit);
         OperationResult unsubscribe(std::shared_ptr<JsonTransmit> transmit);
         const std::vector<std::shared_ptr<JsonTransmit>>& getTransmitTo();

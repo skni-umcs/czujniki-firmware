@@ -86,11 +86,23 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
+OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
+	Serial.println("Hi, I'm going to send message from ready message!");
+
+	std::string packet = message.get()->createPacketForSending();
+	Serial.println(packet.c_str());
+	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+	// Check If there is some problem of succesfully send
+	Serial.println(rs.getResponseDescription());
+    return OperationResult::SUCCESS;
+}
+
 OperationResult LoraTransmit::send(std::string content, moduleAddress destinationNode) {
 	Serial.println("Hi, I'm going to send message!");
 
-	auto senders = std::vector<moduleAddress>{AddressHandler::getInstance().get()->readAddress()};
+	auto senders = std::vector<moduleAddress>();
 	auto rssi = std::vector<std::string>();
+	Serial.println("Hi, I'm goin!");
 	std::shared_ptr<GeneratedMessage> message = std::shared_ptr<GeneratedMessage>(new GeneratedMessage(
 		senders,
 		destinationNode,
@@ -98,7 +110,8 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 		rssi,
 		HOP_START_LIMIT
 	));
-	std::string packet = message.get()->createPacket();
+	std::string packet = message.get()->createPacketForSending();
+	Serial.println("Hi, I'm wdadcwacwa!");
 	Serial.println(packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
 	// Check If there is some problem of succesfully send

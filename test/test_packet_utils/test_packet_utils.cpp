@@ -87,6 +87,19 @@ void create_generatedMessage() {
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
 }
 
+void decrement() {
+    auto senders = std::vector<moduleAddress>{55};
+    auto rssi = std::vector<std::string>{};
+    auto hopLimit = 100;
+    auto message = GeneratedMessage(senders, 1, "test", rssi, hopLimit);
+
+    message.decrementHopLimit();
+    std::string out = message.createPacket();
+
+    std::string expected = "~$63$37$1^test^eab8cc8c~";
+    TEST_ASSERT_EQUAL_STRING(expected.c_str(), out.c_str());
+}
+
 void decode_message_from_packet() {
     std::string packet = "~$37$1^test^40672562~";
     LoraMessage out = LoraMessage(packet, 0, 0);
@@ -229,6 +242,7 @@ void setup() {
     RUN_TEST(create_own_packet_from_loramessage_multiple_senders);
     RUN_TEST(create_generatedMessage);
     RUN_TEST(decode_message_from_packet);
+    RUN_TEST(decrement);
     RUN_TEST(something_that_isnt_even_packet);
     RUN_TEST(only_crc);
     RUN_TEST(no_crc_packet);

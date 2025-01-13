@@ -72,6 +72,11 @@ moduleAddress Message::getOriginalSender() {
     return senders.at(0);
 }
 
+OperationResult Message::decrementHopLimit() {
+    hopLimit -= 1;
+    return OperationResult::SUCCESS;
+}
+
 bool Message::isSameMessage(std::shared_ptr<Message> message) {
     return message->getOriginalSender() == getOriginalSender() &&
     message->getDestination() == getDestination() &&
@@ -79,10 +84,15 @@ bool Message::isSameMessage(std::shared_ptr<Message> message) {
 }
 
 std::string Message::createAddressTableWithoutHop() {
+    Serial.println("Hi, I'm goincreatewithouthop!");
     std::string result = "";
-    for(int i = 0;i < senders.size()-1; ++i) {
+    Serial.println(senders.size());
+    int size = senders.size();
+    for(int i = 0;i < size-1; ++i) {
+        Serial.println(senders.size());
         int rssiIndex = rssi.size()-1-i;
         int senderIndex = senders.size()-1-i;
+        Serial.println("czemu sie wykonujesz");
         result += NODE_BORDER+toHexString(senders.at(senderIndex));
         if(rssiIndex < 0 || rssiIndex >= rssi.size()) {
             result += NODE_BORDER;
@@ -91,6 +101,7 @@ std::string Message::createAddressTableWithoutHop() {
             result += NODE_BORDER+rssi.at(rssiIndex);
         }
     }
+    Serial.println("po");
     result += NODE_BORDER+toHexString(getOriginalSender())+NODE_BORDER+toHexString(getDestination());
     return result;
 }
@@ -101,6 +112,7 @@ std::string Message::createAddressTable() {
 }
 
 std::string Message::createOwnAddressTable() {
+    Serial.println("Hi, I'm goincreate!");
     return NODE_BORDER+toHexString((int)hopLimit)+NODE_BORDER+
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
     createAddressTable();
@@ -108,6 +120,7 @@ std::string Message::createOwnAddressTable() {
 
 std::string Message::createPacket(bool addSelf) {
     std::string addressTable = addSelf ? createOwnAddressTable() : createAddressTable();
+    Serial.println("Hi, I'm goincreate!");
 	std::string validatedPart = 
 		addressTable+
 		MAIN_JSON_BORDER+getContent()+MAIN_JSON_BORDER;
@@ -117,7 +130,7 @@ std::string Message::createPacket(bool addSelf) {
 	std::stringstream hexStream;
 	hexStream << std::hex << crc;
 	Serial.println(hexStream.str().c_str());
-
+    Serial.println("Hi, I'm goincreate!");
 	return PACKET_BORDER+ 
 	validatedPart+
 	toHexString(crc)+

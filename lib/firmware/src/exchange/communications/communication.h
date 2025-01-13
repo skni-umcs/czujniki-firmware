@@ -12,6 +12,7 @@ class Communication : public std::enable_shared_from_this<Communication>
     public:
         virtual OperationResult getNotified(std::shared_ptr<Message> message) = 0;
         virtual OperationResult transmit(std::string message, moduleAddress destinationNode) = 0;
+        virtual OperationResult transmit(std::shared_ptr<Message> message) = 0;
 };
 
 #endif

@@ -15,6 +15,7 @@ class PassthroughCommunication : public JsonCommunication {
         OperationResult getNotified(std::shared_ptr<Message> message) override;
         std::set<std::shared_ptr<LoraMessage>> getSameMessages(std::shared_ptr<LoraMessage> message);
         OperationResult removeMessage(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message);
+        OperationResult rebroadcastMessage(std::shared_ptr<LoraMessage> message);
 };
 
 #endif
