@@ -50,6 +50,9 @@ bool PassthroughCommunication::shouldRebroadcast(std::shared_ptr<LoraMessage> me
 }
 
 OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> message) {
+    if(!message->getIsPacketCorrect()) {
+        return OperationResult::OPERATION_IGNORED;
+    }
     if (message->type() != MessageType::LoraMessage) {
         Serial.println("Passthrough got non-lora message, discarding");
         return OperationResult::ERROR;

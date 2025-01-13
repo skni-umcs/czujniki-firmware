@@ -25,10 +25,11 @@ class Message {
     std::string packet;
     std::vector<std::string> addressTable;
     std::vector<moduleAddress> senders;
-    moduleAddress destination;
+    moduleAddress destination = INVALID_ADDRESS;
     std::string content;
     std::vector<std::string> rssi;
     unsigned char hopLimit;
+    bool isPacketCorrect = true;
     public:
         Message();
         Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
@@ -39,6 +40,8 @@ class Message {
         virtual std::string getContent();
         virtual moduleAddress getOriginalSender();
         virtual unsigned char getHopLimit();
+        virtual bool getIsPacketCorrect();
+        virtual std::string getPacket();
         virtual OperationResult decrementHopLimit();
         virtual std::string createAddressTable();
         virtual std::string createAddressTableWithoutHop();

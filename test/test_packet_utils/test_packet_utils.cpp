@@ -127,7 +127,8 @@ void decode_message_from_packet() {
 }
 
 void dont_allow_merged_packets() {
-    std::string packet = "~$63$3$db$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 2137\\\"]\",\"c\":103}^6c723e01~�~$64$3$0^[\"random prime number: 2137\"]^5a4f6e1a~";
+    std::string packet = "~$63$3$db$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime nummmmmmmmmmmmmmmmmmmmmmmm";
+    packet = "~$37$0^d^b7e09b90~~$37$0^d^b7e09b90~";
     TEST_ASSERT_FALSE(isPacketCorrect(packet));
 }
 

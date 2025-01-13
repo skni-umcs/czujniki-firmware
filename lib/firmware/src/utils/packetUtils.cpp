@@ -113,12 +113,15 @@ std::string getValidatedPart(std::string packet) {
 		Serial.printf("Invalid packet, no JSON borders %s\n", packet.c_str());
 		return INVALID_STRING;
 	}
+	std::cout << "eeeee" << std::endl;
 	int partStart = leftBorder+1;
 	int partLength = rightBorder-leftBorder;
+	std::cout << packet.substr(partStart, partLength) << std::endl;
 	return packet.substr(partStart, partLength);
 }
 
 uint32_t getPacketCrc(std::string packet) {
+	std::cout << "crc" << std::endl;
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
 	if (jsonEnd == std::string::npos) {
 		Serial.printf("Invalid packet, no crc %s\n", packet.c_str());
@@ -129,12 +132,14 @@ uint32_t getPacketCrc(std::string packet) {
 		Serial.printf("Invalid packet, no end border %s\n", packet.c_str());
 		return INVALID_CRC;
 	}
+	std::cout << "crc zyje" << std::endl;
 	int crcStart = jsonEnd+1;
 	int crcLength = packetEnd-jsonEnd-1;
 	std::string crcSubstring = packet.substr(crcStart, crcLength);
 	auto errorDestination = nullptr;
 	int hexadecimalBase = 16;
-	return stoi(crcSubstring, errorDestination, hexadecimalBase);
+	std::cout << crcSubstring << std::endl;
+	return strtol(crcSubstring.c_str(), errorDestination, hexadecimalBase);
 }
 
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
@@ -178,25 +183,34 @@ std::string getPacketContent(std::string packet) {
 }
 
 bool isCrcCorrect(std::string packet) {
+	std::cout << "start crc";
 	uint32_t oldCrc = getPacketCrc(packet);
+	std::cout << "yhhhhh" << std::endl;
 	uint32_t newCrc = getCrc(getValidatedPart(packet));
 
 	return oldCrc == newCrc;
 }
 
 bool isRegexCorrect(std::string packet) {
+	std::cout << "regex start" << std::endl;
 	std::stringstream validatedPart;
-	validatedPart << "(\\" << NODE_BORDER << "[^\\" << NODE_BORDER << "]*)*";
+	validatedPart << "(\\" << NODE_BORDER << "[^\\" << NODE_BORDER << "]+)+";
 	std::stringstream jsonPart;
-	jsonPart << "\\" << MAIN_JSON_BORDER << ".*\\" << MAIN_JSON_BORDER;
+	jsonPart << "\\" << MAIN_JSON_BORDER << ".+\\" << MAIN_JSON_BORDER;
 	std::string crcPart = ".+";
 
 	std::string pattern = PACKET_BORDER+validatedPart.str()+jsonPart.str()+crcPart+PACKET_BORDER;
 	std::regex re(pattern);
 	std::smatch foundValue;
+	std::cout << "regex przetrwal " << packet << " " << pattern << std::endl;
 	return std::regex_match(packet, foundValue, re);
 }
 
 bool isPacketCorrect(std::string packet) {
+	bool rrrrregex = isRegexCorrect(packet);
+	bool ccccc = isCrcCorrect(packet);
+	Serial.println(rrrrregex);
+	Serial.println(ccccc);
+	Serial.println("ispacketcor");
 	return isRegexCorrect(packet) && isCrcCorrect(packet);
 }

@@ -11,6 +11,13 @@ std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     return std::shared_ptr<ServiceCommunication>{s};
 }
 
+OperationResult ServiceCommunication::getNotified(std::shared_ptr<Message> message) {
+    if(!message->getIsPacketCorrect()) {
+        Serial.printf("service is notified of invalid packet %s\n", message.get()->getPacket().c_str());
+    }
+    return OperationResult::SUCCESS;
+}
+
 void ServiceCommunication::sendResetReason() {
     JsonDocument doc;
     JsonArray messages = doc.to<JsonArray>();

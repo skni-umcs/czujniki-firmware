@@ -21,14 +21,17 @@ Message::Message(
 }
 
 LoraMessage::LoraMessage(std::string packet, byte currentRssiByte, int snr) {
+    this->isPacketCorrect = ::isPacketCorrect(packet);
     this->packet = packet;
-    this->addressTable = allAddressTableElements(packet);
-	this->senders = ::getSenders(addressTable);
-	this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
-	this->content =	getPacketContent(packet);
-    this->currentRssiByte = currentRssiByte;
-    this->hopLimit = ::getHopLimit(addressTable);
-    this->snr = snr;
+    if(isPacketCorrect) {
+        this->addressTable = allAddressTableElements(packet);
+        this->senders = ::getSenders(addressTable);
+        this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
+        this->content =	getPacketContent(packet);
+        this->currentRssiByte = currentRssiByte;
+        this->hopLimit = ::getHopLimit(addressTable);
+        this->snr = snr;
+    }
 }
 
 LoraMessage::LoraMessage(
@@ -66,6 +69,10 @@ std::string Message::getContent() {
     return content;
 }
 
+std::string Message::getPacket() {
+    return packet;
+}
+
 moduleAddress Message::getOriginalSender() {
     if(senders.size() <= 0) {
         return INVALID_ADDRESS;
@@ -75,6 +82,10 @@ moduleAddress Message::getOriginalSender() {
 
 unsigned char Message::getHopLimit() {
     return hopLimit;
+}
+
+bool Message::getIsPacketCorrect() {
+    return isPacketCorrect;
 }
 
 OperationResult Message::decrementHopLimit() {

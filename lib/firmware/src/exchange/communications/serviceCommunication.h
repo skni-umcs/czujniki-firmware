@@ -9,6 +9,7 @@ class ServiceCommunication : public JsonCommunication {
     
     public:
         static std::shared_ptr<ServiceCommunication> create();
+        OperationResult getNotified(std::shared_ptr<Message> message) override;
         void sendResetReason();
 };
 
