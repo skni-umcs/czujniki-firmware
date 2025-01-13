@@ -12,7 +12,7 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 
 OperationResult PassthroughCommunication::rebroadcastMessage(std::shared_ptr<LoraMessage> message) {
     message->decrementHopLimit();
-    //transmit(message);
+    transmit(message);
     return OperationResult::SUCCESS;
 }
 
