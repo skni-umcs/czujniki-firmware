@@ -72,7 +72,15 @@ moduleAddress Message::getOriginalSender() {
     return senders.at(0);
 }
 
+unsigned char Message::getHopLimit() {
+    return hopLimit;
+}
+
 OperationResult Message::decrementHopLimit() {
+    if(hopLimit == 0) {
+        Serial.println("Can't decrement hopLimit further");
+        return OperationResult::ERROR;
+    }
     hopLimit -= 1;
     return OperationResult::SUCCESS;
 }
@@ -107,12 +115,14 @@ std::string Message::createAddressTableWithoutHop() {
 }
 
 std::string Message::createAddressTable() {
+    Serial.println("adtb");
+    Serial.println(hopLimit);
     std::string hopLimitString = NODE_BORDER+toHexString((int)hopLimit);
     return hopLimitString+createAddressTableWithoutHop();
 }
 
 std::string Message::createOwnAddressTable() {
-    Serial.println("Hi, I'm goincreate!");
+    Serial.println("Hi, I'm goincreateown!");
     return NODE_BORDER+toHexString((int)hopLimit)+NODE_BORDER+
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
     createAddressTable();

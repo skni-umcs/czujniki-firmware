@@ -36,6 +36,7 @@ class Message {
         virtual moduleAddress getDestination();
         virtual std::string getContent();
         virtual moduleAddress getOriginalSender();
+        virtual unsigned char getHopLimit();
         virtual OperationResult decrementHopLimit();
         virtual std::string createAddressTable();
         virtual std::string createAddressTableWithoutHop();
