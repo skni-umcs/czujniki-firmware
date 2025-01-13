@@ -15,9 +15,14 @@ const unsigned char DESTINATION_INDEX = 0;
 const unsigned char ORIGINAL_SENDER_INDEX = 1;
 
 enum class TransmissionCode : char {
-    RESET = 'r',
+    //JSON codes
     MESSAGE_TYPE = 't',
-    MESSAGE = 'm'
+    MESSAGE = 'm',
+    TIMESTAMP = 'c',
+
+    //message types
+    RESET = 'r',
+    SENSOR_READING = 'p'
 };
 
 class PacketMessage {

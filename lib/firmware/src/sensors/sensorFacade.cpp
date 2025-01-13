@@ -6,6 +6,7 @@
 #include <vector>
 #include <string>
 #include <ArduinoJson.h>
+#include <utils/packetUtils.h>
 
 const int DEFAULT_SENSOR_PERIOD_MS = 20000; //low value for testing
 
@@ -35,7 +36,8 @@ void SensorFacade::sendAllSensors() {
         messages.add(sensor->getSensorDataJson());
     }
     serializeJson(doc, serializedJson);
-    sensorCommunication->transmit(serializedJson, SERVER_ADDRESS);
+    PacketMessage packetMessage = PacketMessage(TransmissionCode::SENSOR_READING, serializedJson);
+    sensorCommunication->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 
 void SensorFacade::addSensor(std::unique_ptr<Sensor> sensor) {

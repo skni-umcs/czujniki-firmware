@@ -6,6 +6,7 @@
 #include <iostream>
 #include <regex>
 #include "otherUtils.h"
+#include "time/timeConstants.h"
 
 FastCRC32 CRC32;
 
@@ -23,8 +24,12 @@ std::string PacketMessage::getJson() {
     JsonObject root = doc.to<JsonObject>();
     std::string serializedJson;
 
+	time_t now;
+	time(&now);
+
     root[transmissionCodeFromEnum(TransmissionCode::MESSAGE_TYPE)] = transmissionCodeFromEnum(type);
     root[transmissionCodeFromEnum(TransmissionCode::MESSAGE)] = message;
+	root[transmissionCodeFromEnum(TransmissionCode::TIMESTAMP)] = now;
 
     serializeJson(doc, serializedJson);
 

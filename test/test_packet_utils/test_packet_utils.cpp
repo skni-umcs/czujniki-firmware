@@ -126,6 +126,11 @@ void decode_message_from_packet() {
     TEST_ASSERT_EQUAL_STRING(expectedMessage.c_str(), out.getContent().c_str());
 }
 
+void dont_allow_merged_packets() {
+    std::string packet = "~$63$3$db$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 2137\\\"]\",\"c\":103}^6c723e01~�~$64$3$0^[\"random prime number: 2137\"]^5a4f6e1a~";
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
 void nth_last_address_check() {
     const int num_elements = 4;
     std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
@@ -256,6 +261,7 @@ void setup() {
     RUN_TEST(create_generatedMessage);
     RUN_TEST(decode_message_from_packet);
     RUN_TEST(decrement);
+    RUN_TEST(dont_allow_merged_packets);
     RUN_TEST(packet_for_sending_no_senders);
     RUN_TEST(something_that_isnt_even_packet);
     RUN_TEST(only_crc);

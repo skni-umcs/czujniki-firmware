@@ -1,7 +1,7 @@
 #include "timerUpdate.h"
 #include <ESP32Time.h>
+#include "timeConstants.h"
 
-ESP32Time rtc(3600);  // offset in seconds GMT+1
 std::vector<std::shared_ptr<Timer>> TimerUpdate::subscribers;
 
 void TimerUpdate::setTime(int time) {
