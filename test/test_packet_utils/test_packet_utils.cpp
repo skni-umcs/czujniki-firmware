@@ -256,6 +256,11 @@ void stress_test() {
     TEST_ASSERT_FALSE(isPacketCorrect(packet));
 }
 
+void redirected_sensor_packet() {
+    std::string packet = "~$63$3$e0$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 2137\\\"]\",\"c\":63}^f14e1278~";
+    TEST_ASSERT_TRUE(isPacketCorrect(packet));
+}
+
 void setup() {
     UNITY_BEGIN();
     setupAddressHandler();
@@ -281,6 +286,7 @@ void setup() {
     RUN_TEST(crc_correct);
     RUN_TEST(packet_correct);
     RUN_TEST(stress_test);
+    RUN_TEST(redirected_sensor_packet);
     UNITY_END();
 }
 

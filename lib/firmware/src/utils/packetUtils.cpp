@@ -199,12 +199,8 @@ bool isRegexCorrect(std::string packet) {
 	MatchState ms;
 	ms.Target(buf);
 
-	std::cout << "elo z regexa" << std::endl;
-	std::cout << buf << " to był buf mam nadzieje ze sie podobal" << std::endl;
-
 	std::string pattern = PACKET_BORDER+validatedPart.str()+jsonPart.str()+crcPart+PACKET_BORDER;
 	char result = ms.Match(pattern.c_str());
-	std::cout << pattern << "to buyl aptern" << std::endl;
 	delete[] buf;
 	return result > 0;
 }
