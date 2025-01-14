@@ -23,6 +23,7 @@
 #include "utils/addressHandler.h"
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
+#include <utils/packetUtils.h>
 
 uint32_t delayMS = 1000;
 
@@ -50,6 +51,10 @@ void setup() {
 
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);
+
+  std::string packet = "~$63$3$dd$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime nummmmmmm";
+  Serial.println("is packet ok");
+  Serial.println(isPacketCorrect(packet));
 }
 
 void loop() {
