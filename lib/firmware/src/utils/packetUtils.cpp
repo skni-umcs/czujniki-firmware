@@ -7,6 +7,7 @@
 #include <regex>
 #include "otherUtils.h"
 #include "time/timeConstants.h"
+#include <Regexp.h>
 
 FastCRC32 CRC32;
 
@@ -186,15 +187,26 @@ bool isCrcCorrect(std::string packet) {
 
 bool isRegexCorrect(std::string packet) {
 	std::stringstream validatedPart;
-	validatedPart << "(\\" << NODE_BORDER << "[^\\" << NODE_BORDER << "]+)+";
+	validatedPart << NODE_BORDER << ".+";
 	std::stringstream jsonPart;
-	jsonPart << "\\" << MAIN_JSON_BORDER << ".+\\" << MAIN_JSON_BORDER;
+	jsonPart << "[\\" << MAIN_JSON_BORDER << "].+[\\" << MAIN_JSON_BORDER << "]";
 	std::string crcPart = ".+";
 
+	size_t packetSize = packet.size();
+	char* buf = new char[packetSize+1];
+	memcpy(buf, packet.c_str(), packetSize);
+	buf[packetSize] = '\0';
+	MatchState ms;
+	ms.Target(buf);
+
+	std::cout << "elo z regexa" << std::endl;
+	std::cout << buf << " to był buf mam nadzieje ze sie podobal" << std::endl;
+
 	std::string pattern = PACKET_BORDER+validatedPart.str()+jsonPart.str()+crcPart+PACKET_BORDER;
-	std::regex re(pattern);
-	std::smatch foundValue;
-	return std::regex_match(packet, foundValue, re);
+	char result = ms.Match(pattern.c_str());
+	std::cout << pattern << "to buyl aptern" << std::endl;
+	delete[] buf;
+	return result > 0;
 }
 
 bool isPacketCorrect(std::string packet) {

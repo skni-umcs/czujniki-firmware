@@ -52,7 +52,7 @@ void setup() {
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);
 
-  std::string packet = "~$63$3$dd$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime nummmmmmm";
+  std::string packet = "~$63$3$dd$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime nummmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm";
   Serial.println("is packet ok");
   Serial.println(isPacketCorrect(packet));
 }
