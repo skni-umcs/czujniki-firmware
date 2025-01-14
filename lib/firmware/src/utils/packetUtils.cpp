@@ -134,8 +134,7 @@ uint32_t getPacketCrc(std::string packet) {
 	int crcLength = packetEnd-jsonEnd-1;
 	std::string crcSubstring = packet.substr(crcStart, crcLength);
 	auto errorDestination = nullptr;
-	int hexadecimalBase = 16;
-	return strtol(crcSubstring.c_str(), errorDestination, hexadecimalBase);
+	return strtoul(crcSubstring.c_str(), errorDestination, HEX);
 }
 
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
