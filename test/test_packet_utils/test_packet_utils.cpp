@@ -251,6 +251,11 @@ void also_accept_hops() {
     TEST_ASSERT_TRUE(isPacketCorrect(packet));
 }
 
+void stress_test() {
+    std::string packet = "~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~~$30$9B$RSSI21$21$RSSI37$37$1^test^450d3fed~";
+    TEST_ASSERT_FALSE(isPacketCorrect(packet));
+}
+
 void setup() {
     UNITY_BEGIN();
     setupAddressHandler();
@@ -275,6 +280,7 @@ void setup() {
     RUN_TEST(get_validated_part_correct);
     RUN_TEST(crc_correct);
     RUN_TEST(packet_correct);
+    RUN_TEST(stress_test);
     UNITY_END();
 }
 
