@@ -24,6 +24,7 @@
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
 #include <utils/packetUtils.h>
+#include "exchange/transmits/DEBUG_timeTransmit.h"
 
 uint32_t delayMS = 1000;
 
@@ -33,12 +34,18 @@ uint32_t delayMS = 1000;
 #define SENSOR_TYPE HumidityTemperatureSensor
 #endif
 
+#if defined(esp32firebeetle)
+using TRANSMIT_TYPE = DEBUG_timeTransmit;
+#else
+using TRANSMIT_TYPE = LoraTransmit;
+#endif
+
 void setup() {
   Serial.begin(9600);
   delay(1000);
 
   AddressHandler::getInstance().get()->initializeAddress();
-  auto transmit = LoraTransmit::create();
+  auto transmit = TRANSMIT_TYPE::create();
   
   auto serviceCommunication = ServiceCommunication::create();
   serviceCommunication.get()->subscribe(transmit);
