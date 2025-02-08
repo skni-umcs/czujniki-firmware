@@ -9,6 +9,8 @@
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
 #include <exchange/communications/passthroughCommunication.h>
+#include <exchange/communications/serviceCommunication.h>
+#include "time/timeConstants.h"
 
 void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std::unique_ptr<JsonTransmit> jsonTransmit) {
     jsonCommunication->subscribe(std::move(jsonTransmit));
@@ -50,12 +52,29 @@ void test_passthrough_no_message_in_set() {
     passthroughCommunication->removeSameMessages(set, message);
 }
 
+void test_service_time_update() {
+    auto serviceCommunication = ServiceCommunication::create();
+    serviceCommunication->askForTime();
+    unsigned long testEpoch = 1739024823;
+    serviceCommunication->updateTime(testEpoch);
+    TEST_ASSERT_TRUE(rtc.getEpoch() >= testEpoch);
+}
+
+void test_service_time_update_ignore_didnt_ask() {
+    auto serviceCommunication = ServiceCommunication::create();
+    unsigned long testEpoch = 2739024823;
+    serviceCommunication->updateTime(testEpoch);
+    TEST_ASSERT_TRUE(rtc.getEpoch() < testEpoch);
+}
+
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(test_wifi_subscription);
     RUN_TEST(test_lora_subscription);
     RUN_TEST(test_passthrough_wrong_message_type);
     RUN_TEST(test_passthrough_no_message_in_set);
+    RUN_TEST(test_service_time_update);
+    RUN_TEST(test_service_time_update_ignore_didnt_ask);
     UNITY_END();
 }
 
