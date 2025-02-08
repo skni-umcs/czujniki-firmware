@@ -6,6 +6,7 @@
 #include <ArduinoJson.h>
 #include "utils/packetUtils.h"
 #include "time/timeConstants.h"
+#include <time/timerUpdate.h>
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto s = new ServiceCommunication();
@@ -63,7 +64,7 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     }
     unsigned long currentTime = rtc.getEpoch();
     unsigned long RTT = currentTime-lastAskTime;
-    rtc.setTime(serverTime+RTT/2);
+    TimerUpdate::setTime(serverTime+RTT/2);
     lastAskTime = DIDNT_ASK;
     Serial.printf("Time updated to: %lu\n", rtc.getEpoch());
     return OperationResult::SUCCESS;
