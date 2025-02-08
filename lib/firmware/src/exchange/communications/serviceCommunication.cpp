@@ -5,6 +5,7 @@
 #include <sstream>
 #include <ArduinoJson.h>
 #include "utils/packetUtils.h"
+#include "time/timeConstants.h"
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto s = new ServiceCommunication();
@@ -14,6 +15,17 @@ std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
 OperationResult ServiceCommunication::getNotified(std::shared_ptr<Message> message) {
     if(!message->getIsPacketCorrect()) {
         Serial.printf("service is notified of invalid packet %s\n", message.get()->getPacket().c_str());
+        return OperationResult::ERROR;
+    }
+    if(!message->isCurrentDestination()) {
+        return OperationResult::OPERATION_IGNORED;
+    }
+    PacketMessage serverMessage = PacketMessage::fromJson(message->getContent());
+    TransmissionCode messageType = serverMessage.getType();
+    switch(messageType) {
+        case(TransmissionCode::TIME_SYNCHRONIZATION):
+            updateTime(serverMessage.getJsonificationEpoch());
+            break;
     }
     return OperationResult::SUCCESS;
 }
@@ -35,3 +47,25 @@ void ServiceCommunication::sendResetReason() {
 
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
+
+OperationResult ServiceCommunication::askForTime() {
+    PacketMessage packetMessage = PacketMessage(TransmissionCode::TIME_SYNCHRONIZATION, "t");
+    lastAskTime = rtc.getEpoch();
+    Serial.println(lastAskTime);
+    Serial.println("lastAskTime");
+    this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
+    return OperationResult::SUCCESS;
+}
+
+OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
+    if(lastAskTime == DIDNT_ASK) {
+        return OperationResult::OPERATION_IGNORED;
+    }
+    unsigned long currentTime = rtc.getEpoch();
+    unsigned long RTT = currentTime-lastAskTime;
+    rtc.setTime(serverTime+RTT/2);
+    lastAskTime = DIDNT_ASK;
+    Serial.printf("Time updated to: %lu\n", rtc.getEpoch());
+    return OperationResult::SUCCESS;
+}
+

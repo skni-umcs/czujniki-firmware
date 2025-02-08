@@ -50,6 +50,7 @@ void setup() {
   auto serviceCommunication = ServiceCommunication::create();
   serviceCommunication.get()->subscribe(transmit);
   serviceCommunication.get()->sendResetReason();
+  serviceCommunication.get()->askForTime();
 
   std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
   std::unique_ptr<Sensor> h = std::unique_ptr<SENSOR_TYPE>(new SENSOR_TYPE());

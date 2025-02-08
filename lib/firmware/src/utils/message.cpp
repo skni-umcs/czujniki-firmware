@@ -3,6 +3,7 @@
 #include <sstream>
 #include "addressHandler.h"
 #include <iostream>
+#include <utils/addressHandler.h>
 
 Message::Message() {}
 
@@ -95,6 +96,10 @@ OperationResult Message::decrementHopLimit() {
     }
     hopLimit -= 1;
     return OperationResult::SUCCESS;
+}
+
+bool Message::isCurrentDestination() {
+    return getDestination() == AddressHandler::getInstance()->readAddress();
 }
 
 bool Message::isSenderPresent(moduleAddress sender) {

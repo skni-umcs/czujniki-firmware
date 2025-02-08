@@ -15,6 +15,9 @@ const unsigned char DESTINATION_INDEX = 0;
 const unsigned char ORIGINAL_SENDER_INDEX = 1;
 
 enum class TransmissionCode : char {
+    //error
+    ERROR_CODE = ' ',
+
     //JSON codes
     MESSAGE_TYPE = 't',
     MESSAGE = 'm',
@@ -22,16 +25,22 @@ enum class TransmissionCode : char {
 
     //message types
     RESET = 'r',
-    SENSOR_READING = 'p'
+    SENSOR_READING = 'p',
+    TIME_SYNCHRONIZATION = 'o'
 };
 
 class PacketMessage {
     TransmissionCode type;
     std::string message;
+    unsigned long jsonificationEpoch;
 
     public:
         PacketMessage(TransmissionCode type, std::string message);
         std::string getJson();
+        static PacketMessage fromJson(std::string jsonString);
+        TransmissionCode getType();
+        std::string getMessage();
+        unsigned long getJsonificationEpoch();
 };
 
 template<typename T>
@@ -41,7 +50,7 @@ std::string toHexString(T address) {
 	return hexStream.str();
 }
 
-std::string transmissionCodeFromEnum(TransmissionCode transmissionCode);
+static std::string transmissionCodeFromEnum(TransmissionCode transmissionCode);
 uint32_t getCrc(std::string string);
 moduleAddress getDestinationAddress(std::string packet);
 std::vector<std::string> allAddressTableElements(std::string packet);
