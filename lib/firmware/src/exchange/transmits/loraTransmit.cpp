@@ -61,8 +61,6 @@ void LoraTransmit::setup() {
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
 	configuration.OPTION.transmissionPower = POWER_10;
 	configuration.CHAN = CHANNEL;
-	configuration.ADDL = address & 0x00ff;
-	configuration.ADDH = address & 0xff00;
 	ResponseStatus rs = e220ttl.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
 
 	Serial.println(c.status.getResponseDescription());
