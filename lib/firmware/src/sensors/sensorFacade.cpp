@@ -23,12 +23,14 @@ uint32_t delayMS = 1000;
 SensorFacade::SensorFacade() {
 }
 
-std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit> transmit) {
+std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit> transmit, bool shouldSetupSensors) {
     auto facade = std::shared_ptr<SensorFacade>(new SensorFacade());
     facade->sensorCommunication = SensorCommunication::create();
     facade->sensorCommunication->subscribe(std::move(transmit));
 
-    facade->setupSensors(transmit);
+    if(shouldSetupSensors) {
+        facade->setupSensors(transmit);
+    }
 
     facade->timer.get()->setExecuteFunction([facade]() {
        facade->sendAllSensors();
@@ -73,11 +75,7 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<JsonTransmit> baseTra
     return OperationResult::SUCCESS;
 }
 
-template <typename T>
-void SensorFacade::addSensor(std::unique_ptr<T>& sensor) {
-    sensors.push_back(std::move(sensor));
-}
-
 int SensorFacade::sensorsCount() {
     return this->sensors.size();
 }
+

@@ -12,22 +12,22 @@
 #include "test_sensor.h"
 #include "test_transmit.h"
 
-uint32_t delayMS = 0;
+uint32_t delayMStest = 0;
 auto testTransmit = std::shared_ptr<TestTransmit>{new TestTransmit()};
 
 void test_add_sensor() {
-    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit);
-    auto testSensor = std::unique_ptr<TestSensor>(new TestSensor());
-    testSensor->setupSensor(&delayMS);
-    sensorFacade->addSensor(std::move(testSensor));
+    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
+    std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
+    testSensor->setupSensor(&delayMStest);
+    sensorFacade->addSensor(testSensor);
     TEST_ASSERT_EQUAL(1, sensorFacade->sensorsCount());
 }
 
 void test_sensor_facade() {
-    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit);
-    auto testSensor = std::unique_ptr<TestSensor>(new TestSensor());
-    testSensor->setupSensor(&delayMS);
-    sensorFacade->addSensor(std::move(testSensor));
+    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
+    std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
+    testSensor->setupSensor(&delayMStest);
+    sensorFacade->addSensor(testSensor);
     sensorFacade->sendAllSensors();
 }
 
