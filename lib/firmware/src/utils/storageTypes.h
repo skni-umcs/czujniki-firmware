@@ -62,6 +62,7 @@ class LoraMessage : public Message {
     LoraMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit, byte currentRssiByte, int snr);
     std::string createOwnAddressTable() override;
     int getSnr();
+    byte getCurrentRssiByte();
     MessageType type() const override {
         return MessageType::LoraMessage;
     }
