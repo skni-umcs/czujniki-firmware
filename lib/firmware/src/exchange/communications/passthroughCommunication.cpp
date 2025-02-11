@@ -12,6 +12,8 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 }
 
 OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
+    Serial.println("Message rebroadcasting info: currentrssibyte is");
+    Serial.println(message->getCurrentRssiByte());
     message->decrementHopLimit();
     transmit(message);
     return OperationResult::SUCCESS;

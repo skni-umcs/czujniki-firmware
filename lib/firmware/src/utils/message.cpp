@@ -186,3 +186,7 @@ std::string LoraMessage::createOwnAddressTable() {
 int LoraMessage::getSnr() {
     return snr;
 }
+
+byte LoraMessage::getCurrentRssiByte() {
+    return currentRssiByte;
+}
