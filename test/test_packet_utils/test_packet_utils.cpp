@@ -140,6 +140,21 @@ void nth_last_address_check() {
     }
 }
 
+void rssi_table_check() {
+    const int num_elements = 4;
+    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
+    std::string expectedRssi[] = {"RSSI21", "RSSI37"};
+
+    LoraMessage message = LoraMessage(packet, 0, 0);
+
+    std::vector<std::string> t = message.getRssi();
+    TEST_ASSERT_EQUAL(2, t.size());
+
+    for(int i = 0;i<num_elements;++i) {
+        TEST_ASSERT_EQUAL_STRING(expectedRssi[i].c_str(), t.at(i).c_str());
+    }
+}
+
 void incorrect_nth_last_address() {
     const int num_elements = 4;
     std::string packet = "~$RSSI0$RSSI21$21$RSSI37$37$1^test^40672562~";
@@ -279,6 +294,7 @@ void setup() {
     RUN_TEST(random_corruption);
     RUN_TEST(random_corruption_but_crc_is_correct);
     RUN_TEST(also_accept_hops);
+    RUN_TEST(rssi_table_check);
     RUN_TEST(incorrect_nth_last_address);
     RUN_TEST(nth_last_address_check);
     RUN_TEST(nth_last_address_table_element_check);

@@ -195,6 +195,24 @@ std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 	return result;
 }
 
+std::vector<std::string> getRssi(std::vector<std::string> addressTable) {
+	if(addressTable.size() <= 3) {
+		Serial.println("No rssi found in packet");
+		return INVALID_VECTOR;
+	}
+	int originalSenderAndDestinationCount = 2;
+	int otherElements = addressTable.size()-originalSenderAndDestinationCount;
+	int rssiCount = (otherElements)/2;
+
+	const int firstRssiIndex = originalSenderAndDestinationCount+1;
+
+	std::vector<std::string> result = {nthLastAddressTableElement(addressTable, firstRssiIndex)};
+	for(int i = 0;i<rssiCount;i += 2) {
+		result.push_back(nthLastAddressTableElement(addressTable, i+originalSenderAndDestinationCount));
+	}
+	return result;
+}
+
 unsigned char getHopLimit(std::vector<std::string> addressTable) {
 	if(addressTable.size() == 0) {
 		return 0;

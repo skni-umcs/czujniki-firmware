@@ -27,6 +27,7 @@ LoraMessage::LoraMessage(std::string packet, byte currentRssiByte, int snr) {
     if(isPacketCorrect) {
         this->addressTable = allAddressTableElements(packet);
         this->senders = ::getSenders(addressTable);
+        this->rssi = ::getRssi(addressTable);
         this->destination =	nthLastAddress(addressTable, DESTINATION_INDEX);
         this->content =	getPacketContent(packet);
         this->currentRssiByte = currentRssiByte;
@@ -60,6 +61,10 @@ GeneratedMessage::GeneratedMessage(
 
 std::vector<moduleAddress> Message::getSenders() {
     return senders;
+}
+
+std::vector<std::string> Message::getRssi() {
+    return rssi;
 }
 
 moduleAddress Message::getDestination() {
