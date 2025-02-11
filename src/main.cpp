@@ -25,14 +25,9 @@
 #include <SPI.h>
 #include <utils/packetUtils.h>
 #include "exchange/transmits/DEBUG_timeTransmit.h"
-
-uint32_t delayMS = 1000;
-
-#if defined(esp32firebeetle) || defined(mini_test)
-#define SENSOR_TYPE TestSensor
-#else
-#define SENSOR_TYPE HumidityTemperatureSensor
-#endif
+#include "sensors/subtypes/cpu_sensor.h"
+#include "sensors/subtypes/noise_sensor.h"
+#include <vector>
 
 #if defined(esp32firebeetle)
 using TRANSMIT_TYPE = DEBUG_timeTransmit;
@@ -53,9 +48,6 @@ void setup() {
   serviceCommunication.get()->askForTime();
 
   std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
-  std::unique_ptr<Sensor> h = std::unique_ptr<SENSOR_TYPE>(new SENSOR_TYPE());
-  h->setupSensor(&delayMS);
-  facade->addSensor(std::move(h));
 
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);

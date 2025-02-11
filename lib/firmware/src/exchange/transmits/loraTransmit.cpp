@@ -21,6 +21,7 @@ const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
+	//TODO: Add periodical noise updates
 	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
 	byte localNoise = RSSIAmbient >> 8;
 
@@ -42,6 +43,10 @@ int LoraTransmit::getSnr(int readRssi) {
 		return -1;
 	}
 	return RssidB-noisedB;
+}
+
+int LoraTransmit::getNoise() {
+	return noisedB;
 }
 
 void LoraTransmit::setup() {

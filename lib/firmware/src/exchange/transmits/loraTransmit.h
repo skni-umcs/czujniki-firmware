@@ -44,6 +44,7 @@ class LoraTransmit : public JsonTransmit
     OperationResult receive(std::shared_ptr<Message> message) override;
     OperationResult updateNoise();
     int getSnr(int readRssi);
+    int getNoise();
 };
 
 #endif
