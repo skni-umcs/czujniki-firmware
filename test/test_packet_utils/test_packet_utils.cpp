@@ -145,13 +145,8 @@ void rssi_table_check() {
     std::string packet = "~$HOP$9B$RSSI21$21$RSSI37$37$1^test^322ee599~";
     std::string expectedRssi[] = {"RSSI37", "RSSI21"};
 
-    std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL" << std::endl;
     LoraMessage message = LoraMessage(packet, 0, 0);
-
-    std::cout << " po elu " << std::endl;
-
     std::vector<std::string> t = message.getRssi();
-    std::cout << " po getrsu te " << std::endl;
     TEST_ASSERT_EQUAL(2, t.size());
 
     for(int i = 0;i<num_elements;++i) {
@@ -165,7 +160,7 @@ void dont_crash_without_hop() {
     std::string expectedRssi[] = {"RSSI37", "RSSI21"};
 
     LoraMessage message = LoraMessage(packet, 0, 0);
-    TEST_ASSERT_EQUAL(155, message.getHopLimit());
+    TEST_ASSERT_EQUAL(155, message.getHopLimit()); //just assume last element is hop
 }
 
 void incorrect_nth_last_address() {
