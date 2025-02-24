@@ -23,7 +23,6 @@ Message::Message(
 
 LoraMessage::LoraMessage(std::string packet, byte currentRssiByte, int snr) {
     this->isPacketCorrect = ::isPacketCorrect(packet);
-    std::cout << " popraw " << this->isPacketCorrect << std:: endl;
     this->packet = packet;
     if(isPacketCorrect) {
         this->addressTable = allAddressTableElements(packet);
