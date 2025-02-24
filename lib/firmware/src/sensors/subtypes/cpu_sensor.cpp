@@ -11,6 +11,8 @@
 
 static const char *TAG = "TempSensor";
 
+const std::string CPU_TEMPERATURE_CODE = "c";
+
 void CPUSensor::setupSensor(uint32_t* delayMS) {
   temp_sensor_config_t temp_sensor = TSENS_CONFIG_DEFAULT();
   temp_sensor_get_config(&temp_sensor);
@@ -20,18 +22,21 @@ void CPUSensor::setupSensor(uint32_t* delayMS) {
   temp_sensor_start();
 }
 
-std::string CPUSensor::getSensorDataJson() {
+std::map<std::string, std::string> CPUSensor::getSensorData() {
   float temperature;
   temp_sensor_read_celsius(&temperature);
 
-  std::stringstream result;
-  result << "CPU temperature: " << temperature;
-  return result.str();
+  int convertedTemperature = temperature*100;
+
+  std::map<std::string, std::string> resultMap;
+  resultMap.insert(std::make_pair(CPU_TEMPERATURE_CODE, std::to_string(convertedTemperature)));
+  return resultMap;
 }
 #else //other boards dont have temperature sensor
 void CPUSensor::setupSensor(uint32_t* delayMS) {}
 
-std::string CPUSensor::getSensorData() {
-  return "";
+std::map<std::string, std::string> CPUSensor::getSensorData() {
+  std::map<std::string, std::string> resultMap;
+  return resultMap;
 }
 #endif

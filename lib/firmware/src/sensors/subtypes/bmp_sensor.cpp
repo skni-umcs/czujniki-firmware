@@ -2,12 +2,16 @@
 #include <Adafruit_BMP085.h>
 #include "bmp_sensor.h"
 #include <sstream>
+#include <utility>
 
 // Define I2C pins
 #define I2C_SDA 8
 #define I2C_SCL 9
 
 Adafruit_BMP085 bmp;
+
+const std::string TEMPERATURE_CODE = "t";
+const std::string PRESSURE_CODE = "p";
 
 void BMPSensor::setupSensor(uint32_t* delayMS) {
   Serial.begin(9600);
@@ -24,12 +28,17 @@ void BMPSensor::setupSensor(uint32_t* delayMS) {
   Serial.println("BMP085 initialization successful!");
 }
 
-std::string BMPSensor::getSensorData() {
+std::map<std::string, std::string> BMPSensor::getSensorData() {
   float temperature = bmp.readTemperature();
   float pressure = bmp.readPressure();
-  float altitude = bmp.readAltitude();
+  //float altitude = bmp.readAltitude();
 
-  std::stringstream result;
-  result << "temperature: " << temperature << " pressure: " << pressure << " altitude: " << altitude;
-  return result.str();
+  int convertedTemp = temperature*100;
+  int convertedPressure = pressure*10;
+
+  std::map<std::string, std::string> resultMap;
+  resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(convertedTemp)));
+  resultMap.insert(std::make_pair(PRESSURE_CODE, std::to_string(convertedTemp)));
+
+  return resultMap;
 }

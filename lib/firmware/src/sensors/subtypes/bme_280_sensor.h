@@ -5,7 +5,7 @@
 
 class BME280Sensor : public Sensor {
     public:
-        std::string getSensorData() override;
+        std::map<std::string, std::string> getSensorData() override;
         void setupSensor(uint32_t* delayMS) override;
 };
 

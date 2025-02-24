@@ -3,6 +3,8 @@
 #include "noise_sensor.h"
 #include <sstream>
 
+const std::string NOISE_CODE = "n";
+
 void NoiseSensor::setupSensor(uint32_t* delayMS) {
   if(transmit == nullptr) {
     Serial.println("Can't read noise, no lora transmit");
@@ -11,19 +13,20 @@ void NoiseSensor::setupSensor(uint32_t* delayMS) {
   transmit->updateNoise();
 }
 
-std::string NoiseSensor::getSensorData() {
-
+std::map<std::string, std::string> NoiseSensor::getSensorData() {
+  std::map<std::string, std::string> resultMap;
   if(transmit == nullptr) {
     Serial.println("Can't read noise, no lora transmit");
-    return NO_NOISE_MESSAGE;
+    return resultMap;
   }
   transmit->updateNoise();
 
   int noise = transmit->getNoise();
 
-  std::stringstream result;
-  result << "noise: " << noise;
-  return result.str();
+  
+  resultMap.insert(std::make_pair(NOISE_CODE, std::to_string(noise)));
+
+  return resultMap;
 }
 
 void NoiseSensor::setLoraTransmit(std::shared_ptr<LoraTransmit> transmit) {

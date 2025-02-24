@@ -47,7 +47,10 @@ void SensorFacade::sendAllSensors() {
 
     Serial.println(sensors.size());
     for(auto const& sensor : sensors) {
-        messages.add(sensor->getSensorData());
+        std::map<std::string, std::string> map = sensor->getSensorData();
+        for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it) {
+            messages[it->first] = it->second;
+        }
     }
     serializeJson(doc, serializedJson);
     PacketMessage packetMessage = PacketMessage(TransmissionCode::SENSOR_READING, serializedJson);

@@ -9,10 +9,9 @@
 void TestSensor::setupSensor(uint32_t* delayMS) {
 }
 
-std::string TestSensor::getSensorData() {
-    // Get temperature event and print its value.
-    sensors_event_t event;
-    std::stringstream result;
-    result << "random prime number: 2137";
-    return result.str();
+std::map<std::string, std::string> TestSensor::getSensorData() {
+    std::map<std::string, std::string> resultMap;
+    resultMap.insert(std::make_pair("random prime number", std::to_string(2137)));
+    
+    return resultMap;
 }
