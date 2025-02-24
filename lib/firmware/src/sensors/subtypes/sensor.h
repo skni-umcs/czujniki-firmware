@@ -6,7 +6,7 @@
 class Sensor 
 {
     public:
-        virtual std::string getSensorDataJson() = 0;
+        virtual std::string getSensorData() = 0;
         virtual void setupSensor(uint32_t* delayMS) = 0;
 };
 

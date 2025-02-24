@@ -42,12 +42,12 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
 
 void SensorFacade::sendAllSensors() {
     JsonDocument doc;
-    JsonArray messages = doc.to<JsonArray>();
+    JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
 
     Serial.println(sensors.size());
     for(auto const& sensor : sensors) {
-        messages.add(sensor->getSensorDataJson());
+        messages.add(sensor->getSensorData());
     }
     serializeJson(doc, serializedJson);
     PacketMessage packetMessage = PacketMessage(TransmissionCode::SENSOR_READING, serializedJson);

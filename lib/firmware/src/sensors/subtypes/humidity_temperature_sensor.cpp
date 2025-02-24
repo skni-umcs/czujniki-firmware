@@ -26,7 +26,7 @@ void HumidityTemperatureSensor::setupSensor(uint32_t* delayMS) {
     digitalWrite(DHT_POWER_PIN, LOW);
 }
 
-std::string HumidityTemperatureSensor::getSensorDataJson() {
+std::string HumidityTemperatureSensor::getSensorData() {
     digitalWrite(DHT_POWER_PIN, HIGH);
     delay(1000);
     // Get temperature event and print its value.

@@ -66,7 +66,7 @@ struct BME280Output {
   }
 };
 
-std::string BME280Sensor::getSensorDataJson() {
+std::string BME280Sensor::getSensorData() {
     sensors_event_t event;
     BME280Output output = BME280Output(
       bme.readHumidity(),

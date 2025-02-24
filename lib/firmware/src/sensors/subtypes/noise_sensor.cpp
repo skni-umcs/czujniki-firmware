@@ -11,7 +11,7 @@ void NoiseSensor::setupSensor(uint32_t* delayMS) {
   transmit->updateNoise();
 }
 
-std::string NoiseSensor::getSensorDataJson() {
+std::string NoiseSensor::getSensorData() {
 
   if(transmit == nullptr) {
     Serial.println("Can't read noise, no lora transmit");

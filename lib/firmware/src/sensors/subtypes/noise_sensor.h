@@ -10,7 +10,7 @@ class NoiseSensor : public Sensor {
     const std::string NO_NOISE_MESSAGE = "NoNoise";
     
     public:
-        std::string getSensorDataJson() override;
+        std::string getSensorData() override;
         void setupSensor(uint32_t* delayMS) override;
         void setLoraTransmit(std::shared_ptr<LoraTransmit> transmit);
 };

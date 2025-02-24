@@ -9,7 +9,7 @@
 void TestSensor::setupSensor(uint32_t* delayMS) {
 }
 
-std::string TestSensor::getSensorDataJson() {
+std::string TestSensor::getSensorData() {
     // Get temperature event and print its value.
     sensors_event_t event;
     std::stringstream result;

@@ -24,7 +24,7 @@ void BMPSensor::setupSensor(uint32_t* delayMS) {
   Serial.println("BMP085 initialization successful!");
 }
 
-std::string BMPSensor::getSensorDataJson() {
+std::string BMPSensor::getSensorData() {
   float temperature = bmp.readTemperature();
   float pressure = bmp.readPressure();
   float altitude = bmp.readAltitude();

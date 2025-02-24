@@ -31,7 +31,7 @@ std::string CPUSensor::getSensorDataJson() {
 #else //other boards dont have temperature sensor
 void CPUSensor::setupSensor(uint32_t* delayMS) {}
 
-std::string CPUSensor::getSensorDataJson() {
+std::string CPUSensor::getSensorData() {
   return "";
 }
 #endif

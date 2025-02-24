@@ -5,7 +5,7 @@
 
 class HumidityTemperatureSensor : public Sensor {
     public:
-        std::string getSensorDataJson() override;
+        std::string getSensorData() override;
         void setupSensor(uint32_t* delayMS) override;
 };
 
