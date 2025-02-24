@@ -40,12 +40,11 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
     return facade;
 }
 
-void SensorFacade::sendAllSensors() {
+std::string SensorFacade::getAllSensorsMessage() {
     JsonDocument doc;
     JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
 
-    Serial.println(sensors.size());
     for(auto const& sensor : sensors) {
         std::map<std::string, std::string> map = sensor->getSensorData();
         for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it) {
@@ -53,7 +52,11 @@ void SensorFacade::sendAllSensors() {
         }
     }
     serializeJson(doc, serializedJson);
-    PacketMessage packetMessage = PacketMessage(TransmissionCode::SENSOR_READING, serializedJson);
+    return serializedJson;
+}
+
+void SensorFacade::sendAllSensors() {
+    PacketMessage packetMessage = PacketMessage(TransmissionCode::SENSOR_READING, getAllSensorsMessage());
     sensorCommunication->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 
