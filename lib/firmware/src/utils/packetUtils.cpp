@@ -87,6 +87,7 @@ uint32_t getCrc(std::string string) {
 }
 
 moduleAddress stringToAddress(std::string string) {
+	std::cout << string << std::endl;
 	if (string.empty()) {
 		return INVALID_ADDRESS;
 	}
@@ -125,6 +126,7 @@ std::vector<std::string> allAddressTableElements(std::string packet) {
 
 std::string nthLastAddressTableElement(std::vector<std::string> elements, unsigned char n) {
 	size_t index = elements.size()-n-1;
+	size_t size = elements.size();
 	if(elements.empty() || index < 0 || index > elements.size()-1) {
 		Serial.printf("Can't get address table element: %i\n", n);
 		return INVALID_STRING;
@@ -133,16 +135,31 @@ std::string nthLastAddressTableElement(std::vector<std::string> elements, unsign
 }
 
 moduleAddress nthLastAddress(std::vector<std::string> addressTableElements, unsigned char n) {
+	std::cout << "biore nty last adres " << (int)n << std::endl;
 	std::set<unsigned char> startAddresses{0,1};
 	if (setContains(startAddresses, n)) {
-		return stringToAddress(nthLastAddressTableElement(addressTableElements, n));
+		std::cout << " set containowal " << std::endl;
+		std::string adres = nthLastAddressTableElement(addressTableElements, n);
+		std::cout << " a jego adres to " << adres << std::endl;
+		return stringToAddress(adres);
 	}
 	else {
 		unsigned char firstMapped = 3;
 		unsigned char jump = (n-2)*2;
 		unsigned char mappedPosition = firstMapped+jump;
-		return stringToAddress(nthLastAddressTableElement(addressTableElements, mappedPosition));
+		std::cout << "a teraz adres" << std::endl;
+		std::string a = nthLastAddressTableElement(addressTableElements, mappedPosition);
+		std::cout << " adres to " << a << std::endl;
+		return stringToAddress(a);
 	}
+}
+
+std::string nthLastRssi(std::vector<std::string> addressTableElements, unsigned char n) {
+	std::cout << "ente ostatnie rssi nr " << (int)n << " to byl index mam nadzieje ze sie podobal" << std::endl;
+	unsigned char firstMapped = 2;
+	unsigned char jump = n*2;
+	unsigned char mappedPosition = firstMapped+jump;
+	return nthLastAddressTableElement(addressTableElements, mappedPosition);
 }
 
 std::string getValidatedPart(std::string packet) {
@@ -180,6 +197,7 @@ uint32_t getPacketCrc(std::string packet) {
 }
 
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
+	std::cout << " getsenders" << std::endl;
 	if(addressTable.size() <= 1) {
 		Serial.println("Incorrect addressTable, no original sender found!");
 		return INVALID_VECTOR;
@@ -187,8 +205,9 @@ std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 	int originalSenderAndDestinationCount = 2;
 	int otherElements = addressTable.size()-originalSenderAndDestinationCount;
 	int otherSendersCount = (otherElements)/2;
-
+	std::cout << " egfege? " << std::endl;
 	std::vector<moduleAddress> result = {nthLastAddress(addressTable, ORIGINAL_SENDER_INDEX)};
+	std::cout << " hello? " << std::endl;
 	for(int i = 0;i<otherSendersCount;++i) {
 		result.push_back(nthLastAddress(addressTable, i+originalSenderAndDestinationCount));
 	}
@@ -196,19 +215,22 @@ std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 }
 
 std::vector<std::string> getRssi(std::vector<std::string> addressTable) {
+	std::cout << "BLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLEBLE" << std::endl;
 	if(addressTable.size() <= 3) {
+		std::cout << "nie mo rssi" << std::endl;
 		Serial.println("No rssi found in packet");
 		return INVALID_VECTOR;
 	}
 	int originalSenderAndDestinationCount = 2;
 	int otherElements = addressTable.size()-originalSenderAndDestinationCount;
-	int rssiCount = (otherElements)/2;
+	int otherSendersCount = (otherElements)/2;
 
-	const int firstRssiIndex = originalSenderAndDestinationCount+1;
-
-	std::vector<std::string> result = {nthLastAddressTableElement(addressTable, firstRssiIndex)};
-	for(int i = 0;i<rssiCount;i += 2) {
-		result.push_back(nthLastAddressTableElement(addressTable, i+originalSenderAndDestinationCount));
+	std::vector<std::string> result = {};
+	for(int i = 0;i<otherSendersCount;++i) {
+		std::cout << " biore " << i << " te ostatnie rssi" << std::endl;
+		std::string e = nthLastRssi(addressTable, i);
+		std::cout << " to jest " << e << std::endl;
+		result.push_back(e);
 	}
 	return result;
 }

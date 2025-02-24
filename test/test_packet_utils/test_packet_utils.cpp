@@ -133,7 +133,7 @@ void dont_allow_merged_packets() {
 
 void nth_last_address_check() {
     const int num_elements = 4;
-    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
+    std::string packet = "~$HOP$9B$RSSI21$21$RSSI37$37$1^test^322ee599~";
     moduleAddress expectedAddresses[] = {1, 55, 33, 155};
     for(int i = 0;i<num_elements;++i) {
         TEST_ASSERT_EQUAL(expectedAddresses[i], nthLastAddress(allAddressTableElements(packet), i));
@@ -141,18 +141,31 @@ void nth_last_address_check() {
 }
 
 void rssi_table_check() {
-    const int num_elements = 4;
-    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^40672562~";
-    std::string expectedRssi[] = {"RSSI21", "RSSI37"};
+    const int num_elements = 2;
+    std::string packet = "~$HOP$9B$RSSI21$21$RSSI37$37$1^test^322ee599~";
+    std::string expectedRssi[] = {"RSSI37", "RSSI21"};
 
+    std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL" << std::endl;
     LoraMessage message = LoraMessage(packet, 0, 0);
 
+    std::cout << " po elu " << std::endl;
+
     std::vector<std::string> t = message.getRssi();
+    std::cout << " po getrsu te " << std::endl;
     TEST_ASSERT_EQUAL(2, t.size());
 
     for(int i = 0;i<num_elements;++i) {
         TEST_ASSERT_EQUAL_STRING(expectedRssi[i].c_str(), t.at(i).c_str());
     }
+}
+
+void dont_crash_without_hop() {
+    const int num_elements = 4;
+    std::string packet = "~$9B$RSSI21$21$RSSI37$37$1^test^79c08850~";
+    std::string expectedRssi[] = {"RSSI37", "RSSI21"};
+
+    LoraMessage message = LoraMessage(packet, 0, 0);
+    TEST_ASSERT_EQUAL(155, message.getHopLimit());
 }
 
 void incorrect_nth_last_address() {
@@ -295,6 +308,7 @@ void setup() {
     RUN_TEST(random_corruption_but_crc_is_correct);
     RUN_TEST(also_accept_hops);
     RUN_TEST(rssi_table_check);
+    RUN_TEST(dont_crash_without_hop);
     RUN_TEST(incorrect_nth_last_address);
     RUN_TEST(nth_last_address_check);
     RUN_TEST(nth_last_address_table_element_check);
