@@ -51,17 +51,35 @@ void ServiceCommunication::sendResetReason() {
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 
-OperationResult ServiceCommunication::askForTime() {
-    lastAskTime = rtc.getEpoch();
-    while(lastAskTime != DIDNT_ASK) {
-        lastAskTime = rtc.getEpoch();
+void askForTimeTask(void* object) {
+    std::shared_ptr<ServiceCommunication>* serviceCommunication = static_cast<std::shared_ptr<ServiceCommunication>*>(object);
+    while(serviceCommunication->get()->getLastAskTime() != DIDNT_ASK) {
+        serviceCommunication->get()->setLastAskTime(rtc.getEpoch());
         PacketMessage packetMessage = PacketMessage(TransmissionCode::TIME_SYNCHRONIZATION, "t");
-        Serial.println(lastAskTime);
+        Serial.println(serviceCommunication->get()->getLastAskTime());
         Serial.println("lastAskTime");
-        this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
-        delay(ASK_TIMEOUT_MS);
+        serviceCommunication->get()->transmit(packetMessage.getJson(), SERVER_ADDRESS);
+        vTaskDelay(ASK_TIMEOUT_MS);
         Serial.println("Ask for time timeout, checking if time updated");
     }
+    vTaskDelete(NULL);
+}
+
+OperationResult ServiceCommunication::setAskForTimeTask() {
+    auto* taskPtr = new std::shared_ptr<Communication>(shared_from_this());
+
+    const int bytesNeeded = 25600; //temporary value thats working
+    const char* taskName = "askForTimeTask";
+    void* taskArgument = static_cast<void*>(taskPtr);
+    const int taskPriority = 2;
+    TaskHandle_t* const taskHandle = NULL;
+    xTaskCreate(askForTimeTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
+    return OperationResult::SUCCESS;
+}
+
+OperationResult ServiceCommunication::askForTime() {
+    lastAskTime = rtc.getEpoch();
+    setAskForTimeTask();
     return OperationResult::SUCCESS;
 }
 
@@ -79,3 +97,11 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     return OperationResult::SUCCESS;
 }
 
+unsigned long ServiceCommunication::getLastAskTime() {
+    return lastAskTime;
+}
+
+OperationResult ServiceCommunication::setLastAskTime(unsigned long lastAskTime) {
+    this->lastAskTime = lastAskTime;
+    return OperationResult::SUCCESS;
+}
