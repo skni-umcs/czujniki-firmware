@@ -173,6 +173,7 @@ std::string Message::createPacket(bool addSelf) {
 	PACKET_BORDER;
 }
 
+//TODO: rewrite this in compliance with cqrs
 std::string Message::createPacketForSending() {
     if(senders.size() == 0) {
         senders.push_back(AddressHandler::getInstance().get()->readAddress());
