@@ -3,7 +3,7 @@
 
 #include <ESP32Time.h>
 
-const int RTC_GMT_1_OFFSET_S = 3600;
+const int RTC_UTC = 0;
 extern ESP32Time rtc;
 
 #endif
