@@ -5,8 +5,13 @@
 #include <utility>
 
 // Define I2C pins
-#define I2C_SDA 8
-#define I2C_SCL 9
+#if defined(esp32firebeetle)
+  #define I2C_SDA 21
+  #define I2C_SCL 22
+#else
+  #define I2C_SDA 8
+  #define I2C_SCL 9
+#endif
 
 Adafruit_BMP085 bmp;
 
@@ -14,8 +19,12 @@ const std::string TEMPERATURE_CODE = "t";
 const std::string PRESSURE_CODE = "p";
 
 OperationResult BMPSensor::setupSensor() {
+  Serial.println("Setup BMP");
+
   // Initialize I2C communication with custom pins
   Wire.begin(I2C_SDA, I2C_SCL);
+
+  Serial.println("Setup BMP 2");
   
   // Initialize BMP085 sensor
   if (!bmp.begin()) {
