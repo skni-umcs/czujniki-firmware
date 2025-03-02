@@ -5,12 +5,13 @@
 
 const std::string NOISE_CODE = "n";
 
-void NoiseSensor::setupSensor(uint32_t* delayMS) {
+OperationResult NoiseSensor::setupSensor() {
   if(transmit == nullptr) {
     Serial.println("Can't read noise, no lora transmit");
-    return;
+    return OperationResult::NOT_FOUND;
   }
   transmit->updateNoise();
+  return OperationResult::SUCCESS;
 }
 
 std::map<std::string, std::string> NoiseSensor::getSensorData() {

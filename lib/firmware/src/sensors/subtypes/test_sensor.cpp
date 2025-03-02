@@ -6,7 +6,8 @@
 #include <string>
 #include <sstream>
 
-void TestSensor::setupSensor(uint32_t* delayMS) {
+OperationResult TestSensor::setupSensor() {
+    return OperationResult::SUCCESS;
 }
 
 std::map<std::string, std::string> TestSensor::getSensorData() {

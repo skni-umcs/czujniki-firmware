@@ -61,23 +61,22 @@ void SensorFacade::sendAllSensors() {
 }
 
 OperationResult SensorFacade::setupSensors(std::shared_ptr<JsonTransmit> baseTransmit) {
+    std::vector<std::unique_ptr<Sensor>> sensors = {};
     #if defined(esp32firebeetle) || defined(mini_test)
-        std::unique_ptr<Sensor> mainSensor = std::unique_ptr<TestSensor>(new TestSensor());
-        mainSensor->setupSensor(&delayMS);
-        addSensor(mainSensor);
+        sensors.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
     #else
-        std::unique_ptr<Sensor> mainSensor = std::unique_ptr<BMPSensor>(new BMPSensor());
-        mainSensor->setupSensor(&delayMS);
-        addSensor(mainSensor);
-        std::unique_ptr<Sensor> cpuSensor = std::unique_ptr<CPUSensor>(new CPUSensor());
-        cpuSensor->setupSensor(&delayMS);
-        addSensor(cpuSensor);
-        std::unique_ptr<NoiseSensor> noiseSensor = std::unique_ptr<NoiseSensor>(new NoiseSensor());
+        sensors.push_back(std::unique_ptr<BMPSensor>(new BMPSensor()));
+        sensors.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
+        sensors.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
-        noiseSensor->setLoraTransmit(transmit);
-        noiseSensor->setupSensor(&delayMS);
-        addSensor(noiseSensor);
+        sensors.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
     #endif
+    for(std::unique_ptr<Sensor> & sensor : sensors) {
+        OperationResult setupResult = sensor->setupSensor();
+        if(setupResult == OperationResult::SUCCESS) {
+            addSensor(sensor);
+        }
+    }
     return OperationResult::SUCCESS;
 }
 

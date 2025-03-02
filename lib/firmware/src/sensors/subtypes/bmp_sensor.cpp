@@ -13,7 +13,7 @@ Adafruit_BMP085 bmp;
 const std::string TEMPERATURE_CODE = "t";
 const std::string PRESSURE_CODE = "p";
 
-void BMPSensor::setupSensor(uint32_t* delayMS) {
+OperationResult BMPSensor::setupSensor() {
   Serial.begin(9600);
   
   // Initialize I2C communication with custom pins
@@ -22,10 +22,11 @@ void BMPSensor::setupSensor(uint32_t* delayMS) {
   // Initialize BMP085 sensor
   if (!bmp.begin()) {
     Serial.println("Could not find a valid BMP085 sensor, check wiring!");
-    return;
+    return OperationResult::NOT_FOUND;
   }
   
   Serial.println("BMP085 initialization successful!");
+  return OperationResult::SUCCESS;
 }
 
 std::map<std::string, std::string> BMPSensor::getSensorData() {

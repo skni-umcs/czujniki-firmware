@@ -13,13 +13,14 @@ static const char *TAG = "TempSensor";
 
 const std::string CPU_TEMPERATURE_CODE = "c";
 
-void CPUSensor::setupSensor(uint32_t* delayMS) {
+OperationResult CPUSensor::setupSensor() {
   temp_sensor_config_t temp_sensor = TSENS_CONFIG_DEFAULT();
   temp_sensor_get_config(&temp_sensor);
   Serial.printf("default dac %d, clk_div %d", temp_sensor.dac_offset, temp_sensor.clk_div);
   temp_sensor.dac_offset = TSENS_DAC_DEFAULT; // DEFAULT: range:-10℃ ~  80℃, error < 1℃.
   temp_sensor_set_config(temp_sensor);
   temp_sensor_start();
+  return OperationResult::SUCCESS;
 }
 
 std::map<std::string, std::string> CPUSensor::getSensorData() {
@@ -33,7 +34,9 @@ std::map<std::string, std::string> CPUSensor::getSensorData() {
   return resultMap;
 }
 #else //other boards dont have temperature sensor
-void CPUSensor::setupSensor(uint32_t* delayMS) {}
+OperationResult CPUSensor::setupSensor() {
+  return OperationResult::NOT_FOUND;
+}
 
 std::map<std::string, std::string> CPUSensor::getSensorData() {
   std::map<std::string, std::string> resultMap;

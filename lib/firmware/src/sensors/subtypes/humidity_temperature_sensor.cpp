@@ -24,9 +24,27 @@ DHT dht(DHTPIN, DHTTYPE);
 const std::string TEMPERATURE_CODE = "t";
 const std::string HUMIDITY_CODE = "h";
 
-void HumidityTemperatureSensor::setupSensor(uint32_t* delayMS) {
+OperationResult HumidityTemperatureSensor::setupSensor() {
     pinMode(DHT_POWER_PIN, OUTPUT);
+    digitalWrite(DHT_POWER_PIN, HIGH);
+
+    delay(1000);
+    // Get temperature event and print its value.
+    dht.begin();
+    delay(2000);
+    sensors_event_t event;
+    std::stringstream result;
+
+    int temp = dht.readTemperature();
+    int humidity = dht.readHumidity();
+
     digitalWrite(DHT_POWER_PIN, LOW);
+    
+    if(isnan(temp) || isnan(humidity)) {
+        return OperationResult::ERROR;
+    }
+
+    return OperationResult::SUCCESS;
 }
 
 std::map<std::string, std::string> HumidityTemperatureSensor::getSensorData() {
