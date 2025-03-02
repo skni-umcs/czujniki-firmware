@@ -66,7 +66,7 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<JsonTransmit> baseTra
         mainSensor->setupSensor(&delayMS);
         addSensor(mainSensor);
     #else
-        std::unique_ptr<Sensor> mainSensor = std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor());
+        std::unique_ptr<Sensor> mainSensor = std::unique_ptr<BMPSensor>(new BMPSensor());
         mainSensor->setupSensor(&delayMS);
         addSensor(mainSensor);
         std::unique_ptr<Sensor> cpuSensor = std::unique_ptr<CPUSensor>(new CPUSensor());

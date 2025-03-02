@@ -38,7 +38,7 @@ std::map<std::string, std::string> BMPSensor::getSensorData() {
 
   std::map<std::string, std::string> resultMap;
   resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(convertedTemp)));
-  resultMap.insert(std::make_pair(PRESSURE_CODE, std::to_string(convertedTemp)));
+  resultMap.insert(std::make_pair(PRESSURE_CODE, std::to_string(convertedPressure)));
 
   return resultMap;
 }
