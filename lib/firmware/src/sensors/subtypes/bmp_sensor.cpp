@@ -14,8 +14,6 @@ const std::string TEMPERATURE_CODE = "t";
 const std::string PRESSURE_CODE = "p";
 
 OperationResult BMPSensor::setupSensor() {
-  Serial.begin(9600);
-  
   // Initialize I2C communication with custom pins
   Wire.begin(I2C_SDA, I2C_SCL);
   

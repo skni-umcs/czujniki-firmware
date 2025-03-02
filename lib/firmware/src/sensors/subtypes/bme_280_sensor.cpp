@@ -24,7 +24,6 @@ Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
 unsigned long delayTime;
 
 OperationResult BME280Sensor::setupSensor() {
-  Serial.begin(9600);
   Serial.println(F("BME280 test"));
 
   bool status;
