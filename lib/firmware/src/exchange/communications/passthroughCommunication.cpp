@@ -4,7 +4,8 @@
 #include <utils/otherUtils.h>
 #include "utils/addressHandler.h"
 
-const int SNR_WAIT_MULTIPLIER = 2;
+const double SNR_WAIT_MULTIPLIER = 0.5;
+const int MINIMAL_SNR = -80;
 
 std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
     auto s = new PassthroughCommunication();
@@ -12,8 +13,6 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 }
 
 OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
-    Serial.println("Message rebroadcasting info: currentrssibyte is");
-    Serial.println(message->getCurrentRssiByte());
     message->decrementHopLimit();
     transmit(message);
     return OperationResult::SUCCESS;
@@ -37,7 +36,6 @@ std::set<std::shared_ptr<LoraMessage>> PassthroughCommunication::getSameMessages
 }
 
 OperationResult PassthroughCommunication::removeSameMessages(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
-    Serial.println("removing message");
     messageSet.erase(message);
     for (auto rebroadcastedMessage : rebroadcastedMessages) {
         messageSet.erase(rebroadcastedMessage);
@@ -63,7 +61,10 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
 
     if (shouldRebroadcast(loraMessage)) {
         messageSet.emplace(loraMessage);
-        int passDelay = loraMessage->getSnr()*SNR_WAIT_MULTIPLIER;
+        int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
+        if(passDelay < 1) {
+            passDelay = 1;
+        }
         Serial.printf("czekam %i\n", passDelay);
         delay(passDelay);
 

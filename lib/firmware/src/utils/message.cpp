@@ -130,7 +130,6 @@ std::string Message::createAddressTableWithoutHop() {
     std::string result = "";
     int size = senders.size();
     for(int i = 0;i < size-1; ++i) {
-        Serial.println(senders.size());
         int rssiIndex = rssi.size()-1-i;
         int senderIndex = senders.size()-1-i;
         result += NODE_BORDER+toHexString(senders.at(senderIndex));
@@ -166,7 +165,6 @@ std::string Message::createPacket(bool addSelf) {
 
 	std::stringstream hexStream;
 	hexStream << std::hex << crc;
-	Serial.println(hexStream.str().c_str());
 	return PACKET_BORDER+ 
 	validatedPart+
 	toHexString(crc)+

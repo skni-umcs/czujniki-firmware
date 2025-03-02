@@ -57,10 +57,6 @@ PacketMessage PacketMessage::fromJson(std::string jsonString) {
     std::string message = root[transmissionCodeFromEnum(TransmissionCode::MESSAGE)].as<std::string>();
 	unsigned long jsonificationEpoch = root[transmissionCodeFromEnum(TransmissionCode::TIMESTAMP)].as<unsigned long>();
 
-	Serial.println(transmissionCodeFromEnum(type).c_str());
-	Serial.println(message.c_str());
-	Serial.println(jsonificationEpoch);
-
 	PacketMessage result = PacketMessage(type, message);
 	result.jsonificationEpoch = jsonificationEpoch;
 
@@ -206,7 +202,6 @@ std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 
 std::vector<std::string> getRssi(std::vector<std::string> addressTable) {
 	if(addressTable.size() <= 3) {
-		Serial.println("No rssi found in packet");
 		return INVALID_VECTOR;
 	}
 	int originalSenderAndDestinationCount = 2;

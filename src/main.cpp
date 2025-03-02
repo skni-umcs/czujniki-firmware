@@ -41,16 +41,20 @@ void setup() {
 
   AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = TRANSMIT_TYPE::create();
+
+  delay(6000);
   
   auto serviceCommunication = ServiceCommunication::create();
   serviceCommunication.get()->subscribe(transmit);
   serviceCommunication.get()->sendResetReason();
+  delay(1000);
   serviceCommunication.get()->askForTime();
 
   std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
 
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);
+
 }
 
 void loop() {

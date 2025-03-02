@@ -29,7 +29,7 @@
 #define M1_PIN 2
 #endif
 
-const int POLL_TIMER_PRIORITY = 0;
+const int POLL_TIMER_PRIORITY = 1;
 
 class LoraTransmit : public JsonTransmit
 {

@@ -11,26 +11,22 @@ std::shared_ptr<JsonCommunication> JsonCommunication::create() {
 
 OperationResult JsonCommunication::getNotified(std::shared_ptr<Message> message) {
     if(message->getIsPacketCorrect()) {
-        Serial.printf("im notified of %s from %i to %i\n", message.get()->getContent().c_str(), message.get()->getOriginalSender(), message.get()->getDestination());
+        //Serial.printf("im notified of %s from %i to %i\n", message.get()->getContent().c_str(), message.get()->getOriginalSender(), message.get()->getDestination());
     }
     return OperationResult::SUCCESS;
 }
 
 OperationResult JsonCommunication::transmit(std::string message, moduleAddress destinationNode) {
-    Serial.printf("generic transmitting message: %s\n", message.c_str());
     for(auto const& destination : transmitTo) {
         destination->send(message, destinationNode);
     }
-    Serial.println("finished generic transmit message");
     return OperationResult::SUCCESS;
 }
 
 OperationResult JsonCommunication::transmit(std::shared_ptr<Message> message) {
-    Serial.printf("generic transmitting message from ready message: %s\n", message->getContent().c_str());
     for(auto const& destination : transmitTo) {
         destination->send(message);
     }
-    Serial.println("finished generic transmit message from ready message");
     return OperationResult::SUCCESS;
 }
 
