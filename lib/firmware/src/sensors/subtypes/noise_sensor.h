@@ -11,7 +11,6 @@ class NoiseSensor : public Sensor {
         NoiseSensor(std::shared_ptr<LoraTransmit> transmit);
         std::map<std::string, std::string> getSensorData() override;
         OperationResult setupSensor() override;
-        void setLoraTransmit(std::shared_ptr<LoraTransmit> transmit);
 };
 
 #endif
