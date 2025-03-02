@@ -14,7 +14,7 @@
 void testDeleteTaskAfterTimeUpdate() {
     std::shared_ptr<Timer> timer = Timer::create();
     for(int i = 0;i<50;++i) {
-        timer.get()->updateTime(100000,100000);
+        timer.get()->updateTime(100000);
     }
     UBaseType_t numberOfTasks = uxTaskGetNumberOfTasks();
     TEST_ASSERT_LESS_OR_EQUAL(10, numberOfTasks); //the default background tasks are usually 6-8

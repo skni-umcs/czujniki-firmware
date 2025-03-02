@@ -12,3 +12,7 @@ The design patterns used in the design are:
 - Bridge (to separate the logic of sending data from collecting it)
 - Observer (to receive)
 - Singleton (to notify timers of time updates on the device)
+
+Technical information:
+- The firmware is designed for esp32 s2 mini
+- Due to the reset functionality of esp32 s2 mini it is advised to run unit tests on other esp32 board (for me it is esp32 firebeetle)
