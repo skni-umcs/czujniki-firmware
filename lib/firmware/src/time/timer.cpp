@@ -18,7 +18,7 @@ void timerTask(void* timerObjectRawPointer) {
             timerPtr->get()->getExecuteFunction()();
         }
         timerPtr->get()->setRecentlyUpdated(false);
-        vTaskDelay(timerPtr->get()->getPeriod());
+        vTaskDelay(timerPtr->get()->getPeriodMs());
     }
 }
 
@@ -37,10 +37,9 @@ void Timer::changeTimerTask() {
     xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
 }
 
-void Timer::updateTime(int lastDate, int period) {
+void Timer::updateTime(int period) {
     this->recentlyUpdated = true;
-    this->lastDate = lastDate;
-    this->period = period;
+    this->periodMs = period;
     this->changeTimerTask();
 }
 
@@ -64,6 +63,6 @@ void Timer::setRecentlyUpdated(bool recentlyUpdated) {
     this->recentlyUpdated = recentlyUpdated;
 }
 
-int Timer::getPeriod() {
-    return this->period;
+int Timer::getPeriodMs() {
+    return this->periodMs;
 }

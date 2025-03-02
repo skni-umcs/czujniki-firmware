@@ -36,7 +36,7 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
        facade->sendAllSensors();
     });
     
-    facade->timer.get()->updateTime(10,DEFAULT_SENSOR_PERIOD_MS);
+    facade->timer.get()->updateTime(DEFAULT_SENSOR_PERIOD_MS);
     return facade;
 }
 

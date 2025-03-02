@@ -34,7 +34,7 @@ const int POLL_TIMER_PRIORITY = 1;
 class LoraTransmit : public JsonTransmit
 {
   LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
-  std::shared_ptr<Timer> timer = Timer::create(POLL_TIMER_PRIORITY);
+  std::shared_ptr<Timer> pollTimer = Timer::create(POLL_TIMER_PRIORITY);
   int noiseRaw;
 
   public:

@@ -84,10 +84,10 @@ void LoraTransmit::setup() {
 std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     auto loraTransmit = new LoraTransmit();
 
-    loraTransmit->timer.get()->setExecuteFunction([loraTransmit]() {
+    loraTransmit->pollTimer.get()->setExecuteFunction([loraTransmit]() {
        loraTransmit->poll();
     });
-    loraTransmit->timer.get()->updateTime(10,DEFAULT_LORA_POLL_MS);
+    loraTransmit->pollTimer.get()->updateTime(DEFAULT_LORA_POLL_MS);
 
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};

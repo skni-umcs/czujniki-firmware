@@ -11,8 +11,7 @@ typedef std::function<void()> executeFunctionType;
 
 class Timer : public std::enable_shared_from_this<Timer>
 {
-    int lastDate = 0; //TODO: remove since it might be useless
-    int period = 60;
+    int periodMs = 60000;
     bool recentlyUpdated = false;
     executeFunctionType executeFunction = nullptr;
     TaskHandle_t currentTask = NULL;
@@ -23,12 +22,12 @@ class Timer : public std::enable_shared_from_this<Timer>
         static std::shared_ptr<Timer> create(int taskPriority = 1);
         void changeTimerTask();
         void onTimerUpdate();
-        void updateTime(int lastDate, int period);
+        void updateTime(int period);
         executeFunctionType getExecuteFunction();
         void setExecuteFunction(executeFunctionType executeFunction);
         bool getRecentlyUpdated();
         void setRecentlyUpdated(bool recentlyUpdated);
-        int getPeriod();
+        int getPeriodMs();
 
 };
 
