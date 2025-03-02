@@ -16,12 +16,13 @@ void printParameters(struct Configuration configuration);
 #define ENABLE_RSSI true
 
 const int DEFAULT_LORA_POLL_MS = 100;
+const int DEFAULT_NOISE_UPDATE_MS = 5*60000;
 const int CHANNEL = 39;
 const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
-	//TODO: Add periodical noise updates
+	Serial.println("Noise update");
 	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
 	byte localNoise = RSSIAmbient >> 8;
 
@@ -30,7 +31,7 @@ OperationResult LoraTransmit::updateNoise() {
 		return OperationResult::ERROR;
 	}
 	noiseRaw = localNoise;
-	//Serial.printf("Noise (raw): %i\n",noiseRaw);
+	Serial.printf("Noise (raw): %i\n",noiseRaw);
 
 	return OperationResult::SUCCESS;
 }
@@ -88,6 +89,11 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
        loraTransmit->poll();
     });
     loraTransmit->pollTimer.get()->updateTime(DEFAULT_LORA_POLL_MS);
+
+	loraTransmit->noiseUpdateTimer.get()->setExecuteFunction([loraTransmit]() {
+		loraTransmit->updateNoise();
+	});
+	loraTransmit->noiseUpdateTimer.get()->updateTime(DEFAULT_NOISE_UPDATE_MS);
 
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
