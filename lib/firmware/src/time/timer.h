@@ -16,10 +16,11 @@ class Timer : public std::enable_shared_from_this<Timer>
     bool recentlyUpdated = false;
     executeFunctionType executeFunction = nullptr;
     TaskHandle_t currentTask = NULL;
+    int taskPriority;
     private:
         Timer();
     public:
-        static std::shared_ptr<Timer> create();
+        static std::shared_ptr<Timer> create(int taskPriority = 1);
         void changeTimerTask();
         void onTimerUpdate();
         void updateTime(int lastDate, int period);

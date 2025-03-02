@@ -4,8 +4,9 @@
 
 Timer::Timer() {}
 
-std::shared_ptr<Timer> Timer::create() {
+std::shared_ptr<Timer> Timer::create(int taskPriority) {
     auto timerPtr = std::shared_ptr<Timer>(new Timer());
+    timerPtr->taskPriority = taskPriority;
     TimerUpdate::addSubscriber(timerPtr);
     return timerPtr;
 }
@@ -32,7 +33,6 @@ void Timer::changeTimerTask() {
     const int bytesNeeded = 25600; //temporary value thats working
     const char* taskName = "timerTask";
     void* taskArgument = static_cast<void*>(taskPtr);
-    const int taskPriority = 1;
     TaskHandle_t* const taskHandle = &this->currentTask;
     xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
 }
