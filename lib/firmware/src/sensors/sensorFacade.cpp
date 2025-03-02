@@ -26,7 +26,7 @@ SensorFacade::SensorFacade() {
 std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit> transmit, bool shouldSetupSensors) {
     auto facade = std::shared_ptr<SensorFacade>(new SensorFacade());
     facade->sensorCommunication = SensorCommunication::create();
-    facade->sensorCommunication->subscribe(std::move(transmit));
+    facade->sensorCommunication->subscribe(transmit);
 
     if(shouldSetupSensors) {
         facade->setupSensors(transmit);
