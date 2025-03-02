@@ -29,8 +29,8 @@ OperationResult LoraTransmit::updateNoise() {
 		Serial.println("Invalid noise");
 		return OperationResult::ERROR;
 	}
-	noisedB = -((256)-localNoise);
-	Serial.printf("Noise (dB): %i\n",noisedB);
+	noiseRaw = localNoise;
+	Serial.printf("Noise (raw): %i\n",noiseRaw);
 
 	return OperationResult::SUCCESS;
 }
@@ -38,6 +38,7 @@ OperationResult LoraTransmit::updateNoise() {
 int LoraTransmit::getSnr(int readRssi) {
 	int RssidB = -((256)-readRssi);
 	Serial.printf("RSSI: %i\n", RssidB);
+	int noisedB = -((256)-noiseRaw);
 	if(noisedB == 0) {
 		Serial.println("Error, realNoise is 0");
 		return -1;
@@ -46,7 +47,7 @@ int LoraTransmit::getSnr(int readRssi) {
 }
 
 int LoraTransmit::getNoise() {
-	return noisedB;
+	return noiseRaw;
 }
 
 void LoraTransmit::setup() {

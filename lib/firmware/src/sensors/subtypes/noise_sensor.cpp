@@ -24,7 +24,7 @@ std::map<std::string, std::string> NoiseSensor::getSensorData() {
     Serial.println("Can't read noise, no lora transmit");
     return resultMap;
   }
-  transmit->updateNoise();
+  transmit->updateNoise(); //TODO: move noise updates to loratransmit, here you should read only
 
   int noise = transmit->getNoise();
 
