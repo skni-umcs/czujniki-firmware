@@ -40,7 +40,7 @@ OperationResult HumidityTemperatureSensor::setupSensor() {
 
     digitalWrite(DHT_POWER_PIN, LOW);
     
-    if(isnan(temp) || isnan(humidity)) {
+    if(temp == INT_MAX || humidity == INT_MAX) {
         return OperationResult::ERROR;
     }
 
