@@ -28,12 +28,14 @@
 #include "sensors/subtypes/cpu_sensor.h"
 #include "sensors/subtypes/noise_sensor.h"
 #include <vector>
+#include <time/timeConstants.h>
 
 #if defined(esp32firebeetle)
 using TRANSMIT_TYPE = DEBUG_timeTransmit;
 #else
 using TRANSMIT_TYPE = LoraTransmit;
 #endif
+
 
 void setup() {
   Serial.begin(9600);

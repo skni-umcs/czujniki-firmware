@@ -8,7 +8,16 @@
 #include "time/timeConstants.h"
 #include <time/timerUpdate.h>
 
-static int ASK_TIMEOUT_MS = 60000;
+static int ASK_TIMEOUT_MS = 10000;
+
+int startTimestamp = 0;
+int coile = 20;
+
+int predictedMessages(int timestamp) {
+  int difference = timestamp-startTimestamp;
+  return difference/coile;
+
+}
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto s = new ServiceCommunication();
@@ -94,6 +103,16 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     TimerUpdate::setTime(serverTime+RTT/2);
     lastAskTime = DIDNT_ASK;
     Serial.printf("Current time after update: %lu\n", rtc.getEpoch());
+
+    startTimestamp = rtc.getEpoch();
+    auto checkTimer = Timer::create();
+    Serial.println("Created prediction timer");
+    int periodS = 20;
+    checkTimer->setExecuteFunction([]{
+        Serial.printf("Predicted number of sent messages: %i\n", predictedMessages(rtc.getEpoch()));
+    });
+    checkTimer->updateTime(periodS*1000);
+
     return OperationResult::SUCCESS;
 }
 
