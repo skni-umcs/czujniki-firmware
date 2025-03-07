@@ -16,7 +16,8 @@ void timerTask(void* timerObjectRawPointer) {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    while(1) {
+    auto condition = timerPtr->get()->getTimerCondition();
+    while(condition == nullptr || condition()) {
         if(timerPtr->get()->getExecuteFunction() != nullptr && !timerPtr->get()->getRecentlyUpdated()) {
             timerPtr->get()->getExecuteFunction()();
         }
@@ -56,6 +57,14 @@ executeFunctionType Timer::getExecuteFunction() {
 
 void Timer::setExecuteFunction(executeFunctionType executeFunction) {
     this->executeFunction = executeFunction;
+}
+
+timerConditionType Timer::getTimerCondition() {
+    return this->timerCondition;
+}
+
+void Timer::setTimerCondition(timerConditionType timerCondition) {
+    this->timerCondition = timerCondition;
 }
 
 bool Timer::getRecentlyUpdated() {
