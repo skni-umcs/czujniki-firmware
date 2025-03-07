@@ -8,7 +8,7 @@
 class PassthroughCommunication : public JsonCommunication {
     
     std::set<std::shared_ptr<LoraMessage>> messageSet;
-    std::shared_ptr<Timer> timer;
+    std::shared_ptr<Timer> timer; //TODO: check if its used anywhere
     
     public:
         static std::shared_ptr<PassthroughCommunication> create();

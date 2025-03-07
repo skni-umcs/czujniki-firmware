@@ -24,6 +24,7 @@ void timerTask(void* timerObjectRawPointer) {
         timerPtr->get()->setRecentlyUpdated(false);
         vTaskDelayUntil(&xLastWakeTime, timerPtr->get()->getPeriodMs());
     }
+    vTaskDelete(NULL);
 }
 
 void Timer::changeTimerTask() {

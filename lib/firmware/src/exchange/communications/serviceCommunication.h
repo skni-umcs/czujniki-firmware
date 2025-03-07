@@ -4,12 +4,14 @@
 #include <vector>
 #include "jsonCommunication.h"
 #include <exchange/transmits/jsonTransmit.h>
+#include "time/timer.h"
 
 #define DIDNT_ASK -1
 
 class ServiceCommunication : public JsonCommunication {
     
     unsigned long lastAskTime = DIDNT_ASK;
+    std::shared_ptr<Timer> askTimeTimeoutTimer = Timer::create();;
 
     protected:
         OperationResult setAskForTimeTask();
