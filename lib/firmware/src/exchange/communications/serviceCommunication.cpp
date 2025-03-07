@@ -10,18 +10,19 @@
 
 static int ASK_TIMEOUT_MS = 10000;
 
-int startTimestamp = 0;
-int coile = 20;
-
-int predictedMessages(int timestamp) {
-  int difference = timestamp-startTimestamp;
-  return difference/coile;
-
-}
-
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
-    auto s = new ServiceCommunication();
-    return std::shared_ptr<ServiceCommunication>{s};
+    auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
+
+    serviceCommunication->askTimeTimeoutTimer.get()->setExecuteFunction([serviceCommunication]() {
+        serviceCommunication->askForTime();
+    });
+    serviceCommunication->askTimeTimeoutTimer.get()->setTimerCondition([serviceCommunication]() {
+        return serviceCommunication->getLastAskTime() != DIDNT_ASK;
+    });
+     
+    serviceCommunication->askTimeTimeoutTimer.get()->updateTime(ASK_TIMEOUT_MS);
+
+    return serviceCommunication;
 }
 
 OperationResult ServiceCommunication::getNotified(std::shared_ptr<Message> message) {
@@ -60,35 +61,12 @@ void ServiceCommunication::sendResetReason() {
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 
-void askForTimeTask(void* object) {
-    std::shared_ptr<ServiceCommunication>* serviceCommunication = static_cast<std::shared_ptr<ServiceCommunication>*>(object);
-    while(serviceCommunication->get()->getLastAskTime() != DIDNT_ASK) {
-        serviceCommunication->get()->setLastAskTime(rtc.getEpoch());
-        PacketMessage packetMessage = PacketMessage(TransmissionCode::TIME_SYNCHRONIZATION, "t");
-        Serial.println(serviceCommunication->get()->getLastAskTime());
-        Serial.println("lastAskTime");
-        serviceCommunication->get()->transmit(packetMessage.getJson(), SERVER_ADDRESS);
-        vTaskDelay(ASK_TIMEOUT_MS);
-        Serial.println("Ask for time timeout, checking if time updated");
-    }
-    vTaskDelete(NULL);
-}
-
-OperationResult ServiceCommunication::setAskForTimeTask() {
-    auto* taskPtr = new std::shared_ptr<Communication>(shared_from_this());
-
-    const int bytesNeeded = 25600; //temporary value thats working
-    const char* taskName = "askForTimeTask";
-    void* taskArgument = static_cast<void*>(taskPtr);
-    const int taskPriority = 2;
-    TaskHandle_t* const taskHandle = NULL;
-    xTaskCreate(askForTimeTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
-    return OperationResult::SUCCESS;
-}
-
 OperationResult ServiceCommunication::askForTime() {
-    lastAskTime = rtc.getEpoch();
-    setAskForTimeTask();
+    this->setLastAskTime(rtc.getEpoch());
+    PacketMessage packetMessage = PacketMessage(TransmissionCode::TIME_SYNCHRONIZATION, "t");
+    Serial.println(this->getLastAskTime());
+    Serial.println("lastAskTime");
+    this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
     return OperationResult::SUCCESS;
 }
 
