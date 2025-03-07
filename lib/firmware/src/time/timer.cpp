@@ -13,12 +13,15 @@ std::shared_ptr<Timer> Timer::create(int taskPriority) {
 
 void timerTask(void* timerObjectRawPointer) {
     std::shared_ptr<Timer>* timerPtr = static_cast<std::shared_ptr<Timer>*>(timerObjectRawPointer);
+    TickType_t xLastWakeTime;
+    xLastWakeTime = xTaskGetTickCount();
+
     while(1) {
         if(timerPtr->get()->getExecuteFunction() != nullptr && !timerPtr->get()->getRecentlyUpdated()) {
             timerPtr->get()->getExecuteFunction()();
         }
         timerPtr->get()->setRecentlyUpdated(false);
-        vTaskDelay(timerPtr->get()->getPeriodMs());
+        vTaskDelayUntil(&xLastWakeTime, timerPtr->get()->getPeriodMs());
     }
 }
 
