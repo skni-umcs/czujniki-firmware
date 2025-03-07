@@ -9,6 +9,14 @@
 #include <time/timerUpdate.h>
 
 static int ASK_TIMEOUT_MS = 10000;
+int startTimestamp = 0;
+int coile = 20;
+
+int predictedMessages(int timestamp) {
+  int difference = timestamp-startTimestamp;
+  return difference/coile;
+
+}
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
