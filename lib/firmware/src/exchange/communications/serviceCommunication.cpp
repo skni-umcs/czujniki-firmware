@@ -108,8 +108,8 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     auto checkTimer = Timer::create();
     Serial.println("Created prediction timer");
     int periodS = 20;
-    checkTimer->setExecuteFunction([]{
-        Serial.printf("Predicted number of sent messages: %i\n", predictedMessages(rtc.getEpoch()));
+    checkTimer->setExecuteFunction([this](){
+        this->transmit("Predicted number of sent messages: "+std::to_string(predictedMessages(rtc.getEpoch())), 0);
     });
     checkTimer->updateTime(periodS*1000);
 
