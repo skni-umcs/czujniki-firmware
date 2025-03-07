@@ -93,7 +93,7 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     startTimestamp = rtc.getEpoch();
     auto checkTimer = Timer::create();
     Serial.println("Created prediction timer");
-    int periodS = 20;
+    int periodS = coile;
     checkTimer->setExecuteFunction([this](){
         this->transmit("Predicted number of sent messages: "+std::to_string(predictedMessages(rtc.getEpoch())), 0);
     });
