@@ -6,3 +6,4 @@
 .vscode/settings.json
 
 src/Secrets.h
+src/root_ca.h
