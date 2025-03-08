@@ -25,10 +25,11 @@
 #include <SPI.h>
 #include <utils/packetUtils.h>
 #include "exchange/transmits/DEBUG_timeTransmit.h"
+#include "exchange/transmits/wifiTransmit.h"
 #include "sensors/subtypes/cpu_sensor.h"
 #include "sensors/subtypes/noise_sensor.h"
 #include <vector>
-#include <time/timeConstants.h>
+#include "exchange/communications/UpdateCommunication.h"
 
 #if defined(esp32firebeetle)
 using TRANSMIT_TYPE = DEBUG_timeTransmit;
@@ -44,6 +45,8 @@ void setup() {
   AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = TRANSMIT_TYPE::create();
 
+  auto wifiTransmit = WifiTransmit::create();
+
   delay(6000);
   
   auto serviceCommunication = ServiceCommunication::create();
@@ -56,6 +59,9 @@ void setup() {
 
   //auto passthroughCommunication = PassthroughCommunication::create();
   //passthroughCommunication.get()->subscribe(transmit);
+
+  auto updateCommunication = UpdateCommunication::create();
+  updateCommunication->subscribe(wifiTransmit);
 
 }
 

@@ -194,3 +194,9 @@ int LoraMessage::getSnr() {
 byte LoraMessage::getCurrentRssiByte() {
     return currentRssiByte;
 }
+
+TextMessage::TextMessage(
+    std::string content
+) : Message({}, 0, content, {}, 0) {
+
+}

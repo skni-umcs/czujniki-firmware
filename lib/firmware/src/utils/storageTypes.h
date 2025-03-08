@@ -17,7 +17,8 @@ const moduleAddress SERVER_ADDRESS = 0;
 
 enum class MessageType {
     LoraMessage,
-    GeneratedMessage
+    GeneratedMessage,
+    TextMessage
 };
 
 class Message {
@@ -74,6 +75,14 @@ class GeneratedMessage : public Message {
     GeneratedMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
     MessageType type() const override {
         return MessageType::GeneratedMessage;
+    }
+};
+
+class TextMessage : public Message {
+    public:
+    TextMessage(std::string content);
+    MessageType type() const override {
+        return MessageType::TextMessage;
     }
 };
 
