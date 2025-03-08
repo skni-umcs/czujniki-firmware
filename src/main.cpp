@@ -29,9 +29,10 @@
 #include "sensors/subtypes/cpu_sensor.h"
 #include "sensors/subtypes/noise_sensor.h"
 #include <vector>
+#include "exchange/communications/UpdateCommunication.h"
 
 #if defined(esp32firebeetle)
-using TRANSMIT_TYPE = WifiTransmit;
+using TRANSMIT_TYPE = DEBUG_timeTransmit;
 #else
 using TRANSMIT_TYPE = LoraTransmit;
 #endif
@@ -42,6 +43,8 @@ void setup() {
 
   AddressHandler::getInstance().get()->initializeAddress();
   auto transmit = TRANSMIT_TYPE::create();
+
+  auto wifiTransmit = WifiTransmit::create();
 
   delay(6000);
   
@@ -55,6 +58,9 @@ void setup() {
 
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);
+
+  auto updateCommunication = UpdateCommunication::create();
+  updateCommunication->subscribe(wifiTransmit);
 
 }
 

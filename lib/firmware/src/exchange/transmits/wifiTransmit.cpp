@@ -3,18 +3,28 @@
 #include <iostream>
 #include <WiFi.h>
 #include "../src/Secrets.h"
+#include <memory>
 
 #define MINIMUM_RSSI -300
 #define NO_NETWORK -1
 #define NO_NETWORK_SSID ""
+
+const int POLL_PERIOD_MS = 100; //low value for testing
+WiFiServer server(80); // Port 80 for HTTP, can be other
 
 bool isKnownNetwork(String ssid) {
     return networks.find(ssid) != networks.end();
 }
 
 std::shared_ptr<WifiTransmit> WifiTransmit::create() {
-    auto wifiTransmit = new WifiTransmit();
+    auto wifiTransmit = std::shared_ptr<WifiTransmit>(new WifiTransmit());
     wifiTransmit->setup();
+
+    wifiTransmit->pollTimer.get()->setExecuteFunction([wifiTransmit]() {
+        wifiTransmit->poll();
+    });
+    wifiTransmit->pollTimer->updateTime(POLL_PERIOD_MS);
+
     return std::shared_ptr<WifiTransmit>{wifiTransmit};
 }
 
@@ -66,9 +76,28 @@ OperationResult WifiTransmit::setup() {
     String bestNetworkSsid = getBestNetworkSsid();
     if(bestNetworkSsid != NO_NETWORK_SSID) {
         WiFi.begin(bestNetworkSsid, networks.at(bestNetworkSsid));
+        server.begin();
+        return OperationResult::SUCCESS;
     }
     else {
         return OperationResult::NOT_FOUND;
+    }
+}
+
+OperationResult WifiTransmit::poll() {
+    WiFiClient client = server.available();
+    if (client) {
+        Serial.println("New Client Connected.");
+        while (client.connected()) {
+            if (client.available()) {
+                String message = client.readStringUntil('\n');
+                receive(std::shared_ptr<TextMessage>(new TextMessage(std::string(message.c_str()))));
+                Serial.print("Received: ");
+                Serial.println(message);
+            }
+        }
+        client.stop();
+        Serial.println("Client Disconnected.");
     }
     
     return OperationResult::SUCCESS;
@@ -85,5 +114,7 @@ OperationResult WifiTransmit::send(std::shared_ptr<Message> message) {
 }
 
 OperationResult WifiTransmit::receive(std::shared_ptr<Message> message) {
+	Serial.printf("RECEIVE WIFI %s\n", message->getPacket().c_str());
+	notifySubscribers(message);
     return OperationResult::SUCCESS;
 }
