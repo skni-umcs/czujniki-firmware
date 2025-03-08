@@ -10,9 +10,12 @@
 class WifiTransmit : public JsonTransmit
 {
     public:
+        static std::shared_ptr<WifiTransmit> create();
         OperationResult send(std::string message, moduleAddress destinationNode) override;
         OperationResult send(std::shared_ptr<Message> message) override;
         OperationResult receive(std::shared_ptr<Message> message) override;
+        String getBestNetworkSsid();
+        OperationResult setup();
 };
 
 #endif

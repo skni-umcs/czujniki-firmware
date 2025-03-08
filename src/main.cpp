@@ -25,12 +25,13 @@
 #include <SPI.h>
 #include <utils/packetUtils.h>
 #include "exchange/transmits/DEBUG_timeTransmit.h"
+#include "exchange/transmits/wifiTransmit.h"
 #include "sensors/subtypes/cpu_sensor.h"
 #include "sensors/subtypes/noise_sensor.h"
 #include <vector>
 
 #if defined(esp32firebeetle)
-using TRANSMIT_TYPE = DEBUG_timeTransmit;
+using TRANSMIT_TYPE = WifiTransmit;
 #else
 using TRANSMIT_TYPE = LoraTransmit;
 #endif
