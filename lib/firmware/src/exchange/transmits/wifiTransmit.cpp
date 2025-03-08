@@ -45,6 +45,8 @@ void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
   
   void disconnected_from_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
     Serial.println("[-] Disconnected from the WiFi AP");
+    //TODO: add mechanism to periodically check if network is back online
+    WiFi.reconnect();
     //WiFi.begin(ssid, password);
   }
   
