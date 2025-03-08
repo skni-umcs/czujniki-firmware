@@ -19,6 +19,7 @@ std::shared_ptr<WifiTransmit> WifiTransmit::create() {
 }
 
 String WifiTransmit::getBestNetworkSsid() {
+    //TODO: rewrite to https://randomnerdtutorials.com/esp32-wifimulti/
     int networksCount = WiFi.scanNetworks();
     int32_t maximumRssi = MINIMUM_RSSI; 
     int bestNetworkIndex = NO_NETWORK;
