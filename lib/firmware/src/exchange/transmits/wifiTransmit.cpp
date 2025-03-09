@@ -2,8 +2,8 @@
 #include "wifiTransmit.h"
 #include <iostream>
 #include <WiFi.h>
-#include "../src/Secrets.h"
 #include <memory>
+#include "utils/SPIFFSUtils.h"
 
 #define MINIMUM_RSSI -300
 #define NO_NETWORK -1
@@ -12,7 +12,7 @@
 const int POLL_PERIOD_MS = 100; //low value for testing
 WiFiServer server(80); // Port 80 for HTTP, can be other
 
-bool isKnownNetwork(String ssid) {
+bool WifiTransmit::isKnownNetwork(String ssid) {
     return networks.find(ssid) != networks.end();
 }
 
@@ -67,6 +67,8 @@ void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
 }
 
 OperationResult WifiTransmit::setup() {
+    networks = getNetworks();
+
     WiFi.mode(WIFI_STA);
 
     WiFi.onEvent(connected_to_ap, ARDUINO_EVENT_WIFI_STA_CONNECTED);
