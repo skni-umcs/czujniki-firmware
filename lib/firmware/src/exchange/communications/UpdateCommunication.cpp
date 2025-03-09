@@ -11,7 +11,7 @@ std::shared_ptr<UpdateCommunication> UpdateCommunication::create() {
     return std::shared_ptr<UpdateCommunication>{s};
 }
 
-static char const OTA_FILE_LOCATION[] = "https://raw.githubusercontent.com/Osariusz/ota_test/main/firmware.ota";
+static char const OTA_FILE_LOCATION[] = "https://raw.githubusercontent.com/Osariusz/ota_test2/main/firmware.ota";
 
 OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> message) {
     if(message->getIsPacketCorrect() && message->getContent() == "u") {
