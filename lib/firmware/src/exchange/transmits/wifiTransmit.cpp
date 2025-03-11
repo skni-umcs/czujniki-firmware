@@ -16,13 +16,6 @@ bool WifiTransmit::isKnownNetwork(String ssid) {
     return networks.find(ssid) != networks.end();
 }
 
-void WifiTransmit::setupPollTask() {
-    pollTimer.get()->setExecuteFunction([this]() {
-        this->poll();
-    });
-    pollTimer->updateTime(POLL_PERIOD_MS);
-}
-
 std::shared_ptr<WifiTransmit> WifiTransmit::create() {
     auto wifiTransmit = std::shared_ptr<WifiTransmit>(new WifiTransmit());
     wifiTransmit->setup();
@@ -67,6 +60,13 @@ void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
   void got_ip_from_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
     Serial.print("[+] Local ESP32 IP: ");
     Serial.println(WiFi.localIP());
+}
+
+void WifiTransmit::setupPollTask() {
+    pollTimer.get()->setExecuteFunction([this]() {
+        this->poll();
+    });
+    pollTimer->updateTime(POLL_PERIOD_MS);
 }
 
 OperationResult WifiTransmit::setup() {
