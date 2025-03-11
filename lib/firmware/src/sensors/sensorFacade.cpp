@@ -17,7 +17,7 @@
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
 
-const int DEFAULT_SENSOR_PERIOD_MS = 5000; //low value for testing
+const int DEFAULT_SENSOR_PERIOD_MS = 20000; //low value for testing
 uint32_t delayMS = 1000;
 
 SensorFacade::SensorFacade() {
