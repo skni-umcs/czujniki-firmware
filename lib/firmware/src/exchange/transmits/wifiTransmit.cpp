@@ -69,35 +69,23 @@ void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
     Serial.println(WiFi.localIP());
 }
 
-void wifiInitTask(void* wifiTransmitPointer) {
-    vTaskDelay(15000); //temporary sleep thats enough, lower sleeps block other tasks
+OperationResult WifiTransmit::setup() {
+    networks = retrieveNetworks();
+    
     WiFi.mode(WIFI_STA);
 
     WiFi.onEvent(connected_to_ap, ARDUINO_EVENT_WIFI_STA_CONNECTED);
     WiFi.onEvent(got_ip_from_ap, ARDUINO_EVENT_WIFI_STA_GOT_IP);
     WiFi.onEvent(disconnected_from_ap, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
-    std::shared_ptr<WifiTransmit>* wifiTransmit = static_cast<std::shared_ptr<WifiTransmit>*>(wifiTransmitPointer);
-    String bestNetworkSsid = wifiTransmit->get()->getBestNetworkSsid();
+    String bestNetworkSsid = getBestNetworkSsid();
     if(bestNetworkSsid != NO_NETWORK_SSID) {
-        WiFi.begin(bestNetworkSsid, wifiTransmit->get()->getNetworks().at(bestNetworkSsid));
+        WiFi.begin(bestNetworkSsid, getNetworks().at(bestNetworkSsid));
         server.begin();
     }
 
-    wifiTransmit->get()->setupPollTask();
+    setupPollTask();
 
-    vTaskDelete(NULL);
-}
-
-OperationResult WifiTransmit::setup() {
-    networks = retrieveNetworks();
-    auto* taskPtr = new std::shared_ptr<WifiTransmit>(shared_from_this());
-
-    const int bytesNeeded = 25600; //temporary value thats working
-    const char* taskName = "wifiInitTask";
-    void* taskArgument = static_cast<void*>(taskPtr);
-    TaskHandle_t* const taskHandle = nullptr;
-    xTaskCreate(wifiInitTask, taskName, bytesNeeded, taskArgument, 1, taskHandle);
     return OperationResult::SUCCESS;
 }
 
