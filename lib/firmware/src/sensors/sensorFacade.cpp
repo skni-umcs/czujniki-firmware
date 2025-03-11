@@ -34,7 +34,6 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
 
     facade->timer.get()->setExecuteFunction([facade]() {
        facade->sendAllSensors();
-       Serial.println("to byly sensory");
     });
     
     facade->timer.get()->updateTime(DEFAULT_SENSOR_PERIOD_MS);

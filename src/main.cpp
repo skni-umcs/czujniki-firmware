@@ -60,12 +60,8 @@ void setup() {
   //auto passthroughCommunication = PassthroughCommunication::create();
   //passthroughCommunication.get()->subscribe(transmit);
 
-  Serial.println("update com");
-
   auto updateCommunication = UpdateCommunication::create();
-  Serial.println("mid");
   updateCommunication->subscribe(wifiTransmit);
-  Serial.println("after sub");
 
 }
 

@@ -21,7 +21,6 @@ void timerTask(void* timerObjectRawPointer) {
     while(condition == nullptr || condition()) {
         if(timerPtr->get()->getExecuteFunction() != nullptr && !timerPtr->get()->getRecentlyUpdated()) {
             timerPtr->get()->getExecuteFunction()();
-            Serial.println("executuje taska");
         }
         timerPtr->get()->setRecentlyUpdated(false);
         vTaskDelayUntil(&xLastWakeTime, timerPtr->get()->getPeriodMs());
@@ -41,7 +40,10 @@ void Timer::changeTimerTask() {
     const char* taskName = "timerTask";
     void* taskArgument = static_cast<void*>(taskPtr);
     TaskHandle_t* const taskHandle = &this->currentTask;
-    Serial.printf("HEAP: %d\n", xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle));
+    int heap_status = xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
+    if(heap_status != 1) {
+        Serial.println("HEAP OVERLOAD");
+    }
 }
 
 void Timer::updateTime(int period) {

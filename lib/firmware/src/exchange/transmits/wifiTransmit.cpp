@@ -17,10 +17,8 @@ bool WifiTransmit::isKnownNetwork(String ssid) {
 }
 
 void WifiTransmit::setupPollTask() {
-    Serial.printf("bebebe %d\n", pollTimer == nullptr);
     pollTimer.get()->setExecuteFunction([this]() {
         this->poll();
-        Serial.println("polled wifi");
     });
     pollTimer->updateTime(POLL_PERIOD_MS);
 }
@@ -35,19 +33,11 @@ std::shared_ptr<WifiTransmit> WifiTransmit::create() {
 String WifiTransmit::getBestNetworkSsid() {
     //TODO: rewrite to https://randomnerdtutorials.com/esp32-wifimulti/
     int networksCount = WiFi.scanNetworks();
-    Serial.printf("n networks: %i\n", networksCount);
     int32_t maximumRssi = MINIMUM_RSSI; 
     int bestNetworkIndex = NO_NETWORK;
 
-    Serial.printf("ile sieci: %d\n", networks.size());
-    // Iteracja po zapisanych sieciach
-    for (std::map<String, String>::const_iterator it = networks.begin(); it != networks.end(); ++it) {
-        Serial.printf("ssid ale z networkow: %s\n", it->first.c_str());
-    }
-
     for(int i = 0;i<networksCount;++i) {
         String ssid = WiFi.SSID(i);
-        Serial.printf("ssid przy skanie: %s\n", ssid.c_str());
         if(isKnownNetwork(ssid)) {
             int32_t rssi = WiFi.RSSI();
             if(rssi > maximumRssi) {
@@ -81,7 +71,6 @@ void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
 
 void wifiInitTask(void* wifiTransmitPointer) {
     vTaskDelay(15000); //temporary sleep thats enough, lower sleeps block other tasks
-    Serial.println("setup task wifi");
     WiFi.mode(WIFI_STA);
 
     WiFi.onEvent(connected_to_ap, ARDUINO_EVENT_WIFI_STA_CONNECTED);
