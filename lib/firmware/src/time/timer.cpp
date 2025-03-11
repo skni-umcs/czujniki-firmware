@@ -1,6 +1,7 @@
 #include "timer.h"
 #include <iostream>
 #include "timerUpdate.h"
+#include <HardwareSerial.h>
 
 Timer::Timer() {}
 
@@ -20,6 +21,7 @@ void timerTask(void* timerObjectRawPointer) {
     while(condition == nullptr || condition()) {
         if(timerPtr->get()->getExecuteFunction() != nullptr && !timerPtr->get()->getRecentlyUpdated()) {
             timerPtr->get()->getExecuteFunction()();
+            Serial.println("executuje taska");
         }
         timerPtr->get()->setRecentlyUpdated(false);
         vTaskDelayUntil(&xLastWakeTime, timerPtr->get()->getPeriodMs());
@@ -35,11 +37,11 @@ void Timer::changeTimerTask() {
 
     auto* taskPtr = new std::shared_ptr<Timer>(shared_from_this());
 
-    const int bytesNeeded = 25600; //temporary value thats working
+    const int bytesNeeded = 2560*2; //temporary value thats working
     const char* taskName = "timerTask";
     void* taskArgument = static_cast<void*>(taskPtr);
     TaskHandle_t* const taskHandle = &this->currentTask;
-    xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
+    Serial.printf("HEAP: %d\n", xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle));
 }
 
 void Timer::updateTime(int period) {

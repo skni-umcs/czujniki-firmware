@@ -16,14 +16,18 @@ bool WifiTransmit::isKnownNetwork(String ssid) {
     return networks.find(ssid) != networks.end();
 }
 
+void WifiTransmit::setupPollTask() {
+    Serial.printf("bebebe %d\n", pollTimer == nullptr);
+    pollTimer.get()->setExecuteFunction([this]() {
+        this->poll();
+        Serial.println("polled wifi");
+    });
+    pollTimer->updateTime(POLL_PERIOD_MS);
+}
+
 std::shared_ptr<WifiTransmit> WifiTransmit::create() {
     auto wifiTransmit = std::shared_ptr<WifiTransmit>(new WifiTransmit());
     wifiTransmit->setup();
-
-    wifiTransmit->pollTimer.get()->setExecuteFunction([wifiTransmit]() {
-        wifiTransmit->poll();
-    });
-    wifiTransmit->pollTimer->updateTime(POLL_PERIOD_MS);
 
     return std::shared_ptr<WifiTransmit>{wifiTransmit};
 }
@@ -31,10 +35,19 @@ std::shared_ptr<WifiTransmit> WifiTransmit::create() {
 String WifiTransmit::getBestNetworkSsid() {
     //TODO: rewrite to https://randomnerdtutorials.com/esp32-wifimulti/
     int networksCount = WiFi.scanNetworks();
+    Serial.printf("n networks: %i\n", networksCount);
     int32_t maximumRssi = MINIMUM_RSSI; 
     int bestNetworkIndex = NO_NETWORK;
+
+    Serial.printf("ile sieci: %d\n", networks.size());
+    // Iteracja po zapisanych sieciach
+    for (std::map<String, String>::const_iterator it = networks.begin(); it != networks.end(); ++it) {
+        Serial.printf("ssid ale z networkow: %s\n", it->first.c_str());
+    }
+
     for(int i = 0;i<networksCount;++i) {
         String ssid = WiFi.SSID(i);
+        Serial.printf("ssid przy skanie: %s\n", ssid.c_str());
         if(isKnownNetwork(ssid)) {
             int32_t rssi = WiFi.RSSI();
             if(rssi > maximumRssi) {
@@ -66,27 +79,43 @@ void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
     Serial.println(WiFi.localIP());
 }
 
-OperationResult WifiTransmit::setup() {
-    networks = getNetworks();
-
+void wifiInitTask(void* wifiTransmitPointer) {
+    vTaskDelay(15000); //temporary sleep thats enough, lower sleeps block other tasks
+    Serial.println("setup task wifi");
     WiFi.mode(WIFI_STA);
 
     WiFi.onEvent(connected_to_ap, ARDUINO_EVENT_WIFI_STA_CONNECTED);
     WiFi.onEvent(got_ip_from_ap, ARDUINO_EVENT_WIFI_STA_GOT_IP);
     WiFi.onEvent(disconnected_from_ap, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
-    String bestNetworkSsid = getBestNetworkSsid();
+    std::shared_ptr<WifiTransmit>* wifiTransmit = static_cast<std::shared_ptr<WifiTransmit>*>(wifiTransmitPointer);
+    Serial.println(!wifiTransmit);
+    String bestNetworkSsid = wifiTransmit->get()->getBestNetworkSsid();
+    Serial.printf("ssid: %s\n", bestNetworkSsid);
     if(bestNetworkSsid != NO_NETWORK_SSID) {
-        WiFi.begin(bestNetworkSsid, networks.at(bestNetworkSsid));
+        WiFi.begin(bestNetworkSsid, wifiTransmit->get()->getNetworks().at(bestNetworkSsid));
         server.begin();
-        return OperationResult::SUCCESS;
     }
-    else {
-        return OperationResult::NOT_FOUND;
-    }
+
+    wifiTransmit->get()->setupPollTask();
+
+    vTaskDelete(NULL);
+}
+
+OperationResult WifiTransmit::setup() {
+    networks = retrieveNetworks();
+    auto* taskPtr = new std::shared_ptr<WifiTransmit>(shared_from_this());
+
+    const int bytesNeeded = 25600; //temporary value thats working
+    const char* taskName = "wifiInitTask";
+    void* taskArgument = static_cast<void*>(taskPtr);
+    TaskHandle_t* const taskHandle = nullptr;
+    xTaskCreate(wifiInitTask, taskName, bytesNeeded, taskArgument, 1, taskHandle);
+    return OperationResult::SUCCESS;
 }
 
 OperationResult WifiTransmit::poll() {
+    //TODO: rewrite to events
     WiFiClient client = server.available();
     if (client) {
         Serial.println("New Client Connected.");
@@ -119,4 +148,8 @@ OperationResult WifiTransmit::receive(std::shared_ptr<Message> message) {
 	Serial.printf("RECEIVE WIFI %s\n", message->getPacket().c_str());
 	notifySubscribers(message);
     return OperationResult::SUCCESS;
+}
+
+std::map<String, String> WifiTransmit::getNetworks() {
+	return networks;
 }

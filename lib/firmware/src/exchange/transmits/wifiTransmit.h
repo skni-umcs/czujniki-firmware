@@ -9,7 +9,7 @@
 #include <time/timer.h>
 #include <map>
 
-class WifiTransmit : public BigTransmit
+class WifiTransmit : public BigTransmit, public std::enable_shared_from_this<WifiTransmit>
 {
     std::shared_ptr<Timer> pollTimer = Timer::create();
     std::map<String, String> networks;
@@ -22,6 +22,8 @@ class WifiTransmit : public BigTransmit
         String getBestNetworkSsid();
         OperationResult setup();
         OperationResult poll();
+        std::map<String, String> getNetworks();
+        void setupPollTask();
 };
 
 #endif
