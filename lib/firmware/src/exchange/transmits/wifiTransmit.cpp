@@ -78,9 +78,7 @@ void wifiInitTask(void* wifiTransmitPointer) {
     WiFi.onEvent(disconnected_from_ap, ARDUINO_EVENT_WIFI_STA_DISCONNECTED);
 
     std::shared_ptr<WifiTransmit>* wifiTransmit = static_cast<std::shared_ptr<WifiTransmit>*>(wifiTransmitPointer);
-    Serial.println(!wifiTransmit);
     String bestNetworkSsid = wifiTransmit->get()->getBestNetworkSsid();
-    Serial.printf("ssid: %s\n", bestNetworkSsid);
     if(bestNetworkSsid != NO_NETWORK_SSID) {
         WiFi.begin(bestNetworkSsid, wifiTransmit->get()->getNetworks().at(bestNetworkSsid));
         server.begin();
