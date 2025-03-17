@@ -21,10 +21,12 @@ int predictedMessages(int timestamp) {
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
 
+    serviceCommunication->setLastAskTime(rtc.getEpoch());
     serviceCommunication->askTimeTimeoutTimer.get()->setExecuteFunction([serviceCommunication]() {
         serviceCommunication->askForTime();
     });
     serviceCommunication->askTimeTimeoutTimer.get()->setTimerCondition([serviceCommunication]() {
+        Serial.printf("last ask time %d \n",  serviceCommunication->getLastAskTime());
         return serviceCommunication->getLastAskTime() != DIDNT_ASK;
     });
      

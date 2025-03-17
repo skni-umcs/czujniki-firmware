@@ -15,7 +15,7 @@ void printParameters(struct Configuration configuration);
 // If you want use RSSI uncomment
 #define ENABLE_RSSI true
 
-const int DEFAULT_LORA_POLL_MS = 100000;
+const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5*60000;
 const int CHANNEL = 39;
 const unsigned char HOP_START_LIMIT = 100;
