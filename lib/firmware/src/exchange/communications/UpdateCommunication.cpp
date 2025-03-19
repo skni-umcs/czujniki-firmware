@@ -29,6 +29,7 @@ OperationResult UpdateCommunication::update() {
     ota.setCACert(root_ca);
     Serial.println("certified.");
     Serial.println("Initializing OTA storage");
+    transmit("initializng: ", 0);
     if ((ota_err = ota.begin()) != Arduino_ESP32_OTA::Error::None)
     {
         Serial.print  ("Arduino_ESP_OTA::begin() failed with error code ");
@@ -40,11 +41,16 @@ OperationResult UpdateCommunication::update() {
     Serial.print(ota_download);
    
 
+    transmit("bytes stored: ", 0);
+    transmit(std::to_string(ota_download), 0);
+
     Serial.println("Verify update integrity and apply ...");
     if ((ota_err = ota.update()) != Arduino_ESP32_OTA::Error::None)
     {
       Serial.print  ("ota.update() failed with error code ");
       Serial.println((int)ota_err);
+      transmit("ota.update() failed with error code ", 0);
+      transmit(std::to_string((int)ota_err), 0);
       return OperationResult::ERROR;
     }
     ota.reset();

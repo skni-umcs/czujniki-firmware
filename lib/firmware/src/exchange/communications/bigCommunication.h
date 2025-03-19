@@ -14,6 +14,7 @@ class BigCommunication : public Communication {
         virtual OperationResult transmit(std::shared_ptr<Message> message) override;
         OperationResult subscribe(std::shared_ptr<BigTransmit> bigTransmit);
         OperationResult unsubscribe(std::shared_ptr<BigTransmit> bigTransmit);
+        const std::vector<std::shared_ptr<BigTransmit>>& getTransmitTo();
 };
 
 #endif
