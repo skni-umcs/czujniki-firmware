@@ -24,6 +24,7 @@ class Timer : public std::enable_shared_from_this<Timer>
         static std::shared_ptr<Timer> create(int taskPriority = 1);
         void changeTimerTask();
         void onTimerUpdate();
+        void updateTimeNoSkip(int period);
         void updateTime(int period);
         executeFunctionType getExecuteFunction();
         void setExecuteFunction(executeFunctionType executeFunction);

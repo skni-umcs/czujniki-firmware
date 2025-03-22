@@ -8,6 +8,7 @@
 #include <LoRa_E220.h>
 #include "time/timer.h"
 #include "utils/storageTypes.h"
+#include <deque>
 
 #if defined(esp32firebeetle)
 #define ESP_RX_PIN 17
@@ -37,17 +38,24 @@ class LoraTransmit : public JsonTransmit
   std::shared_ptr<Timer> pollTimer = Timer::create(POLL_TIMER_PRIORITY);
   std::shared_ptr<Timer> noiseUpdateTimer = Timer::create();
   int noiseRaw;
+  std::deque<std::shared_ptr<Message>> messages;
+  bool canTransmit = true;
+  std::shared_ptr<Timer> sendTimer = Timer::create();
 
   public:
     static std::shared_ptr<LoraTransmit> create();
     void setup();
     OperationResult poll();
+    OperationResult physicalSend(std::shared_ptr<Message> message);
+    OperationResult advanceMessages();
     OperationResult send(std::string message, moduleAddress destinationNode) override;
     OperationResult send(std::shared_ptr<Message> message) override;
+    OperationResult scheduleMessage(std::shared_ptr<Message> message);
     OperationResult receive(std::shared_ptr<Message> message) override;
     OperationResult updateNoise();
     int getSnr(int readRssi);
     int getNoise();
+    bool getCanTransmit();
 };
 
 #endif

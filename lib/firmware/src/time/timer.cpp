@@ -46,10 +46,15 @@ void Timer::changeTimerTask() {
     }
 }
 
-void Timer::updateTime(int period) {
-    this->recentlyUpdated = true;
+void Timer::updateTimeNoSkip(int period) {
     this->periodMs = period;
     this->changeTimerTask();
+}
+
+void Timer::updateTime(int period) {
+    //TODO: are skips even neccesary anymore?
+    this->recentlyUpdated = true;
+    updateTimeNoSkip(period);
 }
 
 void Timer::onTimerUpdate() {

@@ -17,6 +17,7 @@ void printParameters(struct Configuration configuration);
 
 const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5*60000;
+const int MAX_MESSAGE_ADVANCE_MS = 60*60000;
 const int CHANNEL = 39;
 const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
@@ -95,14 +96,53 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 	});
 	loraTransmit->noiseUpdateTimer.get()->updateTime(DEFAULT_NOISE_UPDATE_MS);
 
+	loraTransmit->sendTimer.get()->setExecuteFunction([loraTransmit]() {
+		loraTransmit->advanceMessages();
+	});
+	loraTransmit->sendTimer.get()->setTimerCondition([loraTransmit]() {
+		return !loraTransmit->getCanTransmit();
+	});
+	loraTransmit->sendTimer.get()->updateTime(MAX_MESSAGE_ADVANCE_MS);
+
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
-OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
+OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
 	std::string packet = message.get()->createPacketForSending();
-	Serial.printf("SEND (ready) %s\n", packet.c_str());
+	Serial.printf("SEND %s\n", packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+	return OperationResult::SUCCESS;
+}
+
+int airTime(std::shared_ptr<Message> message) {
+	return 1000;
+}
+
+OperationResult LoraTransmit::advanceMessages() {
+	if(messages.size() > 0) {
+		std::shared_ptr<Message> message = messages.front();
+		messages.pop_front();
+		physicalSend(message);
+		sendTimer->updateTimeNoSkip(airTime(message));
+		canTransmit = false;
+	}
+	else {
+		canTransmit = true;
+	}
+	return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
+	messages.push_back(message);
+	if(canTransmit) {
+		advanceMessages();
+	}
+	return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
+	scheduleMessage(message);
     return OperationResult::SUCCESS;
 }
 
@@ -150,6 +190,10 @@ OperationResult LoraTransmit::receive(std::shared_ptr<Message> message) {
 	Serial.printf("RECEIVE %s\n", message->getPacket().c_str());
 	notifySubscribers(message);
     return OperationResult::SUCCESS;
+}
+
+bool LoraTransmit::getCanTransmit() {
+	return canTransmit;
 }
 
 void printParameters(struct Configuration configuration) {
