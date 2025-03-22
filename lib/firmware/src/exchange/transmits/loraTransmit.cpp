@@ -116,9 +116,7 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 		rssi,
 		HOP_START_LIMIT
 	));
-	std::string packet = message.get()->createPacketForSending();
-	Serial.printf("SEND %s\n", packet.c_str());
-	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+	send(message);
     return OperationResult::SUCCESS;
 }
 
