@@ -115,8 +115,49 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
 	return OperationResult::SUCCESS;
 }
 
+double calculateToA(
+    int size,
+    int sf,
+    int bw,
+    std::string codingRate = "4/5",
+    std::string lowDrOptimize = "auto",
+    bool explicitHeader = true,
+    int preambleLength = 8
+) {
+    // Wszystkie czasy w milisekundach
+    double tSym = (pow(2, sf) / (bw * 1000.0)) * 1000.0;
+    double tPreamble = (preambleLength + 4.25) * tSym;
+    
+    // H = 0 gdy nagłówek jest włączony, H = 1 gdy nagłówek nie występuje
+    int h = explicitHeader ? 0 : 1;
+    
+    // DE = 1 gdy optymalizacja niskiej przepływności jest włączona, DE = 0 gdy wyłączona
+    // W trybie 'auto' tylko dla SF11 i SF12 przy paśmie 125kHz
+    int de = 0;
+    if ((lowDrOptimize == "auto" && bw == 125 && sf >= 11) || lowDrOptimize == "true") {
+        de = 1;
+    }
+    
+    // CR to współczynnik kodowania od 1 do 4
+    int cr = codingRate[2] - '0' - 4;
+    
+    int payloadSymbNb = 8 + 
+        std::max(
+            static_cast<int>(
+                ceil((8.0 * size - 4.0 * sf + 28.0 + 16.0 - 20.0 * h) / (4.0 * (sf - 2.0 * de)))
+            ) * (cr + 4),
+            0
+        );
+        
+    double tPayload = payloadSymbNb * tSym;
+    return tPreamble + tPayload;
+}
+
 int airTime(std::shared_ptr<Message> message) {
-	return 1000;
+	int length = message.get()->createPacketForSending().size();
+	int waitTime = calculateToA(length, 7, 125)*99;
+	Serial.printf("WAIT TIME: %d\n", waitTime);
+	return waitTime;
 }
 
 OperationResult LoraTransmit::advanceMessages() {
