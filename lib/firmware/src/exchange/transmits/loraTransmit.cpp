@@ -96,14 +96,6 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 	});
 	loraTransmit->noiseUpdateTimer.get()->updateTime(DEFAULT_NOISE_UPDATE_MS);
 
-	loraTransmit->sendTimer.get()->setExecuteFunction([loraTransmit]() {
-		loraTransmit->advanceMessages();
-	});
-	loraTransmit->sendTimer.get()->setTimerCondition([loraTransmit]() {
-		return !loraTransmit->getCanTransmit();
-	});
-	loraTransmit->sendTimer.get()->updateTime(MAX_MESSAGE_ADVANCE_MS);
-
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
@@ -236,6 +228,10 @@ OperationResult LoraTransmit::receive(std::shared_ptr<Message> message) {
 
 bool LoraTransmit::getCanTransmit() {
 	return canTransmit;
+}
+
+int LoraTransmit::DEBUG_getWaitingMessagesCount() {
+	return messages.size();
 }
 
 void printParameters(struct Configuration configuration) {

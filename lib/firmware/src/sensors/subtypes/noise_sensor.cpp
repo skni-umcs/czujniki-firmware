@@ -27,6 +27,8 @@ std::map<std::string, std::string> NoiseSensor::getSensorData() {
   int noise = transmit->getNoise();
   
   resultMap.insert(std::make_pair(NOISE_CODE, std::to_string(noise)));
+    
+  resultMap.insert(std::make_pair("D_KOLEJKA", std::to_string(transmit->DEBUG_getWaitingMessagesCount())));
 
   return resultMap;
 }

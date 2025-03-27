@@ -40,7 +40,6 @@ class LoraTransmit : public JsonTransmit
   int noiseRaw;
   std::deque<std::shared_ptr<Message>> messages;
   bool canTransmit = true;
-  std::shared_ptr<Timer> sendTimer = Timer::create();
 
   public:
     static std::shared_ptr<LoraTransmit> create();
@@ -56,6 +55,7 @@ class LoraTransmit : public JsonTransmit
     int getSnr(int readRssi);
     int getNoise();
     bool getCanTransmit();
+    int DEBUG_getWaitingMessagesCount();
 };
 
 #endif
