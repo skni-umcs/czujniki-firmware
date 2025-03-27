@@ -157,9 +157,11 @@ OperationResult LoraTransmit::advanceMessages() {
 		std::shared_ptr<Message> message = messages.front();
 		messages.pop_front();
 		physicalSend(message);
-		delay(airTime(message));
-		advanceMessages();
 		canTransmit = false;
+		//TODO: wait full time
+		delay(airTime(message)/3);
+		//TODO: maybe it can be rewritten into a task that has while(messages.size() > 0)
+		advanceMessages();
 	}
 	else {
 		canTransmit = true;
