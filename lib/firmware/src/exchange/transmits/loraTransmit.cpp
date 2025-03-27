@@ -165,7 +165,8 @@ OperationResult LoraTransmit::advanceMessages() {
 		std::shared_ptr<Message> message = messages.front();
 		messages.pop_front();
 		physicalSend(message);
-		sendTimer->updateTimeNoSkip(airTime(message));
+		delay(airTime(message));
+		advanceMessages();
 		canTransmit = false;
 	}
 	else {
