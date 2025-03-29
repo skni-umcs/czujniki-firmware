@@ -132,12 +132,8 @@ OperationResult WifiTransmit::send(std::string message, moduleAddress destinatio
 
 OperationResult WifiTransmit::send(std::shared_ptr<Message> message) {
     moduleAddress dest = message->getDestination();
-    auto it = activeClients.find(dest);
-    if (it != activeClients.end() && it->second.connected()) {
-        it->second.print(message->getContent().c_str());
-        return OperationResult::SUCCESS;
-    }
-    return OperationResult::ERROR;
+    std::string messageContent = message->getContent();
+    return send(messageContent, dest);
 }
 
 OperationResult WifiTransmit::receive(std::shared_ptr<Message> message) {
