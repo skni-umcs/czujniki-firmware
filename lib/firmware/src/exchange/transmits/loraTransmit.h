@@ -10,6 +10,7 @@
 #include "utils/storageTypes.h"
 #include <deque>
 #include <time/waiter.h>
+#include "wifiTransmit.h"
 
 #if defined(esp32firebeetle)
 #define ESP_RX_PIN 17
@@ -42,9 +43,10 @@ class LoraTransmit : public JsonTransmit
   std::deque<std::shared_ptr<Message>> messages;
   bool canTransmit = true;
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
+  std::shared_ptr<WifiTransmit> DEBUG_wifi;
 
   public:
-    static std::shared_ptr<LoraTransmit> create();
+    static std::shared_ptr<LoraTransmit> create(std::shared_ptr<WifiTransmit> DEBUG_wifi);
     void setup();
     OperationResult poll();
     OperationResult physicalSend(std::shared_ptr<Message> message);

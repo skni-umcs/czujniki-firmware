@@ -17,7 +17,6 @@ void waiterTask(void* timerObjectRawPointer) {
     Serial.println("y");
     while(true) {
         vTaskDelay(timerPtr->get()->getWaitMs());
-        Serial.println("poczekane");
         if(timerPtr->get()->getExecuteFunction() != nullptr) {
             timerPtr->get()->getExecuteFunction()();
         }
