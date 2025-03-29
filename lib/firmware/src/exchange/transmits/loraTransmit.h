@@ -9,6 +9,7 @@
 #include "time/timer.h"
 #include "utils/storageTypes.h"
 #include <deque>
+#include <time/waiter.h>
 
 #if defined(esp32firebeetle)
 #define ESP_RX_PIN 17
@@ -40,6 +41,7 @@ class LoraTransmit : public JsonTransmit
   int noiseRaw;
   std::deque<std::shared_ptr<Message>> messages;
   bool canTransmit = true;
+  std::shared_ptr<Waiter> sendWaiter = Waiter::create();
 
   public:
     static std::shared_ptr<LoraTransmit> create();
@@ -56,6 +58,7 @@ class LoraTransmit : public JsonTransmit
     int getNoise();
     bool getCanTransmit();
     int DEBUG_getWaitingMessagesCount();
+    OperationResult RENAMEadvanceMessages();
 };
 
 #endif

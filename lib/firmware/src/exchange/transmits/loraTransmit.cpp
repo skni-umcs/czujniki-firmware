@@ -96,6 +96,12 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 	});
 	loraTransmit->noiseUpdateTimer.get()->updateTime(DEFAULT_NOISE_UPDATE_MS);
 
+	loraTransmit->sendWaiter.get()->setExecuteFunction([loraTransmit]() {
+		loraTransmit->advanceMessages();
+	});
+	loraTransmit->sendWaiter.get()->updateTime(1000);
+	loraTransmit->sendWaiter.get()->changeTimerTask();
+
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
@@ -152,28 +158,34 @@ int airTime(std::shared_ptr<Message> message) {
 	return waitTime;
 }
 
+OperationResult LoraTransmit::RENAMEadvanceMessages() {
+
+	return OperationResult::SUCCESS;
+}
+
 OperationResult LoraTransmit::advanceMessages() {
+	Serial.println("advancing messages");
 	if(messages.size() > 0) {
 		std::shared_ptr<Message> message = messages.front();
 		messages.pop_front();
 		physicalSend(message);
 		canTransmit = false;
-		//TODO: wait full time
-		delay(airTime(message)/3);
-		//TODO: maybe it can be rewritten into a task that has while(messages.size() > 0)
-		advanceMessages();
+		//TODO: wait full air time
+		sendWaiter.get()->updateTime(airTime(message)/3);
 	}
 	else {
 		canTransmit = true;
+		sendWaiter.get()->updateTime(1000);
 	}
 	return OperationResult::SUCCESS;
 }
 
 OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
+	Serial.printf("SCHEDULE SEND %s\n", message->createPacket().c_str());
 	messages.push_back(message);
-	if(canTransmit) {
+	/*if(canTransmit) {
 		advanceMessages();
-	}
+	}*/
 	return OperationResult::SUCCESS;
 }
 
