@@ -24,9 +24,11 @@ OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> messag
 OperationResult UpdateCommunication::update() {
     //TODO: add check if transmit medium is up
     Serial.println("try ota");
+    transmit("trying ota", 0);
     Arduino_ESP32_OTA ota;
     Arduino_ESP32_OTA::Error ota_err = Arduino_ESP32_OTA::Error::None;
     ota.setCACert(root_ca);
+    transmit("certified", 0);
     Serial.println("certified.");
     Serial.println("Initializing OTA storage");
     transmit("initializng: ", 0);
@@ -53,6 +55,7 @@ OperationResult UpdateCommunication::update() {
       transmit(std::to_string((int)ota_err), 0);
       return OperationResult::ERROR;
     }
+    transmit("reset", 0);
     ota.reset();
 
     return OperationResult::SUCCESS;
