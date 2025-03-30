@@ -20,44 +20,63 @@ OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> messag
     }
     return OperationResult::SUCCESS;
 }
+#include <WiFi.h>
+#include <HTTPClient.h>
+#include <Update.h>
 
 OperationResult UpdateCommunication::update() {
-    //TODO: add check if transmit medium is up
-    Serial.println("try ota");
-    transmit("trying ota", 0);
-    Arduino_ESP32_OTA ota;
-    Arduino_ESP32_OTA::Error ota_err = Arduino_ESP32_OTA::Error::None;
-    ota.setCACert(root_ca);
-    transmit("certified", 0);
-    Serial.println("certified.");
-    Serial.println("Initializing OTA storage");
-    transmit("initializng: ", 0);
-    if ((ota_err = ota.begin()) != Arduino_ESP32_OTA::Error::None)
-    {
-        Serial.print  ("Arduino_ESP_OTA::begin() failed with error code ");
-        Serial.println((int)ota_err);
+    const char* firmware_url = "http://IP:8000/firmware.bin";
+
+    Serial.println("Starting OTA update from local server...");
+
+    WiFiClient client;
+    HTTPClient http;
+
+    http.begin(client, firmware_url);
+    int httpCode = http.GET();
+
+    if (httpCode == HTTP_CODE_OK) {
+        int contentLength = http.getSize();
+        bool canBegin = Update.begin(contentLength);
+
+        if (canBegin) {
+            WiFiClient* stream = http.getStreamPtr();
+            size_t written = Update.writeStream(*stream);
+
+            if (written != contentLength) {
+                Serial.printf("Written only %d/%d bytes. Abort.\n", written, contentLength);
+                http.end(); // Close connection before returning
+                return OperationResult::ERROR;
+            }
+
+            if (Update.end()) {
+                Serial.println("OTA update finished!");
+                if (Update.isFinished()) {
+                    Serial.println("Update successfully completed. Rebooting...");
+                    http.end(); // Close HTTP connection before restarting
+                    ESP.restart();
+                } else {
+                    Serial.println("Update not finished. Something went wrong.");
+                    http.end(); // Close connection on error
+                    return OperationResult::ERROR;
+                }
+            } else {
+                Serial.printf("Error Occurred. Error #: %d\n", Update.getError());
+                http.end(); // Close connection on error
+                return OperationResult::ERROR;
+            }
+        } else {
+            Serial.println("Not enough space to begin OTA.");
+            http.end(); // Close connection on error
+            return OperationResult::ERROR;
+        }
+    } else {
+        Serial.printf("Failed to download firmware. HTTP error: %d\n", httpCode);
+        http.end(); // Close connection on error
         return OperationResult::ERROR;
     }
-    int const ota_download = ota.download(OTA_FILE_LOCATION);
-    Serial.println(" bytes stored:");
-    Serial.print(ota_download);
-   
 
-    transmit("bytes stored: ", 0);
-    transmit(std::to_string(ota_download), 0);
-
-    Serial.println("Verify update integrity and apply ...");
-    if ((ota_err = ota.update()) != Arduino_ESP32_OTA::Error::None)
-    {
-      Serial.print  ("ota.update() failed with error code ");
-      Serial.println((int)ota_err);
-      transmit("ota.update() failed with error code ", 0);
-      transmit(std::to_string((int)ota_err), 0);
-      return OperationResult::ERROR;
-    }
-    transmit("reset", 0);
-    ota.reset();
-
+    // This line is unreachable if update succeeds, but included for safety
+    http.end();
     return OperationResult::SUCCESS;
 }
-
