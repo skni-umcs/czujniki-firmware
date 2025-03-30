@@ -124,7 +124,7 @@ OperationResult WifiTransmit::poll() {
 OperationResult WifiTransmit::send(std::string message, moduleAddress destinationNode) {
     auto it = activeClients.find(destinationNode);
     if (it != activeClients.end() && it->second.connected()) {
-        it->second.print(message.c_str());
+        it->second.printf("%s\n", message.c_str());
         return OperationResult::SUCCESS;
     }
     return OperationResult::ERROR;
@@ -132,7 +132,7 @@ OperationResult WifiTransmit::send(std::string message, moduleAddress destinatio
 
 OperationResult WifiTransmit::send(std::shared_ptr<Message> message) {
     moduleAddress dest = message->getDestination();
-    std::string messageContent = message->getContent();
+    std::string messageContent = message->createPacket();
     return send(messageContent, dest);
 }
 
