@@ -4,7 +4,6 @@
 #include <utils/otherUtils.h>
 #include "utils/addressHandler.h"
 #include <Arduino_ESP32_OTA.h>
-#include <root_ca.h>
 
 std::shared_ptr<UpdateCommunication> UpdateCommunication::create() {
     auto s = new UpdateCommunication();
@@ -25,7 +24,7 @@ OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> messag
 #include <Update.h>
 
 OperationResult UpdateCommunication::update() {
-    const char* firmware_url = "http://IP:8000/firmware.bin";
+    const char* firmware_url = "http://192.168.1.18:8000/firmware.bin";
 
     Serial.println("Starting OTA update from local server...");
 
