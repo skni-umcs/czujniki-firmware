@@ -172,7 +172,7 @@ OperationResult LoraTransmit::advanceMessages() {
 		physicalSend(message);
 		canTransmit = false;
 		//TODO: wait full air time
-		sendWaiter.get()->updateTime(airTime(message)/3);
+		sendWaiter.get()->updateTime(airTime(message)/4);
 	}
 	else {
 		canTransmit = true;
@@ -182,8 +182,10 @@ OperationResult LoraTransmit::advanceMessages() {
 }
 
 OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
-	Serial.printf("SCHEDULE SEND %s\n", message->createPacket().c_str());
-	messages.push_back(message);
+	if(DEBUG_getWaitingMessagesCount() <= 50) {
+		Serial.printf("SCHEDULE SEND %s\n", message->createPacket().c_str());
+		messages.push_back(message);
+	}
 	/*if(canTransmit) {
 		advanceMessages();
 	}*/
