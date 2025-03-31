@@ -42,6 +42,7 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
 }
 
 std::string SensorFacade::getAllSensorsMessage() {
+    //TODO: prevent faulty sensor from crashing
     JsonDocument doc;
     JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
