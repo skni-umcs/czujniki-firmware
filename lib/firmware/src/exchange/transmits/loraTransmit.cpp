@@ -24,8 +24,8 @@ const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
 	Serial.println("Noise update");
-	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
-	byte localNoise = RSSIAmbient >> 8;
+	unsigned short RSSIAmbient = 180;
+	byte localNoise = 180;
 
 	if (localNoise == -1) {
 		Serial.println("Invalid noise");
