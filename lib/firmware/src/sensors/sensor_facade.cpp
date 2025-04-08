@@ -73,7 +73,7 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<JsonTransmit> baseTra
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
     #else
         sensorCandidates.push_back(std::unique_ptr<BMPSensor>(new BMPSensor()));
-        //sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
+        sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
         sensorCandidates.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
