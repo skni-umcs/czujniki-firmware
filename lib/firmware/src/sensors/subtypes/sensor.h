@@ -3,7 +3,7 @@
 
 #include <string>
 #include <map>
-#include <utils/operationResult.h>
+#include <utils/operation_result.h>
 
 class Sensor 
 {

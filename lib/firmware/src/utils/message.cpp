@@ -1,9 +1,9 @@
-#include "storageTypes.h"
-#include "packetUtils.h"
+#include "storage_types.h"
+#include "packet_utils.h"
 #include <sstream>
-#include "addressHandler.h"
+#include "address_handler.h"
 #include <iostream>
-#include <utils/addressHandler.h>
+#include <utils/address_handler.h>
 
 Message::Message() {}
 

@@ -1,16 +1,16 @@
 #include <unity.h>
 #include <string>
 #include <algorithm> 
-#include <exchange/communications/jsonCommunication.h>
-#include <exchange/transmits/wifiTransmit.h>
-#include <exchange/transmits/loraTransmit.h>
+#include <exchange/communications/json_communication.h>
+#include <exchange/transmits/wifi_transmit.h>
+#include <exchange/transmits/lora_transmit.h>
 #include <iostream>
 #include <memory>
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
-#include <exchange/communications/passthroughCommunication.h>
-#include <exchange/communications/serviceCommunication.h>
-#include "time/timeConstants.h"
+#include <exchange/communications/passthrough_communication.h>
+#include <exchange/communications/service_communication.h>
+#include "time/time_constants.h"
 
 void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std::unique_ptr<JsonTransmit> jsonTransmit) {
     jsonCommunication->subscribe(std::move(jsonTransmit));

@@ -3,8 +3,8 @@
 
 #include <string>
 #include <exchange/communications/communication.h>
-#include "exchange/transmits/jsonTransmit.h"
-#include "utils/storageTypes.h"
+#include "exchange/transmits/json_transmit.h"
+#include "utils/storage_types.h"
 
 class TestTransmit : public JsonTransmit
 {

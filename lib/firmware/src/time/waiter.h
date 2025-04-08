@@ -6,7 +6,7 @@
 #include <freertos/task.h>
 #include <functional>
 #include <memory>
-#include <utils/operationResult.h>
+#include <utils/operation_result.h>
 
 typedef std::function<void()> executeFunctionType;
 typedef std::function<bool()> timerConditionType;

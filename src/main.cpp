@@ -11,25 +11,25 @@
 #include <DHT.h>
 #include <DHT_U.h>
 #include "sensors/subtypes/humidity_temperature_sensor.h"
-#include "sensors/sensorFacade.h"
+#include "sensors/sensor_facade.h"
 #include <sensors/subtypes/test_sensor.h>
 #include <iostream>
-#include "time/timerUpdate.h"
+#include "time/timer_update.h"
 #include "time/timer.h"
-#include <exchange/transmits/loraTransmit.h>
-#include <exchange/communications/serviceCommunication.h>
-#include <exchange/communications/passthroughCommunication.h>
+#include <exchange/transmits/lora_transmit.h>
+#include <exchange/communications/service_communication.h>
+#include <exchange/communications/passthrough_communication.h>
 #include <Preferences.h>
-#include "utils/addressHandler.h"
+#include "utils/address_handler.h"
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
-#include <utils/packetUtils.h>
-#include "exchange/transmits/DEBUG_timeTransmit.h"
-#include "exchange/transmits/wifiTransmit.h"
+#include <utils/packet_utils.h>
+#include "exchange/transmits/DEBUG_time_transmit.h"
+#include "exchange/transmits/wifi_transmit.h"
 #include "sensors/subtypes/cpu_sensor.h"
 #include "sensors/subtypes/noise_sensor.h"
 #include <vector>
-#include "exchange/communications/UpdateCommunication.h"
+#include "exchange/communications/update_communication.h"
 
 #if defined(esp32firebeetle)
 using TRANSMIT_TYPE = DEBUG_timeTransmit;

@@ -2,7 +2,7 @@
 #define NOISE_H
 
 #include "sensor.h"
-#include "exchange/transmits/loraTransmit.h"
+#include "exchange/transmits/lora_transmit.h"
 
 class NoiseSensor : public Sensor {
     std::shared_ptr<LoraTransmit> transmit;

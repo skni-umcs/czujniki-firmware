@@ -1,6 +1,6 @@
 #include <unity.h>
 #include <WString.h>
-#include "utils/stringUtils.h"
+#include "utils/string_utils.h"
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
 

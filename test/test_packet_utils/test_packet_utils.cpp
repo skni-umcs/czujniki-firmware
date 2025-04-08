@@ -1,12 +1,12 @@
 #include <unity.h>
-#include "utils/storageTypes.h"
+#include "utils/storage_types.h"
 #include <string>
-#include "utils/packetUtils.h"
+#include "utils/packet_utils.h"
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
 #include <vector>
 #include <iostream>
-#include "utils/addressHandler.h"
+#include "utils/address_handler.h"
 
 const moduleAddress TEST_MODULE_ADDRESS = 28;
 

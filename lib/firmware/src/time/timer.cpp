@@ -1,6 +1,6 @@
 #include "timer.h"
 #include <iostream>
-#include "timerUpdate.h"
+#include "timer_update.h"
 #include <HardwareSerial.h>
 
 Timer::Timer() {}

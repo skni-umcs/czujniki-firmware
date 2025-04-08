@@ -2,9 +2,9 @@
 #define COMMUNICATION_H
 
 #include <string>
-#include <utils/operationResult.h>
+#include <utils/operation_result.h>
 #include <memory>
-#include "utils/storageTypes.h"
+#include "utils/storage_types.h"
 
 class Communication : public std::enable_shared_from_this<Communication>
 {
