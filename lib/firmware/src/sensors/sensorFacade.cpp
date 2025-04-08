@@ -16,8 +16,9 @@
 #include <sensors/subtypes/noise_sensor.h>
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
+#include <sensors/subtypes/heap_sensor.h>
 
-const int DEFAULT_SENSOR_PERIOD_MS = 20000; //low value for testing
+const int DEFAULT_SENSOR_PERIOD_MS = 32000;
 uint32_t delayMS = 1000;
 
 SensorFacade::SensorFacade() {
@@ -41,6 +42,7 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit>
 }
 
 std::string SensorFacade::getAllSensorsMessage() {
+    //TODO: prevent faulty sensor from crashing
     JsonDocument doc;
     JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
@@ -66,11 +68,12 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<JsonTransmit> baseTra
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
     #else
         sensorCandidates.push_back(std::unique_ptr<BMPSensor>(new BMPSensor()));
-        sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
+        //sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
         sensorCandidates.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
     #endif
+    sensorCandidates.push_back(std::unique_ptr<HeapSensor>(new HeapSensor()));
     for(std::unique_ptr<Sensor> & sensor : sensorCandidates) {
         OperationResult setupResult = sensor->setupSensor();
         if(setupResult == OperationResult::SUCCESS) {

@@ -9,14 +9,24 @@
 #include <time/timerUpdate.h>
 
 static int ASK_TIMEOUT_MS = 10000;
+int startTimestamp = 0;
+int coile = 32;
+
+int predictedMessages(int timestamp) {
+  int difference = timestamp-startTimestamp;
+  return difference/coile;
+
+}
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
 
+    serviceCommunication->setLastAskTime(rtc.getEpoch());
     serviceCommunication->askTimeTimeoutTimer.get()->setExecuteFunction([serviceCommunication]() {
         serviceCommunication->askForTime();
     });
     serviceCommunication->askTimeTimeoutTimer.get()->setTimerCondition([serviceCommunication]() {
+        Serial.printf("last ask time %d \n",  serviceCommunication->getLastAskTime());
         return serviceCommunication->getLastAskTime() != DIDNT_ASK;
     });
      
@@ -81,6 +91,16 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     TimerUpdate::setTime(serverTime+RTT/2);
     lastAskTime = DIDNT_ASK;
     Serial.printf("Current time after update: %lu\n", rtc.getEpoch());
+
+    startTimestamp = rtc.getEpoch();
+    auto checkTimer = Timer::create();
+    Serial.println("Created prediction timer");
+    int periodS = coile;
+    checkTimer->setExecuteFunction([this](){
+        this->transmit("Predicted number of sent messages: "+std::to_string(predictedMessages(rtc.getEpoch())), 0);
+    });
+    checkTimer->updateTime(periodS*1000);
+
     return OperationResult::SUCCESS;
 }
 

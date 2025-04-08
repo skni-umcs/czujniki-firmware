@@ -9,6 +9,8 @@ class SensorCommunication : public JsonCommunication {
     
     public:
         static std::shared_ptr<SensorCommunication> create();
+        OperationResult transmit(std::string message, moduleAddress destinationNode) override;
+        OperationResult transmit(std::shared_ptr<Message> message) override;
 };
 
 #endif

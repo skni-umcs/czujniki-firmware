@@ -17,14 +17,15 @@ void printParameters(struct Configuration configuration);
 
 const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5*60000;
+const int MAX_MESSAGE_ADVANCE_MS = 60*60000;
 const int CHANNEL = 39;
 const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
 	Serial.println("Noise update");
-	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
-	byte localNoise = RSSIAmbient >> 8;
+	unsigned short RSSIAmbient = 180;
+	byte localNoise = 180;
 
 	if (localNoise == -1) {
 		Serial.println("Invalid noise");
@@ -82,8 +83,9 @@ void LoraTransmit::setup() {
 	updateNoise();
 }
 
-std::shared_ptr<LoraTransmit> LoraTransmit::create() {
+std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit> DEBUG_wifi) {
     auto loraTransmit = new LoraTransmit();
+	loraTransmit->DEBUG_wifi = DEBUG_wifi;
 
     loraTransmit->pollTimer.get()->setExecuteFunction([loraTransmit]() {
        loraTransmit->poll();
@@ -95,14 +97,103 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 	});
 	loraTransmit->noiseUpdateTimer.get()->updateTime(DEFAULT_NOISE_UPDATE_MS);
 
+	loraTransmit->sendWaiter.get()->setExecuteFunction([loraTransmit]() {
+		loraTransmit->advanceMessages();
+	});
+	loraTransmit->sendWaiter.get()->updateTime(1000);
+	loraTransmit->sendWaiter.get()->changeTimerTask();
+
     loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
-OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
+OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
+	DEBUG_wifi->send(message);
 	std::string packet = message.get()->createPacketForSending();
-	Serial.printf("SEND (ready) %s\n", packet.c_str());
+	Serial.printf("SEND %s\n", packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+	return OperationResult::SUCCESS;
+}
+
+double calculateToA(
+    int size,
+    int sf,
+    int bw,
+    std::string codingRate = "4/5",
+    std::string lowDrOptimize = "auto",
+    bool explicitHeader = true,
+    int preambleLength = 8
+) {
+    // Wszystkie czasy w milisekundach
+    double tSym = (pow(2, sf) / (bw * 1000.0)) * 1000.0;
+    double tPreamble = (preambleLength + 4.25) * tSym;
+    
+    // H = 0 gdy nagłówek jest włączony, H = 1 gdy nagłówek nie występuje
+    int h = explicitHeader ? 0 : 1;
+    
+    // DE = 1 gdy optymalizacja niskiej przepływności jest włączona, DE = 0 gdy wyłączona
+    // W trybie 'auto' tylko dla SF11 i SF12 przy paśmie 125kHz
+    int de = 0;
+    if ((lowDrOptimize == "auto" && bw == 125 && sf >= 11) || lowDrOptimize == "true") {
+        de = 1;
+    }
+    
+    // CR to współczynnik kodowania od 1 do 4
+    int cr = codingRate[2] - '0' - 4;
+    
+    int payloadSymbNb = 8 + 
+        std::max(
+            static_cast<int>(
+                ceil((8.0 * size - 4.0 * sf + 28.0 + 16.0 - 20.0 * h) / (4.0 * (sf - 2.0 * de)))
+            ) * (cr + 4),
+            0
+        );
+        
+    double tPayload = payloadSymbNb * tSym;
+    return tPreamble + tPayload;
+}
+
+int airTime(std::shared_ptr<Message> message) {
+	int length = message.get()->createPacketForSending().size();
+	int waitTime = calculateToA(length, 7, 125)*99;
+	Serial.printf("WAIT TIME: %d\n", waitTime);
+	return waitTime;
+}
+
+OperationResult LoraTransmit::RENAMEadvanceMessages() {
+
+	return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::advanceMessages() {
+	if(messages.size() > 0) {
+		std::shared_ptr<Message> message = messages.front();
+		messages.pop_front();
+		physicalSend(message);
+		canTransmit = false;
+		//TODO: wait full air time
+		sendWaiter.get()->updateTime(airTime(message)/4);
+	}
+	else {
+		canTransmit = true;
+		sendWaiter.get()->updateTime(1000);
+	}
+	return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
+	if(DEBUG_getWaitingMessagesCount() <= 50) {
+		Serial.printf("SCHEDULE SEND %s\n", message->createPacket().c_str());
+		messages.push_back(message);
+	}
+	/*if(canTransmit) {
+		advanceMessages();
+	}*/
+	return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
+	scheduleMessage(message);
     return OperationResult::SUCCESS;
 }
 
@@ -116,9 +207,7 @@ OperationResult LoraTransmit::send(std::string content, moduleAddress destinatio
 		rssi,
 		HOP_START_LIMIT
 	));
-	std::string packet = message.get()->createPacketForSending();
-	Serial.printf("SEND %s\n", packet.c_str());
-	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+	send(message);
     return OperationResult::SUCCESS;
 }
 
@@ -152,6 +241,14 @@ OperationResult LoraTransmit::receive(std::shared_ptr<Message> message) {
 	Serial.printf("RECEIVE %s\n", message->getPacket().c_str());
 	notifySubscribers(message);
     return OperationResult::SUCCESS;
+}
+
+bool LoraTransmit::getCanTransmit() {
+	return canTransmit;
+}
+
+int LoraTransmit::DEBUG_getWaitingMessagesCount() {
+	return messages.size();
 }
 
 void printParameters(struct Configuration configuration) {

@@ -30,3 +30,7 @@ OperationResult BigCommunication::transmit(std::shared_ptr<Message> message) {
     }
     return OperationResult::SUCCESS;
 }
+
+const std::vector<std::shared_ptr<BigTransmit>>& BigCommunication::getTransmitTo() {
+    return transmitTo;
+}

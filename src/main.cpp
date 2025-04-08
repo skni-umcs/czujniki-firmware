@@ -37,14 +37,16 @@ using TRANSMIT_TYPE = DEBUG_timeTransmit;
 using TRANSMIT_TYPE = LoraTransmit;
 #endif
 
+
 void setup() {
   Serial.begin(9600);
   delay(1000);
 
   AddressHandler::getInstance().get()->initializeAddress();
-  auto transmit = TRANSMIT_TYPE::create();
+  
 
   auto wifiTransmit = WifiTransmit::create();
+  auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
 
   delay(6000);
   

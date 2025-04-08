@@ -5,7 +5,7 @@
 
 #define NO_NETWORKS {}
 
-std::map<String, String> getNetworks() {
+std::map<String, String> retrieveNetworks() {
   if (!SPIFFS.begin(true)) {
     Serial.println("An error occurred while mounting SPIFFS");
     return NO_NETWORKS;

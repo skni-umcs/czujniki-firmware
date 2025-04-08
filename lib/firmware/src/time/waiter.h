@@ -1,27 +1,27 @@
-#ifndef TIMER_H
-#define TIMER_H
+#ifndef WAITER_H
+#define WAITER_H
 
 #include <string>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <functional>
 #include <memory>
+#include <utils/operationResult.h>
 
 typedef std::function<void()> executeFunctionType;
 typedef std::function<bool()> timerConditionType;
 
-class Timer : public std::enable_shared_from_this<Timer>
+class Waiter : public std::enable_shared_from_this<Waiter>
 {
-    int periodMs = 60000;
-    bool recentlyUpdated = false;
+    int waitMS = 60000;
     executeFunctionType executeFunction = nullptr;
     timerConditionType timerCondition = nullptr;
     TaskHandle_t currentTask = NULL;
     int taskPriority;
     private:
-        Timer();
+        Waiter();
     public:
-        static std::shared_ptr<Timer> create(int taskPriority = 1);
+        static std::shared_ptr<Waiter> create(int taskPriority = 1);
         void changeTimerTask();
         void onTimerUpdate();
         void updateTimeNoSkip(int period);
@@ -32,7 +32,8 @@ class Timer : public std::enable_shared_from_this<Timer>
         void setTimerCondition(timerConditionType timerCondition);
         bool getRecentlyUpdated();
         void setRecentlyUpdated(bool recentlyUpdated);
-        int getPeriodMs();
+        int getWaitMs();
+        OperationResult deleteTimerTask();
 
 };
 
