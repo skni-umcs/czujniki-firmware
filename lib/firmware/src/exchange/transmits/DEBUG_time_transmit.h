@@ -8,6 +8,7 @@
 #include <LoRa_E220.h>
 #include "time/timer.h"
 #include "utils/storage_types.h"
+#include "wifi_transmit.h"
 
 class DEBUG_timeTransmit : public JsonTransmit
 {
@@ -15,7 +16,7 @@ class DEBUG_timeTransmit : public JsonTransmit
   int noisedB;
 
   public:
-    static std::shared_ptr<DEBUG_timeTransmit> create();
+    static std::shared_ptr<DEBUG_timeTransmit> create(std::shared_ptr<WifiTransmit> DEBUG_wifi);
     void setup();
     OperationResult poll();
     OperationResult send(std::string message, moduleAddress destinationNode) override;

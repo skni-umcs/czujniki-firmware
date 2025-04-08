@@ -8,12 +8,13 @@
 #include <utils/address_handler.h>
 #include <utils/packet_utils.h>
 #include <memory>
+#include "wifi_transmit.h"
 
 void DEBUG_timeTransmit::setup() {
 	Serial.println("Setupping DEBUG_timeTransmit");
 }
 
-std::shared_ptr<DEBUG_timeTransmit> DEBUG_timeTransmit::create() {
+std::shared_ptr<DEBUG_timeTransmit> DEBUG_timeTransmit::create(std::shared_ptr<WifiTransmit> DEBUG_wifi) {
     auto loraTransmit = new DEBUG_timeTransmit();
 
     loraTransmit->setup();
