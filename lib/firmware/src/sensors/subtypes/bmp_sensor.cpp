@@ -38,7 +38,7 @@ std::map<std::string, std::string> BMPSensor::getSensorData() {
   //float altitude = bmp.readAltitude();
 
   int convertedTemp = temperature*100;
-  int convertedPressure = pressure*10;
+  int convertedPressure = pressure/100;
 
   std::map<std::string, std::string> resultMap;
   resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(convertedTemp)));
