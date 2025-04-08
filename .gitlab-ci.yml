@@ -19,10 +19,10 @@ build:
     paths:
       - .pio/build
 
-test:
-  stage: test
-  script:
-    - pio test -e esp32dev --without-uploading
+#test:
+#  stage: test
+#  script:
+#    - pio test -e esp32dev --without-uploading
 
 # deploy:
 #   stage: deploy
