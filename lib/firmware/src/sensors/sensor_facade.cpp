@@ -48,9 +48,14 @@ std::string SensorFacade::getAllSensorsMessage() {
     std::string serializedJson;
 
     for(auto const& sensor : sensors) {
-        std::map<std::string, std::string> map = sensor->getSensorData();
-        for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it) {
-            messages[it->first] = it->second;
+        try {
+            std::map<std::string, std::string> map = sensor->getSensorData();
+            for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it) {
+                messages[it->first] = it->second;
+            }
+        }
+        catch (int error) {
+            Serial.printf("EXCEPTION in sensor message with code: %d", error);
         }
     }
     serializeJson(doc, serializedJson);
