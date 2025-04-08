@@ -12,7 +12,7 @@
 #include <exchange/communications/service_communication.h>
 #include "time/time_constants.h"
 
-void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std::unique_ptr<JsonTransmit> jsonTransmit) {
+void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std::shared_ptr<JsonTransmit> jsonTransmit) {
     jsonCommunication->subscribe(std::move(jsonTransmit));
     TEST_ASSERT_EQUAL(1, jsonCommunication->getTransmitTo().size());
 }
@@ -20,14 +20,14 @@ void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std
 void test_wifi_subscription() {
     test_subscription(
         JsonCommunication::create(),
-        std::unique_ptr<JsonTransmit>(new WifiTransmit())
+        std::static_pointer_cast<JsonTransmit>(WifiTransmit::create())
     );
 }
 
 void test_lora_subscription() {
     test_subscription(
         JsonCommunication::create(),
-        std::unique_ptr<JsonTransmit>(new LoraTransmit())
+        std::shared_ptr<JsonTransmit>(new LoraTransmit())
     );
 }
 

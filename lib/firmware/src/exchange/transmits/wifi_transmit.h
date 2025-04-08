@@ -5,11 +5,12 @@
 #include <exchange/communications/communication.h>
 #include "transmit.h"
 #include "big_transmit.h"
+#include "json_transmit.h"
 #include "utils/storage_types.h"
 #include <time/timer.h>
 #include <map>
 
-class WifiTransmit : public BigTransmit, public std::enable_shared_from_this<WifiTransmit>
+class WifiTransmit : public BigTransmit, public JsonTransmit, public std::enable_shared_from_this<WifiTransmit>
 {
     std::shared_ptr<Timer> pollTimer = Timer::create();
     std::map<String, String> networks;
