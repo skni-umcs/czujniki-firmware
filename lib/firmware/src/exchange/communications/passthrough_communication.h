@@ -1,11 +1,11 @@
 #ifndef PASSTHROUGHCOMMUNICATION_H
 #define PASSTHROUGHCOMMUNICATION_H
 
-#include "json_communication.h"
+#include "small_communication.h"
 #include <set>
 #include "time/timer.h"
 
-class PassthroughCommunication : public JsonCommunication {
+class PassthroughCommunication : public SmallCommunication {
     
     std::set<std::shared_ptr<LoraMessage>> messageSet;
     std::shared_ptr<Timer> timer; //TODO: check if its used anywhere

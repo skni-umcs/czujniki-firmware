@@ -2,13 +2,13 @@
 #define SERVICECOMMUNICATION_H
 
 #include <vector>
-#include "json_communication.h"
+#include "small_communication.h"
 #include <exchange/transmits/json_transmit.h>
 #include "time/timer.h"
 
 #define DIDNT_ASK -1
 
-class ServiceCommunication : public JsonCommunication {
+class ServiceCommunication : public SmallCommunication {
     
     unsigned long lastAskTime = DIDNT_ASK;
     std::shared_ptr<Timer> askTimeTimeoutTimer = Timer::create();;

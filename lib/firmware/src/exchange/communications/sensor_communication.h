@@ -2,10 +2,10 @@
 #define SENSORCOMMUNICATION_H
 
 #include <vector>
-#include "json_communication.h"
+#include "small_communication.h"
 #include <exchange/transmits/json_transmit.h>
 
-class SensorCommunication : public JsonCommunication {
+class SensorCommunication : public SmallCommunication {
     
     public:
         static std::shared_ptr<SensorCommunication> create();

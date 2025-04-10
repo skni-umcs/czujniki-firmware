@@ -1,5 +1,5 @@
-#ifndef JSONCOMMUNICATION_H
-#define JSONCOMMUNICATION_H
+#ifndef SMALLCOMMUNICATION_H
+#define SMALLCOMMUNICATION_H
 
 #include <vector>
 #include <exchange/transmits/json_transmit.h>
@@ -7,12 +7,12 @@
 #include <memory>
 #include "utils/storage_types.h"
 
-class JsonCommunication : public Communication {
+class SmallCommunication : public Communication {
     
     protected:
         std::vector<std::shared_ptr<JsonTransmit>> transmitTo;
     public:
-        static std::shared_ptr<JsonCommunication> create();
+        static std::shared_ptr<SmallCommunication> create();
         virtual OperationResult getNotified(std::shared_ptr<Message> message) override;
         virtual OperationResult transmit(std::string message, moduleAddress destinationNode) override;
         virtual OperationResult transmit(std::shared_ptr<Message> message) override;

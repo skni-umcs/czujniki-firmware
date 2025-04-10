@@ -1,7 +1,7 @@
 #include <unity.h>
 #include <string>
 #include <algorithm> 
-#include <exchange/communications/json_communication.h>
+#include <exchange/communications/small_communication.h>
 #include <exchange/transmits/wifi_transmit.h>
 #include <exchange/transmits/lora_transmit.h>
 #include <iostream>
@@ -12,21 +12,21 @@
 #include <exchange/communications/service_communication.h>
 #include "time/time_constants.h"
 
-void test_subscription(std::shared_ptr<JsonCommunication> jsonCommunication, std::shared_ptr<JsonTransmit> jsonTransmit) {
-    jsonCommunication->subscribe(std::move(jsonTransmit));
-    TEST_ASSERT_EQUAL(1, jsonCommunication->getTransmitTo().size());
+void test_subscription(std::shared_ptr<SmallCommunication> smallCommunication, std::shared_ptr<JsonTransmit> jsonTransmit) {
+    smallCommunication->subscribe(std::move(jsonTransmit));
+    TEST_ASSERT_EQUAL(1, smallCommunication->getTransmitTo().size());
 }
 
 void test_wifi_subscription() {
     test_subscription(
-        JsonCommunication::create(),
+        SmallCommunication::create(),
         std::static_pointer_cast<JsonTransmit>(WifiTransmit::create())
     );
 }
 
 void test_lora_subscription() {
     test_subscription(
-        JsonCommunication::create(),
+        SmallCommunication::create(),
         std::shared_ptr<JsonTransmit>(new LoraTransmit())
     );
 }
