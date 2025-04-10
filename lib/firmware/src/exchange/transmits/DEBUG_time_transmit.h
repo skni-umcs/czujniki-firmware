@@ -4,13 +4,13 @@
 #include <string>
 #include <exchange/communications/communication.h>
 #include "transmit.h"
-#include "json_transmit.h"
+#include "small_transmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"
 #include "utils/storage_types.h"
 #include "wifi_transmit.h"
 
-class DEBUG_timeTransmit : public JsonTransmit
+class DEBUG_timeTransmit : public SmallTransmit
 {
   std::shared_ptr<Timer> timer = Timer::create();
   int noisedB;

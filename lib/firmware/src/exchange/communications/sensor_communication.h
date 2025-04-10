@@ -3,7 +3,7 @@
 
 #include <vector>
 #include "small_communication.h"
-#include <exchange/transmits/json_transmit.h>
+#include <exchange/transmits/small_transmit.h>
 
 class SensorCommunication : public SmallCommunication {
     

@@ -31,14 +31,14 @@ OperationResult SmallCommunication::transmit(std::shared_ptr<Message> message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult SmallCommunication::subscribe(std::shared_ptr<JsonTransmit> transmit) {
+OperationResult SmallCommunication::subscribe(std::shared_ptr<SmallTransmit> transmit) {
     auto thisPtr = shared_from_this();
     transmit->addSubscriber(thisPtr);
     transmitTo.push_back(transmit);
     return OperationResult::SUCCESS;
 }
 
-OperationResult SmallCommunication::unsubscribe(std::shared_ptr<JsonTransmit> transmit) {
+OperationResult SmallCommunication::unsubscribe(std::shared_ptr<SmallTransmit> transmit) {
     auto index = std::find(transmitTo.begin(), transmitTo.end(), transmit);
     if (index != transmitTo.end()) {
         transmitTo.erase(index);
@@ -47,6 +47,6 @@ OperationResult SmallCommunication::unsubscribe(std::shared_ptr<JsonTransmit> tr
     return OperationResult::NOT_FOUND;
 }
 
-const std::vector<std::shared_ptr<JsonTransmit>>& SmallCommunication::getTransmitTo() {
+const std::vector<std::shared_ptr<SmallTransmit>>& SmallCommunication::getTransmitTo() {
     return transmitTo;
 }

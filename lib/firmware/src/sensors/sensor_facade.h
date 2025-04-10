@@ -12,7 +12,7 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
     
     SensorFacade();
     public:
-        static std::shared_ptr<SensorFacade> create(std::shared_ptr<JsonTransmit> transmit, bool shouldSetupSensors = true);
+        static std::shared_ptr<SensorFacade> create(std::shared_ptr<SmallTransmit> transmit, bool shouldSetupSensors = true);
         std::string getAllSensorsMessage();
         void sendAllSensors();
         template <typename T>
@@ -20,5 +20,5 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
             sensors.push_back(std::move(sensor));
         }
         int sensorsCount();
-        OperationResult setupSensors(std::shared_ptr<JsonTransmit> transmit);
+        OperationResult setupSensors(std::shared_ptr<SmallTransmit> transmit);
 };

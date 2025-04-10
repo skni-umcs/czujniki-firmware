@@ -4,7 +4,7 @@
 #include <string>
 #include <exchange/communications/communication.h>
 #include "transmit.h"
-#include "json_transmit.h"
+#include "small_transmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"
 #include "utils/storage_types.h"
@@ -34,7 +34,7 @@
 
 const int POLL_TIMER_PRIORITY = 1;
 
-class LoraTransmit : public JsonTransmit
+class LoraTransmit : public SmallTransmit
 {
   LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
   std::shared_ptr<Timer> pollTimer = Timer::create(POLL_TIMER_PRIORITY);

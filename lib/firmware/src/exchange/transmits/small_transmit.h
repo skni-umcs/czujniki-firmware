@@ -1,5 +1,5 @@
-#ifndef JSONTRANSMIT_H
-#define JSONTRANSMIT_H
+#ifndef SMALLTRANSMIT_H
+#define SMALLTRANSMIT_H
 
 #include <string>
 #include <vector>
@@ -7,7 +7,7 @@
 #include "transmit.h"
 #include "utils/storage_types.h"
 
-class JsonTransmit : virtual public Transmit
+class SmallTransmit : virtual public Transmit
 {
     public:
         virtual OperationResult send(std::string message, moduleAddress destinationNode) = 0;

@@ -24,7 +24,7 @@ uint32_t delayMS = 1000;
 SensorFacade::SensorFacade() {
 }
 
-std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<JsonTransmit> transmit, bool shouldSetupSensors) {
+std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit> transmit, bool shouldSetupSensors) {
     auto facade = std::shared_ptr<SensorFacade>(new SensorFacade());
     facade->sensorCommunication = SensorCommunication::create();
     facade->sensorCommunication->subscribe(transmit);
@@ -67,7 +67,7 @@ void SensorFacade::sendAllSensors() {
     sensorCommunication->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 
-OperationResult SensorFacade::setupSensors(std::shared_ptr<JsonTransmit> baseTransmit) {
+OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTransmit) {
     std::vector<std::unique_ptr<Sensor>> sensorCandidates = {};
     #if defined(esp32firebeetle) || defined(mini_test)
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));

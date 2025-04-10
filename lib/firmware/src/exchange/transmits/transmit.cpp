@@ -1,6 +1,5 @@
+#include "transmit.h"
 #include <utils/operation_result.h>
-#include "json_transmit.h"
-#include <iostream>
 
 OperationResult Transmit::notifySubscribers(std::shared_ptr<Message> message) {
     for(auto subscriber : subscribers) {

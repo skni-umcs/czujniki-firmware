@@ -1,7 +1,7 @@
 #include <unity.h>
 #include <string>
 #include <algorithm> 
-#include <exchange/communications/json_communication.h>
+#include <exchange/communications/small_communication.h>
 #include <exchange/transmits/wifi_transmit.h>
 #include <exchange/transmits/lora_transmit.h>
 #include <iostream>
