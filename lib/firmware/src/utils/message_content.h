@@ -8,7 +8,7 @@ enum class TransmissionCode : char {
 
     //JSON codes
     MESSAGE_TYPE = 't',
-    MESSAGE = 'm',
+    DETAILS = 'm',
     TIMESTAMP = 'c',
 
     //message types
@@ -19,7 +19,7 @@ enum class TransmissionCode : char {
 
 class MessageContent {
     TransmissionCode type;
-    std::string message;
+    std::string details;
     unsigned long jsonificationEpoch;
 
     public:
@@ -27,7 +27,7 @@ class MessageContent {
         std::string getJson();
         static MessageContent fromJson(std::string jsonString);
         TransmissionCode getType();
-        std::string getMessage();
+        std::string getDetails();
         unsigned long getJsonificationEpoch();
 };
 
