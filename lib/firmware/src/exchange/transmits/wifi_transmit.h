@@ -4,7 +4,7 @@
 #include <string>
 #include "big_transmit.h"
 #include "small_transmit.h"
-#include "utils/storage_types.h"
+#include "utils/message.h"
 #include <time/timer.h>
 #include <map>
 

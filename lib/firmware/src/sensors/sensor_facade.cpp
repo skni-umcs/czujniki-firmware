@@ -63,7 +63,7 @@ std::string SensorFacade::getAllSensorsMessage() {
 }
 
 void SensorFacade::sendAllSensors() {
-    PacketMessage packetMessage = PacketMessage(TransmissionCode::SENSOR_READING, getAllSensorsMessage());
+    JsonMessage packetMessage = JsonMessage(TransmissionCode::SENSOR_READING, getAllSensorsMessage());
     sensorCommunication->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 

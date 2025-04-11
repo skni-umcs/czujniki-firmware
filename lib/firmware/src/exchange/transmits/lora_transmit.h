@@ -7,7 +7,7 @@
 #include "small_transmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"
-#include "utils/storage_types.h"
+#include "utils/message.h"
 #include <deque>
 #include <time/waiter.h>
 #include "wifi_transmit.h"

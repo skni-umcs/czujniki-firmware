@@ -5,7 +5,7 @@
 #include <exchange/transmits/small_transmit.h>
 #include <exchange/communications/communication.h>
 #include <memory>
-#include "utils/storage_types.h"
+#include "utils/message.h"
 
 class SmallCommunication : public Communication<SmallTransmit, SmallCommunication> {
 

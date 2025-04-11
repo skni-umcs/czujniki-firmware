@@ -3,7 +3,7 @@
 
 #include <string>
 #include <exchange/transmits/transmit.h>
-#include "utils/storage_types.h"
+#include "utils/message.h"
 
 class BigCommunication;
 

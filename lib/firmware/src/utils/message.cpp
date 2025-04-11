@@ -1,4 +1,5 @@
 #include "storage_types.h"
+#include "message.h"
 #include "packet_utils.h"
 #include <sstream>
 #include "address_handler.h"

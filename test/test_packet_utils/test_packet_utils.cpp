@@ -1,5 +1,5 @@
 #include <unity.h>
-#include "utils/storage_types.h"
+#include "utils/message.h"
 #include <string>
 #include "utils/packet_utils.h"
 #include <Adafruit_I2CDevice.h>

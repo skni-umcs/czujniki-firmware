@@ -4,7 +4,7 @@
 #include <string>
 #include <exchange/communications/communication.h>
 #include "exchange/transmits/small_transmit.h"
-#include "utils/storage_types.h"
+#include "utils/message.h"
 
 class TestTransmit : public SmallTransmit
 {

@@ -11,69 +11,6 @@
 
 FastCRC32 CRC32;
 
-PacketMessage::PacketMessage(TransmissionCode type, std::string message) {
-    this->type = type;
-    this->message = message;
-}
-
-std::string transmissionCodeFromEnum(TransmissionCode transmissionCode) {
-    return std::string(1, (char)transmissionCode);
-}
-
-TransmissionCode enumFromTransmissionCode(std::string code) {
-	if (code.length() != 1) {
-        return TransmissionCode::ERROR_CODE;
-    }
-    return static_cast<TransmissionCode>(code[0]);
-}
-
-std::string PacketMessage::getJson() {
-	jsonificationEpoch = rtc.getEpoch();
-    JsonDocument doc;
-    JsonObject root = doc.to<JsonObject>();
-    std::string serializedJson;
-
-    root[transmissionCodeFromEnum(TransmissionCode::MESSAGE_TYPE)] = transmissionCodeFromEnum(type);
-    root[transmissionCodeFromEnum(TransmissionCode::MESSAGE)] = message;
-	root[transmissionCodeFromEnum(TransmissionCode::TIMESTAMP)] = jsonificationEpoch;
-
-    serializeJson(doc, serializedJson);
-
-    return serializedJson;
-}
-
-PacketMessage PacketMessage::fromJson(std::string jsonString) {
-    JsonDocument doc;
-    DeserializationError error = deserializeJson(doc, jsonString);
-    
-    if (error) {
-        Serial.printf("Failed to deserialize json %s", jsonString.c_str());
-		return PacketMessage(TransmissionCode::ERROR_CODE, "");
-    }
-
-    JsonObject root = doc.as<JsonObject>();
-
-    TransmissionCode type = enumFromTransmissionCode(root[transmissionCodeFromEnum(TransmissionCode::MESSAGE_TYPE)].as<std::string>());
-    std::string message = root[transmissionCodeFromEnum(TransmissionCode::MESSAGE)].as<std::string>();
-	unsigned long jsonificationEpoch = root[transmissionCodeFromEnum(TransmissionCode::TIMESTAMP)].as<unsigned long>();
-
-	PacketMessage result = PacketMessage(type, message);
-	result.jsonificationEpoch = jsonificationEpoch;
-
-    return result;
-}
-
-TransmissionCode PacketMessage::getType() {
-	return type;
-}
-
-std::string PacketMessage::getMessage() {
-	return message;
-}
-
-unsigned long PacketMessage::getJsonificationEpoch() {
-	return jsonificationEpoch;
-}
 
 uint32_t getCrc(std::string string) {
 	return CRC32.crc32(
