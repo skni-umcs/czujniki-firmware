@@ -284,6 +284,23 @@ void big_crc_overflow() {
     TEST_ASSERT_TRUE(isPacketCorrect(packet));
 }
 
+void double_create_works() {
+    //TODO: fix test
+    auto senders = std::vector<moduleAddress>{};
+    auto rssi = std::vector<std::string>{};
+    auto hopLimit = 100;
+    auto message_one = GeneratedMessage(senders, 1, "test", rssi, hopLimit);
+
+    auto message_two = GeneratedMessage(senders, 1, "test", rssi, hopLimit);
+
+    std::string expected = "~$64$1c$1^test^b56be544~";
+
+    message_one.createPacketForSending();
+
+    TEST_ASSERT_EQUAL_STRING(expected.c_str(), message_one.createPacketForSending().c_str());
+    TEST_ASSERT_EQUAL_STRING(message_one.createPacketForSending().c_str(), message_two.createPacketForSending().c_str());
+}
+
 void setup() {
     UNITY_BEGIN();
     setupAddressHandler();
@@ -312,6 +329,7 @@ void setup() {
     RUN_TEST(packet_correct);
     RUN_TEST(stress_test);
     RUN_TEST(big_crc_overflow);
+    RUN_TEST(double_create_works);
     UNITY_END();
 }
 
