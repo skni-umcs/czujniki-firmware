@@ -15,9 +15,7 @@ class Communication : public std::enable_shared_from_this<Derived>
     //TODO: Disable default constructor for all communications to prevent their creation outside of the create() function
     public:
         OperationResult subscribe(std::shared_ptr<TTransmit> transmit) {
-            std::cout << "yyyyyyyyyyyyyyyyy" << std::endl;
             auto thisPtr = this->shared_from_this();
-            std::cout << "thissssssssssssss" << std::endl;
             transmit->addSubscriber(thisPtr);
             transmitTo.push_back(transmit);
             return OperationResult::SUCCESS;

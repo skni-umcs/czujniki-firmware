@@ -10,8 +10,6 @@
 
 class WifiTransmit : public BigTransmit, public SmallTransmit, public std::enable_shared_from_this<WifiTransmit>
 {
-    //using BigTransmit::notifySubscribers;
-    //using SmallTransmit::notifySubscribers;
     std::shared_ptr<Timer> pollTimer = Timer::create();
     std::map<String, String> networks;
     public:
