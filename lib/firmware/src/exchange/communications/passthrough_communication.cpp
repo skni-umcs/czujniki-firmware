@@ -4,7 +4,7 @@
 #include <utils/other_utils.h>
 #include "utils/address_handler.h"
 
-const double SNR_WAIT_MULTIPLIER = 0.5;
+const double SNR_WAIT_MULTIPLIER = 5;
 const int MINIMAL_SNR = -80;
 
 std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {

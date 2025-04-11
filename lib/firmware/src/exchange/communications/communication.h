@@ -10,9 +10,9 @@
 template <class TTransmit, typename Derived>
 class Communication : public std::enable_shared_from_this<Derived>
 {
+    //TODO: Disable default constructor for all communications to prevent their creation outside of the create() function
     protected:
         std::vector<std::shared_ptr<TTransmit>> transmitTo;
-    //TODO: Disable default constructor for all communications to prevent their creation outside of the create() function
     public:
         OperationResult subscribe(std::shared_ptr<TTransmit> transmit) {
             auto thisPtr = this->shared_from_this();
