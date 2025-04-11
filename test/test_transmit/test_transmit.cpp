@@ -15,9 +15,7 @@
 #include "time/time_constants.h"
 
 void test_subscription_small(std::shared_ptr<SmallCommunication> communication, std::shared_ptr<SmallTransmit> transmit) {
-    std::cout << "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO" << std::flush;
     communication->subscribe(transmit);
-    std::cout << "BBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBB";
     TEST_ASSERT_EQUAL(1, communication->getTransmitTo().size());
 }
 
@@ -48,11 +46,8 @@ void test_DEBUG_subscription_small() {
 }
 
 void test_lora_subscription() {
-    std::cout << "uuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuu" << std::endl;
     auto mockCommunication = MockSmallCommunication::create();
-    std::cout << "ttttttttttttttttttttttttttttttttttttttt" << std::endl;
     auto loraTransmit = LoraTransmit::create(WifiTransmit::create());
-    std::cout << "wwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwwww" << std::endl;
     test_subscription_small(
         mockCommunication,
         loraTransmit

@@ -1,6 +1,5 @@
 #include <utils/operation_result.h>
 #include "lora_transmit.h"
-#include <iostream>
 #include <LoRa_E220.h>
 #include "utils/string_utils.h"
 #include <FastCRC.h>
@@ -84,7 +83,6 @@ void LoraTransmit::setup() {
 }
 
 std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit> DEBUG_wifi) {
-	std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLora" << std::endl;
     auto loraTransmit = new LoraTransmit();
 	loraTransmit->DEBUG_wifi = DEBUG_wifi;
 
