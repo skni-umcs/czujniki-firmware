@@ -84,6 +84,7 @@ void LoraTransmit::setup() {
 }
 
 std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit> DEBUG_wifi) {
+	std::cout << "LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLora" << std::endl;
     auto loraTransmit = new LoraTransmit();
 	loraTransmit->DEBUG_wifi = DEBUG_wifi;
 
