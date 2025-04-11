@@ -15,12 +15,12 @@
 #include <exchange/communications/update_communication.h>
 
 void test_subscription_small(std::shared_ptr<SmallCommunication> communication, std::shared_ptr<SmallTransmit> transmit) {
-    communication->subscribe(std::move(transmit));
+    communication->subscribe(transmit);
     TEST_ASSERT_EQUAL(1, communication->getTransmitTo().size());
 }
 
 void test_subscription_big(std::shared_ptr<BigCommunication> communication, std::shared_ptr<BigTransmit> transmit) {
-    communication->subscribe(std::move(transmit));
+    communication->subscribe(transmit);
     TEST_ASSERT_EQUAL(1, communication->getTransmitTo().size());
 }
 
@@ -88,6 +88,8 @@ void test_service_time_update_ignore_didnt_ask() {
     serviceCommunication->updateTime(testEpoch);
     TEST_ASSERT_TRUE(rtc.getEpoch() < testEpoch);
 }
+
+
 
 void setup() {
     UNITY_BEGIN();
