@@ -1,6 +1,6 @@
 #include <string>
-#ifndef JSON_MESSAGE_H
-#define JSON_MESSAGE_H
+#ifndef message_content_H
+#define message_content_H
 
 enum class TransmissionCode : char {
     //error
@@ -17,15 +17,15 @@ enum class TransmissionCode : char {
     TIME_SYNCHRONIZATION = 'o'
 };
 
-class JsonMessage {
+class MessageContent {
     TransmissionCode type;
     std::string message;
     unsigned long jsonificationEpoch;
 
     public:
-        JsonMessage(TransmissionCode type, std::string message);
+        MessageContent(TransmissionCode type, std::string message);
         std::string getJson();
-        static JsonMessage fromJson(std::string jsonString);
+        static MessageContent fromJson(std::string jsonString);
         TransmissionCode getType();
         std::string getMessage();
         unsigned long getJsonificationEpoch();

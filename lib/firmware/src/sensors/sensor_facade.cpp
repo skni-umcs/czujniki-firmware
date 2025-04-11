@@ -17,6 +17,7 @@
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
 #include <sensors/subtypes/heap_sensor.h>
+#include <utils/message_content.h>
 
 const int DEFAULT_SENSOR_PERIOD_MS = 32000;
 uint32_t delayMS = 1000;
@@ -63,8 +64,8 @@ std::string SensorFacade::getAllSensorsMessage() {
 }
 
 void SensorFacade::sendAllSensors() {
-    JsonMessage packetMessage = JsonMessage(TransmissionCode::SENSOR_READING, getAllSensorsMessage());
-    sensorCommunication->transmit(packetMessage.getJson(), SERVER_ADDRESS);
+    MessageContent messageContent = MessageContent(TransmissionCode::SENSOR_READING, getAllSensorsMessage());
+    sensorCommunication->transmit(messageContent.getJson(), SERVER_ADDRESS);
 }
 
 OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTransmit) {

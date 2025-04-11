@@ -1,10 +1,10 @@
-#include "json_message.h"
+#include "message_content.h"
 #include <sstream>
 #include <HardwareSerial.h>
 #include <ArduinoJson.h>
 #include "time/time_constants.h"
 
-JsonMessage::JsonMessage(TransmissionCode type, std::string message) {
+MessageContent::MessageContent(TransmissionCode type, std::string message) {
     this->type = type;
     this->message = message;
 }
@@ -20,7 +20,7 @@ TransmissionCode enumFromTransmissionCode(std::string code) {
     return static_cast<TransmissionCode>(code[0]);
 }
 
-std::string JsonMessage::getJson() {
+std::string MessageContent::getJson() {
 	jsonificationEpoch = rtc.getEpoch();
     JsonDocument doc;
     JsonObject root = doc.to<JsonObject>();
@@ -35,13 +35,13 @@ std::string JsonMessage::getJson() {
     return serializedJson;
 }
 
-JsonMessage JsonMessage::fromJson(std::string jsonString) {
+MessageContent MessageContent::fromJson(std::string jsonString) {
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, jsonString);
     
     if (error) {
         Serial.printf("Failed to deserialize json %s", jsonString.c_str());
-		return JsonMessage(TransmissionCode::ERROR_CODE, "");
+		return MessageContent(TransmissionCode::ERROR_CODE, "");
     }
 
     JsonObject root = doc.as<JsonObject>();
@@ -50,20 +50,20 @@ JsonMessage JsonMessage::fromJson(std::string jsonString) {
     std::string message = root[transmissionCodeFromEnum(TransmissionCode::MESSAGE)].as<std::string>();
 	unsigned long jsonificationEpoch = root[transmissionCodeFromEnum(TransmissionCode::TIMESTAMP)].as<unsigned long>();
 
-	JsonMessage result = JsonMessage(type, message);
+	MessageContent result = MessageContent(type, message);
 	result.jsonificationEpoch = jsonificationEpoch;
 
     return result;
 }
 
-TransmissionCode JsonMessage::getType() {
+TransmissionCode MessageContent::getType() {
 	return type;
 }
 
-std::string JsonMessage::getMessage() {
+std::string MessageContent::getMessage() {
 	return message;
 }
 
-unsigned long JsonMessage::getJsonificationEpoch() {
+unsigned long MessageContent::getJsonificationEpoch() {
 	return jsonificationEpoch;
 }

@@ -7,6 +7,7 @@
 #include "utils/packet_utils.h"
 #include "time/time_constants.h"
 #include <time/timer_update.h>
+#include <utils/message_content.h>
 
 static int ASK_TIMEOUT_MS = 10000;
 int startTimestamp = 0;
@@ -43,7 +44,7 @@ OperationResult ServiceCommunication::getNotified(std::shared_ptr<Message> messa
     if(!message->isCurrentDestination()) {
         return OperationResult::OPERATION_IGNORED;
     }
-    JsonMessage serverMessage = JsonMessage::fromJson(message->getContent());
+    MessageContent serverMessage = MessageContent::fromJson(message->getContent());
     TransmissionCode messageType = serverMessage.getType();
     switch(messageType) {
         case(TransmissionCode::TIME_SYNCHRONIZATION):
@@ -66,14 +67,14 @@ void ServiceCommunication::sendResetReason() {
         messages.add(reason);
     }
     serializeJson(doc, serializedJson);
-    JsonMessage packetMessage = JsonMessage(TransmissionCode::RESET, serializedJson);
+    MessageContent packetMessage = MessageContent(TransmissionCode::RESET, serializedJson);
 
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
 }
 
 OperationResult ServiceCommunication::askForTime() {
     this->setLastAskTime(rtc.getEpoch());
-    JsonMessage packetMessage = JsonMessage(TransmissionCode::TIME_SYNCHRONIZATION, "t");
+    MessageContent packetMessage = MessageContent(TransmissionCode::TIME_SYNCHRONIZATION, "t");
     Serial.println(this->getLastAskTime());
     Serial.println("lastAskTime");
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);

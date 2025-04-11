@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "storage_types.h"
+#include <sstream>
 
 template<typename T>
 std::string toHexString(T address) {
