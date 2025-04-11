@@ -2,8 +2,7 @@
 #define DEBUGTIMETRANSMIT_H
 
 #include <string>
-#include <exchange/communications/communication.h>
-#include "transmit.h"
+#include <exchange/transmits/transmit.h>
 #include "small_transmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"

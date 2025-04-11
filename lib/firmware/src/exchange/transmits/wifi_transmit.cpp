@@ -4,6 +4,9 @@
 #include <WiFi.h>
 #include <memory>
 #include "utils/spiffs_utils.h"
+#include "exchange/communications/small_communication.h"
+#include "exchange/transmits/big_transmit.h"
+#include "exchange/communications/big_communication.h"
 
 #define MINIMUM_RSSI -300
 #define NO_NETWORK -1
@@ -140,6 +143,15 @@ OperationResult WifiTransmit::receive(std::shared_ptr<Message> message) {
     Serial.printf("WIFI RECEIVE %s\n", message->getPacket().c_str());
     notifySubscribers(message);
     return OperationResult::SUCCESS;
+}
+
+OperationResult WifiTransmit::notifySubscribers(std::shared_ptr<Message> message) {
+    OperationResult smallResult = this->SmallTransmit::notifySubscribers(message);
+    OperationResult bigResult = this->BigTransmit::notifySubscribers(message);
+    if(smallResult == OperationResult::SUCCESS && bigResult == OperationResult::SUCCESS) {
+        return OperationResult::SUCCESS;
+    }
+    return OperationResult::ERROR;
 }
 
 std::map<String, String> WifiTransmit::getNetworks() {

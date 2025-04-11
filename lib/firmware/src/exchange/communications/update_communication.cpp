@@ -7,6 +7,9 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <Update.h>
+#include "exchange/communications/big_communication.h"
+#include "exchange/communications/small_communication.h"
+#include "exchange/transmits/big_transmit.h"
 
 std::shared_ptr<UpdateCommunication> UpdateCommunication::create() {
     auto s = new UpdateCommunication();

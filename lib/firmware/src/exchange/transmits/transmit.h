@@ -2,20 +2,31 @@
 #define TRANSMIT_H
 
 #include <string>
-#include <exchange/communications/communication.h>
 #include <memory>
 #include "utils/storage_types.h"
 
+template <class TTransmit, typename Derived>
+class Communication;
+
+template <class TCommunication>
 class Transmit
 {
-    std::vector<std::shared_ptr<Communication>> subscribers;
+    std::vector<std::shared_ptr<TCommunication>> subscribers;
 
     public:
         virtual OperationResult send(std::string message, moduleAddress destinationNode) = 0;
         virtual OperationResult send(std::shared_ptr<Message> message) = 0;
         virtual OperationResult receive(std::shared_ptr<Message> message) = 0;
-        OperationResult notifySubscribers(std::shared_ptr<Message> message);
-        OperationResult addSubscriber(std::shared_ptr<Communication> communication);
+        OperationResult notifySubscribers(std::shared_ptr<Message> message) {
+            for(auto subscriber : subscribers) {
+                subscriber->getNotified(message);
+            }
+            return OperationResult::SUCCESS;
+        }
+        OperationResult addSubscriber(std::shared_ptr<TCommunication> communication) {
+            subscribers.push_back(communication);
+            return OperationResult::SUCCESS;
+        }
 };
 
 #endif

@@ -1,7 +1,6 @@
 #include <unity.h>
 #include <string>
 #include <algorithm> 
-#include <exchange/communications/small_communication.h>
 #include <exchange/transmits/wifi_transmit.h>
 #include <exchange/transmits/lora_transmit.h>
 #include <iostream>
@@ -11,23 +10,45 @@
 #include <exchange/communications/passthrough_communication.h>
 #include <exchange/communications/service_communication.h>
 #include "time/time_constants.h"
+#include "mock_transmit.h"
+#include <exchange/communications/sensor_communication.h>
+#include <exchange/communications/update_communication.h>
 
-void test_subscription(std::shared_ptr<SmallCommunication> smallCommunication, std::shared_ptr<SmallTransmit> smallTransmit) {
-    smallCommunication->subscribe(std::move(smallTransmit));
-    TEST_ASSERT_EQUAL(1, smallCommunication->getTransmitTo().size());
+void test_subscription_small(std::shared_ptr<SmallCommunication> communication, std::shared_ptr<SmallTransmit> transmit) {
+    communication->subscribe(std::move(transmit));
+    TEST_ASSERT_EQUAL(1, communication->getTransmitTo().size());
 }
 
-void test_wifi_subscription() {
-    test_subscription(
-        SmallCommunication::create(),
-        std::static_pointer_cast<SmallTransmit>(WifiTransmit::create())
+void test_subscription_big(std::shared_ptr<BigCommunication> communication, std::shared_ptr<BigTransmit> transmit) {
+    communication->subscribe(std::move(transmit));
+    TEST_ASSERT_EQUAL(1, communication->getTransmitTo().size());
+}
+
+void test_sensor_subscription() {
+    test_subscription_small(
+        SensorCommunication::create(),
+        MockTransmit::create()
     );
 }
 
-void test_lora_subscription() {
-    test_subscription(
-        SmallCommunication::create(),
-        std::shared_ptr<SmallTransmit>(new LoraTransmit())
+void test_passthrough_subscription() {
+    test_subscription_small(
+        PassthroughCommunication::create(),
+        MockTransmit::create()
+    );
+}
+
+void test_service_subscription() {
+    test_subscription_small(
+        ServiceCommunication::create(),
+        MockTransmit::create()
+    );
+}
+
+void test_update_subscription() {
+    test_subscription_big(
+        UpdateCommunication::create(),
+        MockTransmit::create()
     );
 }
 
@@ -70,8 +91,10 @@ void test_service_time_update_ignore_didnt_ask() {
 
 void setup() {
     UNITY_BEGIN();
-    RUN_TEST(test_wifi_subscription);
-    RUN_TEST(test_lora_subscription);
+    RUN_TEST(test_sensor_subscription);
+    RUN_TEST(test_passthrough_subscription);
+    RUN_TEST(test_service_subscription);
+    RUN_TEST(test_update_subscription);
     RUN_TEST(test_passthrough_wrong_message_type);
     RUN_TEST(test_passthrough_no_message_in_set);
     RUN_TEST(test_service_time_update);

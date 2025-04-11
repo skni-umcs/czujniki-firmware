@@ -47,7 +47,6 @@ void setup() {
 
   auto wifiTransmit = WifiTransmit::create();
   auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
-
   delay(6000);
   
   auto serviceCommunication = ServiceCommunication::create();

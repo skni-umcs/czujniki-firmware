@@ -8,7 +8,6 @@
 #include <utils/address_handler.h>
 #include <utils/packet_utils.h>
 #include <memory>
-#include "wifi_transmit.h"
 
 void DEBUG_timeTransmit::setup() {
 	Serial.println("Setupping DEBUG_timeTransmit");

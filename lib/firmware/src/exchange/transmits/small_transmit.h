@@ -3,11 +3,12 @@
 
 #include <string>
 #include <vector>
-#include <exchange/communications/communication.h>
-#include "transmit.h"
+#include <exchange/transmits/transmit.h>
 #include "utils/storage_types.h"
 
-class SmallTransmit : virtual public Transmit
+class SmallCommunication;
+
+class SmallTransmit : virtual public Transmit<SmallCommunication>
 {
     public:
         virtual OperationResult send(std::string message, moduleAddress destinationNode) = 0;

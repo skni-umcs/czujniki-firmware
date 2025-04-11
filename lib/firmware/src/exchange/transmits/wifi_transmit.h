@@ -2,8 +2,6 @@
 #define WIFITRANSMIT_H
 
 #include <string>
-#include <exchange/communications/communication.h>
-#include "transmit.h"
 #include "big_transmit.h"
 #include "small_transmit.h"
 #include "utils/storage_types.h"
@@ -12,6 +10,8 @@
 
 class WifiTransmit : public BigTransmit, public SmallTransmit, public std::enable_shared_from_this<WifiTransmit>
 {
+    //using BigTransmit::notifySubscribers;
+    //using SmallTransmit::notifySubscribers;
     std::shared_ptr<Timer> pollTimer = Timer::create();
     std::map<String, String> networks;
     public:
@@ -25,6 +25,7 @@ class WifiTransmit : public BigTransmit, public SmallTransmit, public std::enabl
         OperationResult poll();
         std::map<String, String> getNetworks();
         void setupPollTask();
+        OperationResult notifySubscribers(std::shared_ptr<Message> message);
 };
 
 #endif

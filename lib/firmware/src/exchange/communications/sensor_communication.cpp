@@ -26,3 +26,7 @@ OperationResult SensorCommunication::transmit(std::shared_ptr<Message> message) 
     }
     return OperationResult::SUCCESS;
 }
+
+OperationResult SensorCommunication::getNotified(std::shared_ptr<Message> message) {
+    return OperationResult::SUCCESS;
+}

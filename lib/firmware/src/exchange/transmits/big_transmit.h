@@ -2,11 +2,12 @@
 #define BIGTRANSMIT_H
 
 #include <string>
-#include <exchange/communications/communication.h>
-#include "transmit.h"
+#include <exchange/transmits/transmit.h>
 #include "utils/storage_types.h"
 
-class BigTransmit : virtual public Transmit
+class BigCommunication;
+
+class BigTransmit : virtual public Transmit<BigCommunication>
 {
     public:
         virtual OperationResult send(std::string message, moduleAddress destinationNode) = 0;
