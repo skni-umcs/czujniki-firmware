@@ -13,7 +13,6 @@
 
 FastCRC32 CRC32;
 
-
 uint32_t getCrc(std::string string) {
 	return CRC32.crc32(
 		reinterpret_cast<const uint8_t*>(string.c_str()), 
