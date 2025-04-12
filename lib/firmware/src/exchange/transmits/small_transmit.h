@@ -4,7 +4,6 @@
 #include <string>
 #include <vector>
 #include <exchange/transmits/transmit.h>
-#include "utils/message.h"
 
 class SmallCommunication;
 

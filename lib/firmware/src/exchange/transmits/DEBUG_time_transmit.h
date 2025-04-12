@@ -6,7 +6,7 @@
 #include "small_transmit.h"
 #include <LoRa_E220.h>
 #include "time/timer.h"
-#include "utils/message.h"
+#include "message/message.h"
 #include "wifi_transmit.h"
 
 class DEBUG_timeTransmit : public SmallTransmit

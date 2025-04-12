@@ -3,7 +3,7 @@
 
 #include <string>
 #include <vector>
-#include "storage_types.h"
+#include "utils/storage_types.h"
 #include <sstream>
 
 template<typename T>

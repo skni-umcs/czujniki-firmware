@@ -6,7 +6,7 @@
 #include <vector>
 #include <string>
 #include <ArduinoJson.h>
-#include <utils/packet_utils.h>
+#include "message/message_decode_utils.h"
 #include <memory>
 #include <vector>
 #include <sensors/subtypes/bme_280_sensor.h>
@@ -17,7 +17,7 @@
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
 #include <sensors/subtypes/heap_sensor.h>
-#include <utils/message_content.h>
+#include <message/message_content.h>
 
 const int DEFAULT_SENSOR_PERIOD_MS = 32000;
 uint32_t delayMS = 1000;

@@ -4,10 +4,10 @@
 #include <rom/rtc.h>
 #include <sstream>
 #include <ArduinoJson.h>
-#include "utils/packet_utils.h"
+#include "message/message_decode_utils.h"
 #include "time/time_constants.h"
 #include <time/timer_update.h>
-#include <utils/message_content.h>
+#include <message/message_content.h>
 
 static int ASK_TIMEOUT_MS = 10000;
 int startTimestamp = 0;

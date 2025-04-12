@@ -4,7 +4,7 @@
 #include <string>
 #include <utils/operation_result.h>
 #include <memory>
-#include "utils/message.h"
+#include "message/message.h"
 #include <iostream>
 
 template <class TTransmit, typename Derived>

@@ -2,7 +2,7 @@
 #define PACKETUTILS_H
 
 #include <string>
-#include "storage_types.h"
+#include "utils/storage_types.h"
 #include <ArduinoJson.h>
 #include <FastCRC.h>
 #include <sstream>

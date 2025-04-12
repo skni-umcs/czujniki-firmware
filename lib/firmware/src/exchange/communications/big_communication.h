@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <exchange/communications/communication.h>
-#include "utils/message.h"
+#include "message/message.h"
 
 class BigTransmit;
 

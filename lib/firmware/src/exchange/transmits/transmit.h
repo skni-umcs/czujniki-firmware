@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include "utils/message.h"
+#include "message/message.h"
 
 template <class TTransmit, typename Derived>
 class Communication;

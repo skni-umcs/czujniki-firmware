@@ -23,7 +23,7 @@
 #include "utils/address_handler.h"
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
-#include <utils/packet_utils.h>
+#include <message/message_decode_utils.h>
 #include "exchange/transmits/DEBUG_time_transmit.h"
 #include "exchange/transmits/wifi_transmit.h"
 #include "sensors/subtypes/cpu_sensor.h"
