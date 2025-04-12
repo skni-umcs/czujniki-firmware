@@ -6,7 +6,7 @@
 #include <exchange/transmits/big_transmit.h>
 #include <LoRa_E220.h>
 #include "time/timer.h"
-#include "utils/message.h"
+#include <message/message_decode_utils.h>
 
 class MockTransmit : public SmallTransmit, public BigTransmit
 {

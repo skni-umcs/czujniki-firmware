@@ -1,7 +1,7 @@
 #include <unity.h>
-#include "utils/message.h"
+#include "message/message.h"
 #include <string>
-#include "utils/packet_utils.h"
+#include <message/message_decode_utils.h>
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
 #include <vector>
