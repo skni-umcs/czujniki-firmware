@@ -22,7 +22,7 @@ int predictedMessages(int timestamp) {
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
 
-    serviceCommunication->setLastAskTime(rtc.getEpoch());
+    serviceCommunication->setLastAskTime(DIDNT_ASK);
     serviceCommunication->askTimeTimeoutTimer.get()->setExecuteFunction([serviceCommunication]() {
         serviceCommunication->askForTime();
     });

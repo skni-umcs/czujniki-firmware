@@ -83,7 +83,6 @@ void test_service_time_update() {
 
 void test_service_time_update_ignore_didnt_ask() {
     auto serviceCommunication = ServiceCommunication::create();
-    serviceCommunication->setLastAskTime(DIDNT_ASK);
     unsigned long testEpoch = 2739024823;
     serviceCommunication->updateTime(testEpoch);
     TEST_ASSERT_TRUE(rtc.getEpoch() < testEpoch);

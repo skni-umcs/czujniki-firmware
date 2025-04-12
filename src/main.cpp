@@ -41,18 +41,15 @@ using TRANSMIT_TYPE = LoraTransmit;
 void setup() {
   Serial.begin(9600);
   delay(1000);
-
   AddressHandler::getInstance().get()->initializeAddress();
-  
 
   auto wifiTransmit = WifiTransmit::create();
   auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
-  delay(6000);
+  delay(1000);
   
   auto serviceCommunication = ServiceCommunication::create();
   serviceCommunication.get()->subscribe(transmit);
   serviceCommunication.get()->sendResetReason();
-  delay(1000);
   serviceCommunication.get()->askForTime();
 
   std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
