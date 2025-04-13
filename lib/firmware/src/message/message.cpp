@@ -150,7 +150,7 @@ std::string Message::createAddressTable() {
     return hopLimitString+createAddressTableWithoutHop();
 }
 
-std::string Message::createOwnAddressTable() {;
+std::string Message::createOwnAddressTable() {
     return NODE_BORDER+toHexString((int)hopLimit)+NODE_BORDER+
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
     createAddressTable();
