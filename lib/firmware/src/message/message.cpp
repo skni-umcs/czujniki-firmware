@@ -153,7 +153,7 @@ std::string Message::createAddressTable() {
 std::string Message::createOwnAddressTable() {
     return NODE_BORDER+toHexString((int)hopLimit)+NODE_BORDER+
     toHexString(AddressHandler::getInstance().get()->readAddress())+NODE_BORDER+
-    createAddressTable();
+    toHexString(getDestination());
 }
 
 std::string Message::createPacket(bool addSelf) {
@@ -172,12 +172,7 @@ std::string Message::createPacket(bool addSelf) {
 	PACKET_BORDER;
 }
 
-//TODO: rewrite this in compliance with cqrs
 std::string Message::createPacketForSending() {
-    if(senders.size() == 0) {
-        senders.push_back(AddressHandler::getInstance().get()->readAddress());
-        return createPacket(false);
-    }
     return createPacket(true);
 }
 
