@@ -135,7 +135,7 @@ OperationResult WifiTransmit::send(std::string message, moduleAddress destinatio
 
 OperationResult WifiTransmit::send(std::shared_ptr<Message> message) {
     moduleAddress dest = message->getDestination();
-    std::string messageContent = message->createPacket();
+    std::string messageContent = message->createPacketForSending();
     return send(messageContent, dest);
 }
 

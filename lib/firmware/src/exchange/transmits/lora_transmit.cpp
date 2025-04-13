@@ -182,7 +182,7 @@ OperationResult LoraTransmit::advanceMessages() {
 
 OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
 	if(DEBUG_getWaitingMessagesCount() <= 50) {
-		Serial.printf("SCHEDULE SEND %s\n", message->createPacket().c_str());
+		Serial.printf("SCHEDULE SEND %s\n", message->createPacketForSending().c_str());
 		messages.push_back(message);
 	}
 	/*if(canTransmit) {
