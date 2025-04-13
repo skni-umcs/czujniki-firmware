@@ -57,16 +57,17 @@ std::map<std::string, std::string> HumidityTemperatureSensor::getSensorData() {
     std::stringstream result;
 
     float temp = dht.readTemperature();
+    delay(1000);
     float humidity = dht.readHumidity();
     std::map<std::string, std::string> resultMap;
 
-    if(!isnan(temp) && !isnan(humidity)) {
-        int convertedTemp = temp*100;
-        int convertedHumidity = humidity;
+    // if(!isnan(temp) && !isnan(humidity)) {
+    //     int convertedTemp = temp*100;
+    //     int convertedHumidity = humidity;
     
-        resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(convertedTemp)));
-        resultMap.insert(std::make_pair(HUMIDITY_CODE, std::to_string(convertedHumidity)));
-    }
+    //     resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(convertedTemp)));
+    //     resultMap.insert(std::make_pair(HUMIDITY_CODE, std::to_string(convertedHumidity)));
+    // }
 
     digitalWrite(DHT_POWER_PIN, LOW);
     return resultMap;
