@@ -8,7 +8,8 @@
 #include "message/message.h"
 
 class SmallCommunication : public Communication<SmallTransmit, SmallCommunication> {
-
+    protected:
+        SmallCommunication() {};
 };
 
 #endif

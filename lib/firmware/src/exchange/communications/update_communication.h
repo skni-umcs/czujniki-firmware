@@ -6,7 +6,9 @@
 #include "time/timer.h"
 
 class UpdateCommunication : public BigCommunication {
-    
+    protected:
+        UpdateCommunication() {};
+
     public:
         static std::shared_ptr<UpdateCommunication> create();
         OperationResult getNotified(std::shared_ptr<Message> message) override;

@@ -6,10 +6,13 @@
 #include "time/timer.h"
 
 class PassthroughCommunication : public SmallCommunication {
-    
+
     std::set<std::shared_ptr<LoraMessage>> messageSet;
     std::shared_ptr<Timer> timer; //TODO: check if its used anywhere
-    
+
+    protected:
+        PassthroughCommunication() {};
+
     public:
         static std::shared_ptr<PassthroughCommunication> create();
         OperationResult getNotified(std::shared_ptr<Message> message) override;

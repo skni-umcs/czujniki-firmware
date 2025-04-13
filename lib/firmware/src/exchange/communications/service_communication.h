@@ -15,6 +15,8 @@ class ServiceCommunication : public SmallCommunication {
 
     protected:
         OperationResult setAskForTimeTask();
+        ServiceCommunication() {};
+
     public:
         static std::shared_ptr<ServiceCommunication> create();
         OperationResult getNotified(std::shared_ptr<Message> message) override;
