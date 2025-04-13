@@ -4,6 +4,8 @@
 #include <DHT.h>
 #include <string>
 #include <sstream>
+#include <iomanip>
+#include <algorithm>
 
 #define DHT_POWER_PIN 3
 
@@ -56,18 +58,22 @@ std::map<std::string, std::string> HumidityTemperatureSensor::getSensorData() {
     sensors_event_t event;
     std::stringstream result;
 
+    std::stringstream tempStream;
+    std::stringstream humidityStream;
     float temp = dht.readTemperature();
+    tempStream << std::fixed << std::setprecision(2) << temp;
     delay(1000);
     float humidity = dht.readHumidity();
+    humidityStream << std::fixed << std::setprecision(0) << humidity;
     std::map<std::string, std::string> resultMap;
 
-    // if(!isnan(temp) && !isnan(humidity)) {
-    //     int convertedTemp = temp*100;
-    //     int convertedHumidity = humidity;
-    
-    //     resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(convertedTemp)));
-    //     resultMap.insert(std::make_pair(HUMIDITY_CODE, std::to_string(convertedHumidity)));
-    // }
+    if(!isnan(temp) && !isnan(humidity)) {
+        std::string tempString = tempStream.str();
+        tempString.erase(std::remove(tempString.begin(), tempString.end(), '.'), tempString.end());
+        std::string humidityString = humidityStream.str();
+        resultMap.insert(std::make_pair(TEMPERATURE_CODE, tempString));
+        resultMap.insert(std::make_pair(HUMIDITY_CODE, humidityString));
+    }
 
     digitalWrite(DHT_POWER_PIN, LOW);
     return resultMap;
