@@ -93,15 +93,6 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     lastAskTime = DIDNT_ASK;
     Serial.printf("Current time after update: %lu\n", rtc.getEpoch());
 
-    startTimestamp = rtc.getEpoch();
-    auto checkTimer = Timer::create();
-    Serial.println("Created prediction timer");
-    int periodS = coile;
-    checkTimer->setExecuteFunction([this](){
-        this->transmit("Predicted number of sent messages: "+std::to_string(predictedMessages(rtc.getEpoch())), 0);
-    });
-    checkTimer->updateTime(periodS*1000);
-
     return OperationResult::SUCCESS;
 }
 
