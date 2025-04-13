@@ -56,8 +56,8 @@ std::map<std::string, std::string> HumidityTemperatureSensor::getSensorData() {
     sensors_event_t event;
     std::stringstream result;
 
-    float temp = 500.0;
-    float humidity = 13.0;
+    float temp = dht.readTemperature();
+    float humidity = dht.readHumidity();
     std::map<std::string, std::string> resultMap;
 
     if(!isnan(temp) && !isnan(humidity)) {
