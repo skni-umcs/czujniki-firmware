@@ -12,6 +12,7 @@ class ServiceCommunication : public SmallCommunication {
     
     unsigned long lastAskTime = DIDNT_ASK;
     std::shared_ptr<Timer> askTimeTimeoutTimer = Timer::create();;
+    std::shared_ptr<Timer> timeSyncTimer = Timer::create();;
 
     protected:
         OperationResult setAskForTimeTask();

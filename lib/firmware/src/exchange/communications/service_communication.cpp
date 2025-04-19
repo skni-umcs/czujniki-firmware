@@ -10,6 +10,7 @@
 #include <message/message_content.h>
 
 static int ASK_TIMEOUT_MS = 10000;
+static int TIME_SYNC_PERIOD_MS = FULL_WEEK_MS;
 int startTimestamp = 0;
 int coile = 32;
 
@@ -18,6 +19,8 @@ int predictedMessages(int timestamp) {
   return difference/coile;
 
 }
+
+
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
@@ -30,8 +33,13 @@ std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
         Serial.printf("last ask time %d \n",  serviceCommunication->getLastAskTime());
         return serviceCommunication->getLastAskTime() != DIDNT_ASK;
     });
-     
     serviceCommunication->askTimeTimeoutTimer.get()->updateTime(ASK_TIMEOUT_MS);
+    
+    serviceCommunication->timeSyncTimer.get()->setExecuteFunction([serviceCommunication]() {
+        serviceCommunication->askForTime();
+    });
+    serviceCommunication->timeSyncTimer.get()->updateTime(TIME_SYNC_PERIOD_MS);     
+
 
     return serviceCommunication;
 }
