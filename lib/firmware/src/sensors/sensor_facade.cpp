@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include <sensors/subtypes/bme_280_sensor.h>
+#include <sensors/subtypes/bme_680_sensor.h>
 #include <sensors/subtypes/bmp_sensor.h>
 #include <sensors/subtypes/cpu_sensor.h>
 #include <sensors/subtypes/humidity_temperature_sensor.h>
@@ -75,6 +76,8 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTr
     #else
         sensorCandidates.push_back(std::unique_ptr<BMPSensor>(new BMPSensor()));
         sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
+        sensorCandidates.push_back(std::unique_ptr<BME280Sensor>(new BME280Sensor()));
+        sensorCandidates.push_back(std::unique_ptr<BME680Sensor>(new BME680Sensor()));
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
         sensorCandidates.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
