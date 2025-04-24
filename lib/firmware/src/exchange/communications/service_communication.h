@@ -12,9 +12,12 @@ class ServiceCommunication : public SmallCommunication {
     
     unsigned long lastAskTime = DIDNT_ASK;
     std::shared_ptr<Timer> askTimeTimeoutTimer = Timer::create();;
+    std::shared_ptr<Timer> timeSyncTimer = Timer::create();;
 
     protected:
         OperationResult setAskForTimeTask();
+        ServiceCommunication() {};
+
     public:
         static std::shared_ptr<ServiceCommunication> create();
         OperationResult getNotified(std::shared_ptr<Message> message) override;

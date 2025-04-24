@@ -8,8 +8,8 @@ const double SNR_WAIT_MULTIPLIER = 5;
 const int MINIMAL_SNR = -80;
 
 std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
-    auto s = new PassthroughCommunication();
-    return std::shared_ptr<PassthroughCommunication>{s};
+    auto passthroughCommunication = new PassthroughCommunication();
+    return std::shared_ptr<PassthroughCommunication>{passthroughCommunication};
 }
 
 OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
@@ -49,6 +49,20 @@ bool PassthroughCommunication::shouldRebroadcast(std::shared_ptr<LoraMessage> me
     message->getDestination() != AddressHandler::getInstance()->readAddress();
 }
 
+OperationResult PassthroughCommunication::afterWait(std::shared_ptr<LoraMessage> loraMessage) {
+    if (!setContains(messageSet, loraMessage)) {
+        return alreadyRebroadcasted();
+    }
+
+    std::set<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
+
+    if (sameMessages.empty()) {
+        rebroadcast(loraMessage);
+    }
+    removeSameMessages(sameMessages, loraMessage);
+    return OperationResult::SUCCESS;
+}
+
 OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> message) {
     if(!message->getIsPacketCorrect()) {
         return OperationResult::OPERATION_IGNORED;
@@ -68,16 +82,12 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         Serial.printf("czekam %i\n", passDelay);
         delay(passDelay);
 
-        if (!setContains(messageSet, loraMessage)) {
-            return alreadyRebroadcasted();
-        }
+        waiter.get()->setExecuteFunction([this, loraMessage]() {
+            this->afterWait(loraMessage);
+        });
+        waiter.get()->updateTime(passDelay);
+        waiter.get()->changeTimerTask();
 
-        std::set<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
-
-        if (sameMessages.empty()) {
-            rebroadcast(loraMessage);
-        }
-        removeSameMessages(sameMessages, loraMessage);
         return OperationResult::SUCCESS;
     }
     return OperationResult::OPERATION_IGNORED;

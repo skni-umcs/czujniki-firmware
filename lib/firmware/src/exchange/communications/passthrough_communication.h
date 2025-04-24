@@ -3,13 +3,16 @@
 
 #include "small_communication.h"
 #include <set>
-#include "time/timer.h"
+#include "time/waiter.h"
 
 class PassthroughCommunication : public SmallCommunication {
-    
+
     std::set<std::shared_ptr<LoraMessage>> messageSet;
-    std::shared_ptr<Timer> timer; //TODO: check if its used anywhere
-    
+    std::shared_ptr<Waiter> waiter = Waiter::create();
+
+    protected:
+        PassthroughCommunication() {};
+
     public:
         static std::shared_ptr<PassthroughCommunication> create();
         OperationResult getNotified(std::shared_ptr<Message> message) override;
@@ -17,6 +20,7 @@ class PassthroughCommunication : public SmallCommunication {
         OperationResult removeSameMessages(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message);
         OperationResult rebroadcast(std::shared_ptr<LoraMessage> message);
         bool shouldRebroadcast(std::shared_ptr<LoraMessage> message);
+        OperationResult afterWait(std::shared_ptr<LoraMessage> loraMessage);
 };
 
 #endif

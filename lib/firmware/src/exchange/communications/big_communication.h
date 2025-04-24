@@ -8,6 +8,8 @@
 class BigTransmit;
 
 class BigCommunication : public Communication<BigTransmit, BigCommunication> {
+    protected:
+        BigCommunication() {};
 };
 
 #endif
