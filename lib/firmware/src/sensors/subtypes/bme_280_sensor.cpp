@@ -5,78 +5,55 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include <ArduinoJson.h>
 
-#define D5 9
-#define D6 10
-#define D7 13
-#define D8 5
+#if defined(esp32firebeetle)
+  #define I2C_SDA 21
+  #define I2C_SCL 22
+#else
+  #define I2C_SDA 8
+  #define I2C_SCL 9
+#endif
 
-#define BME_SCK D8
-#define BME_MISO D5
-#define BME_MOSI D7
-#define BME_CS D6
+const std::string TEMPERATURE_CODE = "t";
+const std::string PRESSURE_CODE = "p";
+const std::string HUMIDITY_CODE = "h";
 
-#define SEALEVELPRESSURE_HPA (1013.25)
+#define HUMIDITY_PRECISION 1;
+#define TEMPERATURE_PRECISION 100;
+#define PRESSURE_CUT 10;
 
-Adafruit_BME280 bme(BME_CS, BME_MOSI, BME_MISO, BME_SCK); // software SPI
-
-unsigned long delayTime;
+Adafruit_BME280 bme;
 
 OperationResult BME280Sensor::setupSensor() {
-  Serial.println(F("BME280 test"));
+  Wire.begin(I2C_SDA, I2C_SCL);
 
-  bool status;
+  unsigned status;
 
-  // default settings
-  // (you can also pass in a Wire library object like &Wire2)
-  status = bme.begin(0x76);
+  status = bme.begin();  
   if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, check wiring!");
-    return OperationResult::NOT_FOUND;
+    Serial.println("Could not find a valid BME280 sensor, check wiring, address, sensor ID!");
+    Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
+    Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+    Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
+    Serial.print("        ID of 0x60 represents a BME 280.\n");
+    Serial.print("        ID of 0x61 represents a BME 680.\n");
+    return OperationResult::ERROR;
   }
-
-  Serial.println("-- Default Test --");
-  delayTime = 1000;
-
   return OperationResult::SUCCESS;
 }
 
-struct BME280Output {
-  float humidity;
-  float temperature;
-  float pressure;
-  float altitude;
-
-  BME280Output(float humidity, float temperature, float pressure, float altitude) {
-    this->humidity = humidity;
-    this->temperature = temperature;
-    this->pressure = pressure;
-    this->altitude = altitude;
-  }
-
-  void serialize(JsonDocument& doc) {
-    JsonObject obj = doc.to<JsonObject>();
-    obj["humidity"] = this->humidity;
-    obj["temperature"] = this->temperature;
-    obj["pressure"] = this->pressure;
-    obj["altitude"] = this->altitude;
-  }
-};
-
 std::map<std::string, std::string> BME280Sensor::getSensorData() {
-    sensors_event_t event;
-    BME280Output output = BME280Output(
-      bme.readHumidity(),
-      bme.readTemperature(),
-      bme.readPressure(),
-      bme.readAltitude(SEALEVELPRESSURE_HPA)
-    );
-    std::stringstream result;
+  sensors_event_t event;
+  std::stringstream result;
 
-    JsonDocument doc;
-    output.serialize(doc);
-    serializeJson(doc, result);
-    std::map<std::string, std::string> resultMap; //TODO: fix sensor return
-    return resultMap;
+  int humidity = bme.readHumidity()*HUMIDITY_PRECISION;
+  int temperature = bme.readTemperature()*TEMPERATURE_PRECISION;
+  int pressure = bme.readPressure()/PRESSURE_CUT;
+
+  std::map<std::string, std::string> resultMap;
+  resultMap.insert(std::make_pair(HUMIDITY_CODE, std::to_string(humidity)));
+  resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(temperature)));
+  resultMap.insert(std::make_pair(PRESSURE_CODE, std::to_string(pressure)));
+
+  return resultMap;
 }
