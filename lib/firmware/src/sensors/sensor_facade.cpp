@@ -19,6 +19,10 @@
 #include <sensors/subtypes/sensor.h>
 #include <sensors/subtypes/heap_sensor.h>
 #include <message/message_content.h>
+#include "subtypes/bme_constants.h"
+
+#define enableBME() digitalWrite(BME_POWER_PIN, HIGH);
+#define disableBME() digitalWrite(BME_POWER_PIN, LOW);
 
 const int DEFAULT_SENSOR_PERIOD_MS = 32000;
 uint32_t delayMS = 1000;
@@ -40,6 +44,10 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     });
     
     facade->timer.get()->updateTime(DEFAULT_SENSOR_PERIOD_MS);
+
+    pinMode(BME_POWER_PIN, OUTPUT);
+    disableBME();
+
     return facade;
 }
 
@@ -49,6 +57,7 @@ std::string SensorFacade::getAllSensorsMessage() {
     JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
 
+    enableBME();
     for(auto const& sensor : sensors) {
         try {
             std::map<std::string, std::string> map = sensor->getSensorData();
@@ -60,6 +69,8 @@ std::string SensorFacade::getAllSensorsMessage() {
             Serial.printf("EXCEPTION in sensor message with code: %d", error);
         }
     }
+    disableBME();
+    
     serializeJson(doc, serializedJson);
     return serializedJson;
 }
