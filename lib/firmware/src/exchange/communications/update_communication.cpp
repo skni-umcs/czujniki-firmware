@@ -10,6 +10,7 @@
 #include "exchange/communications/big_communication.h"
 #include "exchange/communications/small_communication.h"
 #include "exchange/transmits/big_transmit.h"
+#include <utils/logger.h>
 
 std::shared_ptr<UpdateCommunication> UpdateCommunication::create() {
     auto s = new UpdateCommunication();
@@ -20,7 +21,7 @@ static char const OTA_FILE_LOCATION[] = "http://192.168.1.18:8000/firmware.bin";
 
 OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> message) {
     if(message->getIsPacketCorrect() && message->getContent() == "u") {
-        Serial.printf("received: %s", message->getContent());
+        Logger::logf("received: %s", message->getContent());
         update();
     }
     return OperationResult::SUCCESS;
@@ -44,7 +45,7 @@ OperationResult UpdateCommunication::update() {
             size_t written = Update.writeStream(*stream);
 
             if (written != contentLength) {
-                Serial.printf("Written only %d/%d bytes. Abort.\n", written, contentLength);
+                Logger::logf("Written only %d/%d bytes. Abort.\n", written, contentLength);
                 http.end(); // Close connection before returning
                 return OperationResult::ERROR;
             }
@@ -61,7 +62,7 @@ OperationResult UpdateCommunication::update() {
                     return OperationResult::ERROR;
                 }
             } else {
-                Serial.printf("Error Occurred. Error #: %d\n", Update.getError());
+                Logger::logf("Error Occurred. Error #: %d\n", Update.getError());
                 http.end(); // Close connection on error
                 return OperationResult::ERROR;
             }
@@ -71,7 +72,7 @@ OperationResult UpdateCommunication::update() {
             return OperationResult::ERROR;
         }
     } else {
-        Serial.printf("Failed to download firmware. HTTP error: %d\n", httpCode);
+        Logger::logf("Failed to download firmware. HTTP error: %d\n", httpCode);
         http.end(); // Close connection on error
         return OperationResult::ERROR;
     }

@@ -7,6 +7,7 @@
 #include "exchange/communications/small_communication.h"
 #include "exchange/transmits/big_transmit.h"
 #include "exchange/communications/big_communication.h"
+#include <utils/logger.h>
 
 #define MINIMUM_RSSI -300
 #define NO_NETWORK -1
@@ -99,12 +100,12 @@ OperationResult WifiTransmit::poll() {
         String idMsg = "0";
         moduleAddress nodeId = parseNodeId(idMsg);
         activeClients[nodeId] = client;
-        Serial.printf("Client with node id %d registered.\n", nodeId);
+        Logger::logf("Client with node id %d registered.\n", nodeId);
     }
 
     for (auto it = activeClients.begin(); it != activeClients.end(); ) {
         if (!it->second.connected()) {
-            Serial.printf("Client with node id %d disconnected.\n", it->first);
+            Logger::logf("Client with node id %d disconnected.\n", it->first);
             it = activeClients.erase(it);
         } else {
             ++it;
@@ -140,7 +141,7 @@ OperationResult WifiTransmit::send(std::shared_ptr<Message> message) {
 }
 
 OperationResult WifiTransmit::receive(std::shared_ptr<Message> message) {
-    Serial.printf("WIFI RECEIVE %s\n", message->getPacket().c_str());
+    Logger::logf("WIFI RECEIVE %s\n", message->getPacket().c_str());
     notifySubscribers(message);
     return OperationResult::SUCCESS;
 }

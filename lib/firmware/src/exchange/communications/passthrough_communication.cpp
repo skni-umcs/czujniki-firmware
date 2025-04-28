@@ -3,6 +3,7 @@
 #include <memory>
 #include <utils/other_utils.h>
 #include "utils/address_handler.h"
+#include <utils/logger.h>
 
 const double SNR_WAIT_MULTIPLIER = 5;
 const int MINIMAL_SNR = -80;
@@ -79,7 +80,7 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         if(passDelay < 1) {
             passDelay = 1;
         }
-        Serial.printf("czekam %i\n", passDelay);
+        Logger::logf("czekam %i\n", passDelay);
         delay(passDelay);
 
         waiter.get()->setExecuteFunction([this, loraMessage]() {

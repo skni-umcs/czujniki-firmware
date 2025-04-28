@@ -5,6 +5,7 @@
 #include <string>
 #include "string_utils.h"
 #include <Preferences.h>
+#include "logger.h"
 
 Preferences preferences;
 std::shared_ptr<AddressHandler> AddressHandler::instance;
@@ -54,7 +55,7 @@ void AddressHandler::initializeAddress() {
     preferences.begin("address");
     moduleAddress addressInMemory = readAddress();
     if(addressInMemory == 0) {
-        Serial.printf(
+        Logger::logf(
             "What address should this module have? (no backspace allowed) (%d - %d)\n", 
             MIN_MODULE_ADDRESS, 
             MAX_MODULE_ADDRESS 
@@ -66,5 +67,5 @@ void AddressHandler::initializeAddress() {
     else {
         address = addressInMemory;
     }
-    Serial.printf("Module address: %d\n", address);
+    Logger::logf("Module address: %d\n", address);
 }

@@ -14,12 +14,12 @@ OperationResult Logger::log(...) {
 }
 
 OperationResult Logger::logf(const char* str, ...) {
-    va_list ptr;
-    va_start(ptr, str);
+    // va_list ptr;
+    // va_start(ptr, str);
 
-    char token[1000];
+    // char token[1000];
 
-    int tokenIndex = 0;
+    // int tokenIndex = 0;
     // for(int i = 0;str[i] != '\0'; i++) {
     //     token[tokenIndex++] = str[i];
 
@@ -28,6 +28,17 @@ OperationResult Logger::logf(const char* str, ...) {
     //         tokenIndex = 0;
     //     }
     // }
-    instance->wifi.get()->send(str, 0);
+    if(getWifi()) {
+        getWifi()->send(str, 0);
+    }
+    return OperationResult::SUCCESS;
+}
+
+std::shared_ptr<WifiTransmit> Logger::getWifi() {
+    return getInstance()->wifi;
+}
+
+OperationResult Logger::setWifi(std::shared_ptr<WifiTransmit> wifi) {
+    getInstance()->wifi = wifi;
     return OperationResult::SUCCESS;
 }

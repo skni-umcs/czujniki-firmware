@@ -7,12 +7,14 @@
 
 class Logger {
     static std::shared_ptr<Logger> instance;
-    std::shared_ptr<WifiTransmit> wifi;
+    std::shared_ptr<WifiTransmit> wifi = nullptr;
 
     public:
         static std::shared_ptr<Logger> getInstance();
         static OperationResult log(...);
         static OperationResult logf(const char* str, ...);
+        static std::shared_ptr<WifiTransmit> getWifi();
+        static OperationResult setWifi(std::shared_ptr<WifiTransmit> wifi);
 };
 
 #endif

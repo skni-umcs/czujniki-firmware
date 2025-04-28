@@ -8,6 +8,7 @@
 #include "time/time_constants.h"
 #include <time/timer_update.h>
 #include <message/message_content.h>
+#include <utils/logger.h>
 
 static int ASK_TIMEOUT_MS = 10000;
 static int TIME_SYNC_PERIOD_MS = FULL_WEEK_MS;
@@ -30,7 +31,7 @@ std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
         serviceCommunication->askForTime();
     });
     serviceCommunication->askTimeTimeoutTimer.get()->setTimerCondition([serviceCommunication]() {
-        Serial.printf("last ask time %d \n",  serviceCommunication->getLastAskTime());
+        Logger::logf("last ask time %d \n",  serviceCommunication->getLastAskTime());
         return serviceCommunication->getLastAskTime() != DIDNT_ASK;
     });
     serviceCommunication->askTimeTimeoutTimer.get()->updateTime(ASK_TIMEOUT_MS);
@@ -46,7 +47,7 @@ std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
 
 OperationResult ServiceCommunication::getNotified(std::shared_ptr<Message> message) {
     if(!message->getIsPacketCorrect()) {
-        Serial.printf("service is notified of invalid packet %s\n", message.get()->getPacket().c_str());
+        Logger::logf("service is notified of invalid packet %s\n", message.get()->getPacket().c_str());
         return OperationResult::ERROR;
     }
     if(!message->isCurrentDestination()) {
@@ -96,10 +97,10 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
 
     unsigned long currentTime = rtc.getEpoch();
     unsigned long RTT = currentTime-lastAskTime;
-    Serial.printf("I waited from %i to %i with RTT of %i, new time will be %i\n", lastAskTime, currentTime, RTT, serverTime+RTT/2);
+    Logger::logf("I waited from %i to %i with RTT of %i, new time will be %i\n", lastAskTime, currentTime, RTT, serverTime+RTT/2);
     TimerUpdate::setTime(serverTime+RTT/2);
     lastAskTime = DIDNT_ASK;
-    Serial.printf("Current time after update: %lu\n", rtc.getEpoch());
+    Logger::logf("Current time after update: %lu\n", rtc.getEpoch());
 
     return OperationResult::SUCCESS;
 }

@@ -6,6 +6,7 @@
 #include <sstream>
 #include <utils/address_handler.h>
 #include "message/message_decode_utils.h"
+#include <utils/logger.h>
 
 void printParameters(struct Configuration configuration);
 
@@ -32,7 +33,7 @@ OperationResult LoraTransmit::updateNoise() {
 
 	byte localNoise = RSSIAmbient >> 8;
 	noiseRaw = localNoise;
-	Serial.printf("Noise (raw): %i\n",noiseRaw);
+	Logger::logf("Noise (raw): %i\n",noiseRaw);
 
 	return OperationResult::SUCCESS;
 }
@@ -110,7 +111,7 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit>
 OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
 	DEBUG_wifi->send(message);
 	std::string packet = message.get()->createPacketForSending();
-	Serial.printf("SEND %s\n", packet.c_str());
+	Logger::logf("SEND %s\n", packet.c_str());
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
 	return OperationResult::SUCCESS;
 }
@@ -156,7 +157,7 @@ double calculateToA(
 int airTime(std::shared_ptr<Message> message) {
 	int length = message.get()->createPacketForSending().size();
 	int waitTime = calculateToA(length, 7, 125)*99;
-	Serial.printf("WAIT TIME: %d\n", waitTime);
+	Logger::logf("WAIT TIME: %d\n", waitTime);
 	return waitTime;
 }
 
@@ -183,7 +184,7 @@ OperationResult LoraTransmit::advanceMessages() {
 
 OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
 	if(DEBUG_getWaitingMessagesCount() <= 50) {
-		Serial.printf("SCHEDULE SEND %s\n", message->createPacketForSending().c_str());
+		Logger::logf("SCHEDULE SEND %s\n", message->createPacketForSending().c_str());
 		messages.push_back(message);
 	}
 	/*if(canTransmit) {
@@ -238,7 +239,7 @@ OperationResult LoraTransmit::poll() {
 }
 
 OperationResult LoraTransmit::receive(std::shared_ptr<Message> message) {
-	Serial.printf("RECEIVE %s\n", message->getPacket().c_str());
+	Logger::logf("RECEIVE %s\n", message->getPacket().c_str());
 	notifySubscribers(message);
     return OperationResult::SUCCESS;
 }

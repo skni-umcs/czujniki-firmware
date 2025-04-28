@@ -30,6 +30,7 @@
 #include "sensors/subtypes/noise_sensor.h"
 #include <vector>
 #include "exchange/communications/update_communication.h"
+#include "utils/logger.h"
 
 #if defined(esp32firebeetle)
 using TRANSMIT_TYPE = DEBUG_timeTransmit;
@@ -41,9 +42,13 @@ using TRANSMIT_TYPE = LoraTransmit;
 void setup() {
   Serial.begin(9600);
   delay(1000);
-  AddressHandler::getInstance().get()->initializeAddress();
 
   auto wifiTransmit = WifiTransmit::create();
+  Logger::setWifi(wifiTransmit);
+
+  AddressHandler::getInstance().get()->initializeAddress();
+
+
   auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
   delay(1000);
   

@@ -3,6 +3,7 @@
 #include <HardwareSerial.h>
 #include <ArduinoJson.h>
 #include "time/time_constants.h"
+#include <utils/logger.h>
 
 MessageContent::MessageContent(TransmissionCode type, std::string message) {
     this->type = type;
@@ -40,7 +41,7 @@ MessageContent MessageContent::fromJson(std::string jsonString) {
     DeserializationError error = deserializeJson(doc, jsonString);
     
     if (error) {
-        Serial.printf("Failed to deserialize json %s", jsonString.c_str());
+        Logger::logf("Failed to deserialize json %s", jsonString.c_str());
 		return MessageContent(TransmissionCode::ERROR_CODE, "");
     }
 

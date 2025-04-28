@@ -20,6 +20,7 @@
 #include <sensors/subtypes/heap_sensor.h>
 #include <message/message_content.h>
 #include "subtypes/bme_constants.h"
+#include <utils/logger.h>
 
 #define enableBME() digitalWrite(BME_POWER_PIN, HIGH);
 #define disableBME() digitalWrite(BME_POWER_PIN, LOW);
@@ -66,7 +67,7 @@ std::string SensorFacade::getAllSensorsMessage() {
             }
         }
         catch (int error) {
-            Serial.printf("EXCEPTION in sensor message with code: %d", error);
+            Logger::logf("EXCEPTION in sensor message with code: %d", error);
         }
     }
     disableBME();
@@ -101,7 +102,7 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTr
         }
         
     }
-    Serial.printf("Size of sensors %i\n", sensors.size());
+    Logger::logf("Size of sensors %i\n", sensors.size());
     return OperationResult::SUCCESS;
 }
 

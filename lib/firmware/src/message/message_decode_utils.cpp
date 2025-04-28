@@ -10,6 +10,7 @@
 #include "message_content.h"
 #include <FastCRC.h>
 #include "message_decode_utils.h"
+#include <utils/logger.h>
 
 FastCRC32 CRC32;
 
@@ -40,7 +41,7 @@ std::vector<std::string> allAddressTableElements(std::string packet) {
 	int addressesStart = packet.find(NODE_BORDER);
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	if (addressesStart == std::string::npos || jsonStart == std::string::npos || addressesStart >= jsonStart) {
-		Serial.printf("Invalid packet, no message: %s\n", packet.c_str());
+		Logger::logf("Invalid packet, no message: %s\n", packet.c_str());
 		return INVALID_VECTOR;
 	}
 	std::vector<std::string> result;
@@ -61,7 +62,7 @@ std::string nthLastAddressTableElement(std::vector<std::string> elements, unsign
 	size_t index = elements.size()-n-1;
 	size_t size = elements.size();
 	if(elements.empty() || index < 0 || index > elements.size()-1) {
-		Serial.printf("Can't get address table element: %i\n", n);
+		Logger::logf("Can't get address table element: %i\n", n);
 		return INVALID_STRING;
 	}
 	return elements.at(index);
@@ -92,12 +93,12 @@ std::string nthLastRssi(std::vector<std::string> addressTableElements, unsigned 
 std::string getValidatedPart(std::string packet) {
 	int leftBorder = packet.find(PACKET_BORDER);
 	if (leftBorder == std::string::npos) {
-		Serial.printf("Invalid packet, no left border %s\n", packet.c_str());
+		Logger::logf("Invalid packet, no left border %s\n", packet.c_str());
 		return INVALID_STRING;
 	}
 	int rightBorder = packet.find_last_of(MAIN_JSON_BORDER);
 	if (rightBorder == std::string::npos) {
-		Serial.printf("Invalid packet, no JSON borders %s\n", packet.c_str());
+		Logger::logf("Invalid packet, no JSON borders %s\n", packet.c_str());
 		return INVALID_STRING;
 	}
 	int partStart = leftBorder+1;
@@ -108,12 +109,12 @@ std::string getValidatedPart(std::string packet) {
 uint32_t getPacketCrc(std::string packet) {
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
 	if (jsonEnd == std::string::npos) {
-		Serial.printf("Invalid packet, no crc %s\n", packet.c_str());
+		Logger::logf("Invalid packet, no crc %s\n", packet.c_str());
 		return INVALID_CRC;
 	}
 	int packetEnd = packet.find_last_of(PACKET_BORDER);
 	if (packetEnd == std::string::npos) {
-		Serial.printf("Invalid packet, no end border %s\n", packet.c_str());
+		Logger::logf("Invalid packet, no end border %s\n", packet.c_str());
 		return INVALID_CRC;
 	}
 	int crcStart = jsonEnd+1;
@@ -171,7 +172,7 @@ std::string getPacketContent(std::string packet) {
 	int jsonStart = packet.find(MAIN_JSON_BORDER);
 	int jsonEnd = packet.find_last_of(MAIN_JSON_BORDER);
 	if (jsonStart == std::string::npos || jsonEnd == std::string::npos || jsonEnd <= jsonStart) {
-		Serial.printf("Invalid packet, no message: %s\n",packet.c_str());
+		Logger::logf("Invalid packet, no message: %s\n",packet.c_str());
 		return INVALID_STRING;
 	}
 	int jsonChars = jsonEnd-jsonStart-1;

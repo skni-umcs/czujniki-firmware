@@ -16,7 +16,7 @@ const std::string CPU_TEMPERATURE_CODE = "c";
 OperationResult CPUSensor::setupSensor() {
   temp_sensor_config_t temp_sensor = TSENS_CONFIG_DEFAULT();
   temp_sensor_get_config(&temp_sensor);
-  Serial.printf("default dac %d, clk_div %d", temp_sensor.dac_offset, temp_sensor.clk_div);
+  Logger::logf("default dac %d, clk_div %d", temp_sensor.dac_offset, temp_sensor.clk_div);
   temp_sensor.dac_offset = TSENS_DAC_DEFAULT; // DEFAULT: range:-10℃ ~  80℃, error < 1℃.
   temp_sensor_set_config(temp_sensor);
   temp_sensor_start();
