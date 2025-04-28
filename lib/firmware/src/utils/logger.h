@@ -11,7 +11,8 @@ class Logger {
 
     public:
         static std::shared_ptr<Logger> getInstance();
-        static OperationResult log(const char* str, ...);
+        static OperationResult log(...);
+        static OperationResult logf(const char* str, ...);
 };
 
 #endif
