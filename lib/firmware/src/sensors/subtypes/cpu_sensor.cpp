@@ -6,6 +6,7 @@
 #include "freertos/task.h"
 #include <Arduino.h>
 #include <sstream>
+#include "utils/logger.h"
 #if defined(production) || defined(mini_test)
 #include "driver/temp_sensor.h"
 
