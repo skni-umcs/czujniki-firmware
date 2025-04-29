@@ -9,13 +9,6 @@ std::shared_ptr<Logger> Logger::getInstance() {
     return instance;
 }
 
-OperationResult Logger::log(...) {
-    if(getWifi()) {
-        getWifi()->send("some log", 0);
-    }
-    return OperationResult::SUCCESS;
-}
-
 OperationResult Logger::logf(const char* str, ...) {
     // va_list ptr;
     // va_start(ptr, str);
