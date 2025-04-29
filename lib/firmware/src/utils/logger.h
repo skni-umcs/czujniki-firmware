@@ -7,6 +7,7 @@
 #include <string>
 #include <sstream>
 #include <utility>
+#include <cstdio>
 
 class Logger {
     static std::shared_ptr<Logger> instance;
@@ -34,7 +35,21 @@ class Logger {
             }
             return OperationResult::SUCCESS;
         }
-        static OperationResult logf(const char* str, ...);
+
+        template<typename... Args>
+        static OperationResult logf(const char* str, Args ... args) {
+            if(getWifi()) {
+                int size = std::snprintf(nullptr, 0, str, args...);
+                if(size < 0) {
+                    return OperationResult::ERROR;
+                }
+                std::string message;
+                message.resize(size);
+                std::snprintf(&message[0], size+1, str, args...);
+                getWifi()->send(message, 0);
+            }
+            return OperationResult::SUCCESS;
+        }
         static std::shared_ptr<WifiTransmit> getWifi();
         static OperationResult setWifi(std::shared_ptr<WifiTransmit> wifi);
 };

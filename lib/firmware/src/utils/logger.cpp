@@ -9,27 +9,6 @@ std::shared_ptr<Logger> Logger::getInstance() {
     return instance;
 }
 
-OperationResult Logger::logf(const char* str, ...) {
-    // va_list ptr;
-    // va_start(ptr, str);
-
-    // char token[1000];
-
-    // int tokenIndex = 0;
-    // for(int i = 0;str[i] != '\0'; i++) {
-    //     token[tokenIndex++] = str[i];
-
-    //     if(str[i+1] == '%' || str[i+1] == '\0') {
-    //         token[tokenIndex] = '\0';
-    //         tokenIndex = 0;
-    //     }
-    // }
-    if(getWifi()) {
-        getWifi()->send(str, 0);
-    }
-    return OperationResult::SUCCESS;
-}
-
 std::shared_ptr<WifiTransmit> Logger::getWifi() {
     return getInstance()->wifi;
 }
