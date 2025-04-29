@@ -46,6 +46,7 @@ void setup() {
   auto wifiTransmit = WifiTransmit::create();
   Logger::setWifi(wifiTransmit);
 
+  delay(5000);
   AddressHandler::getInstance().get()->initializeAddress();
 
 
