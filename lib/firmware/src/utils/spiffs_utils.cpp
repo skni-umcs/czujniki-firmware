@@ -2,24 +2,25 @@
 #include "spiffs_utils.h"
 #include <SPIFFS.h>
 #include <ArduinoJson.h>
+#include "logger.h"
 
 #define NO_NETWORKS {}
 
 std::map<String, String> retrieveNetworks() {
   if (!SPIFFS.begin(true)) {
-    Serial.println("An error occurred while mounting SPIFFS");
+    Logger::log("An error occurred while mounting SPIFFS");
     return NO_NETWORKS;
   }
 
   File configFile = SPIFFS.open("/config.json", "r");
   if (!configFile) {
-    Serial.println("Failed to open config file");
+    Logger::log("Failed to open config file");
     return NO_NETWORKS;
   }
   
   size_t size = configFile.size();
   if (size > 1024) {
-    Serial.println("Config file size is too large");
+    Logger::log("Config file size is too large");
     return NO_NETWORKS;
   }
   
@@ -30,8 +31,8 @@ std::map<String, String> retrieveNetworks() {
   JsonDocument doc;
   DeserializationError error = deserializeJson(doc, buf.get());
   if (error) {
-    Serial.print("Failed to parse config file: ");
-    Serial.println(error.c_str());
+    Logger::log("Failed to parse config file: ");
+    Logger::log(error.c_str());
     return NO_NETWORKS;
   }
 

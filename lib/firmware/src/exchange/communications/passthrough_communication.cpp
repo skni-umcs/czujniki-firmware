@@ -20,7 +20,7 @@ OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessag
 }
 
 OperationResult alreadyRebroadcasted() {
-    Serial.println("already rebro");
+    Logger::log("already rebro");
     return OperationResult::SUCCESS;
 }
 
@@ -69,7 +69,7 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         return OperationResult::OPERATION_IGNORED;
     }
     if (message->type() != MessageType::LoraMessage) {
-        Serial.println("Passthrough got non-lora message, discarding");
+        Logger::log("Passthrough got non-lora message, discarding");
         return OperationResult::ERROR;
     }
     std::shared_ptr<LoraMessage> loraMessage = std::static_pointer_cast<LoraMessage>(message);

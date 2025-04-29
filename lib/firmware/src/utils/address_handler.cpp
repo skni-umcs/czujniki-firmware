@@ -35,7 +35,7 @@ moduleAddress AddressHandler::getAddressFromUser() {
     while(true) {
         character = Serial.read();
         if(character != 255) {
-            Serial.print(character);
+            Logger::log(character);
             if(character == '\n') {
                 break;
             }

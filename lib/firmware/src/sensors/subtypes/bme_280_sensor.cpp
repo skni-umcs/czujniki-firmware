@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include "bme_constants.h"
+#include <utils/logger.h>
 
 #if defined(esp32firebeetle)
   #define I2C_SDA 21
@@ -22,12 +23,12 @@ OperationResult BME280Sensor::setupSensor() {
 
   status = bme.begin();  
   if (!status) {
-    Serial.println("Could not find a valid BME280 sensor, address, sensor ID!");
-    Serial.print("SensorID was: 0x"); Serial.println(bme.sensorID(),16);
-    Serial.print("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
-    Serial.print("   ID of 0x56-0x58 represents a BMP 280,\n");
-    Serial.print("        ID of 0x60 represents a BME 280.\n");
-    Serial.print("        ID of 0x61 represents a BME 680.\n");
+    Logger::log("Could not find a valid BME280 sensor, address, sensor ID!");
+    Logger::log("SensorID was: 0x"); Logger::log(bme.sensorID(),16);
+    Logger::log("        ID of 0xFF probably means a bad address, a BMP 180 or BMP 085\n");
+    Logger::log("   ID of 0x56-0x58 represents a BMP 280,\n");
+    Logger::log("        ID of 0x60 represents a BME 280.\n");
+    Logger::log("        ID of 0x61 represents a BME 680.\n");
     return OperationResult::ERROR;
   }
   return OperationResult::SUCCESS;

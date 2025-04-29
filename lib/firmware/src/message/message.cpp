@@ -5,6 +5,7 @@
 #include "utils/address_handler.h"
 #include <iostream>
 #include <utils/address_handler.h>
+#include <utils/logger.h>
 
 Message::Message() {}
 
@@ -97,7 +98,7 @@ bool Message::getIsPacketCorrect() {
 
 OperationResult Message::decrementHopLimit() {
     if(hopLimit == 0) {
-        Serial.println("Can't decrement hopLimit further");
+        Logger::log("Can't decrement hopLimit further");
         return OperationResult::ERROR;
     }
     hopLimit -= 1;

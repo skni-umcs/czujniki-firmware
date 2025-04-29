@@ -2,6 +2,7 @@
 #include <iostream>
 #include "timer_update.h"
 #include <HardwareSerial.h>
+#include <utils/logger.h>
 
 Waiter::Waiter() {}
 
@@ -14,7 +15,7 @@ std::shared_ptr<Waiter> Waiter::create(int taskPriority) {
 
 void waiterTask(void* timerObjectRawPointer) {
     std::shared_ptr<Waiter>* timerPtr = static_cast<std::shared_ptr<Waiter>*>(timerObjectRawPointer);
-    Serial.println("y");
+    Logger::log("y");
     while(true) {
         vTaskDelay(timerPtr->get()->getWaitMs());
         if(timerPtr->get()->getExecuteFunction() != nullptr) {
@@ -35,7 +36,7 @@ void Waiter::changeTimerTask() {
     TaskHandle_t* const taskHandle = &this->currentTask;
     int heap_status = xTaskCreate(waiterTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
     if(heap_status != 1) {
-        Serial.println("HEAP OVERLOAD");
+        Logger::log("HEAP OVERLOAD");
     }
 }
 

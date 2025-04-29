@@ -28,7 +28,7 @@ OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> messag
 }
 
 OperationResult UpdateCommunication::update() {
-    Serial.println("Starting OTA update from local server...");
+    Logger::log("Starting OTA update from local server...");
 
     WiFiClient client;
     HTTPClient http;
@@ -51,13 +51,13 @@ OperationResult UpdateCommunication::update() {
             }
 
             if (Update.end()) {
-                Serial.println("OTA update finished!");
+                Logger::log("OTA update finished!");
                 if (Update.isFinished()) {
-                    Serial.println("Update successfully completed. Rebooting...");
+                    Logger::log("Update successfully completed. Rebooting...");
                     http.end(); // Close HTTP connection before restarting
                     ESP.restart();
                 } else {
-                    Serial.println("Update not finished. Something went wrong.");
+                    Logger::log("Update not finished. Something went wrong.");
                     http.end(); // Close connection on error
                     return OperationResult::ERROR;
                 }
@@ -67,7 +67,7 @@ OperationResult UpdateCommunication::update() {
                 return OperationResult::ERROR;
             }
         } else {
-            Serial.println("Not enough space to begin OTA.");
+            Logger::log("Not enough space to begin OTA.");
             http.end(); // Close connection on error
             return OperationResult::ERROR;
         }

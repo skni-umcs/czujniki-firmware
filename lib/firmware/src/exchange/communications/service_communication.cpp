@@ -84,8 +84,8 @@ void ServiceCommunication::sendResetReason() {
 OperationResult ServiceCommunication::askForTime() {
     this->setLastAskTime(rtc.getEpoch());
     MessageContent packetMessage = MessageContent(TransmissionCode::TIME_SYNCHRONIZATION, "t");
-    Serial.println(this->getLastAskTime());
-    Serial.println("lastAskTime");
+    Logger::log(this->getLastAskTime());
+    Logger::log("lastAskTime");
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
     return OperationResult::SUCCESS;
 }

@@ -6,6 +6,7 @@
 #include <iostream>
 #include <Adafruit_BME680.h>
 #include "bme_constants.h"
+#include <utils/logger.h>
 
 #if defined(esp32firebeetle)
   #define I2C_SDA 21
@@ -19,7 +20,7 @@ OperationResult BME680Sensor::setupSensor() {
   Wire.begin(I2C_SDA, I2C_SCL);
 
   if (!bme.begin()) {
-    Serial.println("Could not find a valid BME680 sensor!");
+    Logger::log("Could not find a valid BME680 sensor!");
     return OperationResult::ERROR;
   }
 

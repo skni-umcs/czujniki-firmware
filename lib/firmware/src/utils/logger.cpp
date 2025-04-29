@@ -10,6 +10,9 @@ std::shared_ptr<Logger> Logger::getInstance() {
 }
 
 OperationResult Logger::log(...) {
+    if(getWifi()) {
+        getWifi()->send("some log", 0);
+    }
     return OperationResult::SUCCESS;
 }
 

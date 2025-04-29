@@ -54,17 +54,17 @@ String WifiTransmit::getBestNetworkSsid() {
 }
 
 void connected_to_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
-    Serial.println("[+] Connected to the WiFi network");
+    Logger::log("[+] Connected to the WiFi network");
 }
 
 void disconnected_from_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
-    Serial.println("[-] Disconnected from the WiFi AP");
+    Logger::log("[-] Disconnected from the WiFi AP");
     WiFi.reconnect();
 }
 
 void got_ip_from_ap(WiFiEvent_t wifi_event, WiFiEventInfo_t wifi_info) {
-    Serial.print("[+] Local ESP32 IP: ");
-    Serial.println(WiFi.localIP());
+    Logger::log("[+] Local ESP32 IP: ");
+    Logger::log(WiFi.localIP());
 }
 
 void WifiTransmit::setupPollTask() {
@@ -94,7 +94,7 @@ OperationResult WifiTransmit::setup() {
 OperationResult WifiTransmit::poll() {
     WiFiClient client = server.available();
     if (client) {
-        Serial.println("New Client Connected.");
+        Logger::log("New Client Connected.");
         unsigned long startTime = millis();
         while (millis() - startTime < 100 && !client.available()) { }
         String idMsg = "0";
@@ -117,8 +117,8 @@ OperationResult WifiTransmit::poll() {
         while (clientRef.available()) {
             String message = clientRef.readStringUntil('\n');
             receive(std::make_shared<TextMessage>(std::string(message.c_str())));
-            Serial.print("Received: ");
-            Serial.println(message);
+            Logger::log("Received: ");
+            Logger::log(message);
         }
     }
 

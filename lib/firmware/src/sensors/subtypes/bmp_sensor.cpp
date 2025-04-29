@@ -3,6 +3,7 @@
 #include "bmp_sensor.h"
 #include <sstream>
 #include <utility>
+#include <utils/logger.h>
 
 // Define I2C pins
 #if defined(esp32firebeetle)
@@ -24,11 +25,11 @@ OperationResult BMPSensor::setupSensor() {
   
   // Initialize BMP085 sensor
   if (!bmp.begin()) {
-    Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+    Logger::log("Could not find a valid BMP085 sensor, check wiring!");
     return OperationResult::NOT_FOUND;
   }
   
-  Serial.println("BMP085 initialization successful!");
+  Logger::log("BMP085 initialization successful!");
   return OperationResult::SUCCESS;
 }
 

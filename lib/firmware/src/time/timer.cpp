@@ -2,6 +2,7 @@
 #include <iostream>
 #include "timer_update.h"
 #include <HardwareSerial.h>
+#include <utils/logger.h>
 
 Timer::Timer() {}
 
@@ -42,7 +43,7 @@ void Timer::changeTimerTask() {
     TaskHandle_t* const taskHandle = &this->currentTask;
     int heap_status = xTaskCreate(timerTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
     if(heap_status != 1) {
-        Serial.println("HEAP OVERLOAD");
+        Logger::log("HEAP OVERLOAD");
     }
 }
 

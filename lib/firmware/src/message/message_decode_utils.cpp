@@ -126,7 +126,7 @@ uint32_t getPacketCrc(std::string packet) {
 
 std::vector<moduleAddress> getSenders(std::vector<std::string> addressTable) {
 	if(addressTable.size() <= 1) {
-		Serial.println("Incorrect addressTable, no original sender found!");
+		Logger::log("Incorrect addressTable, no original sender found!");
 		return INVALID_VECTOR;
 	}
 	int originalSenderAndDestinationCount = 2;

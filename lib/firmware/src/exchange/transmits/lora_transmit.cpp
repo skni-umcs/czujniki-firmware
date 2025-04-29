@@ -23,11 +23,11 @@ const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
-	Serial.println("Noise update");
+	Logger::log("Noise update");
 	unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
 
 	if (RSSIAmbient == RSSI_AMBIENT_ERROR_RESPONSE) {
-		Serial.println("Invalid noise");
+		Logger::log("Invalid noise");
 		return OperationResult::ERROR;
 	}
 
@@ -42,13 +42,13 @@ int LoraTransmit::getSnr(int readRssi) {
 	int RssidB = -((256)-readRssi);
 	int noisedB = -((256)-noiseRaw);
 	if(noisedB == 0) {
-		Serial.println("Error, realNoise is 0");
+		Logger::log("Error, realNoise is 0");
 		return -1;
 	}
-	Serial.println("rssi rzeczy");
-	Serial.println(readRssi);
-	Serial.println(RssidB);
-	Serial.println(noisedB);
+	Logger::log("rssi rzeczy");
+	Logger::log(readRssi);
+	Logger::log(RssidB);
+	Logger::log(noisedB);
 	return RssidB-noisedB;
 }
 
@@ -57,7 +57,7 @@ int LoraTransmit::getNoise() {
 }
 
 void LoraTransmit::setup() {
-	Serial.println("Setupping LoraTransmit");
+	Logger::log("Setupping LoraTransmit");
 
 	// Startup all pins and UART
 	e220ttl.begin();
@@ -223,7 +223,7 @@ OperationResult LoraTransmit::poll() {
 		#endif
 			// Is something goes wrong print error
 			if (rc.status.code!=1){
-				Serial.println(rc.status.getResponseDescription());
+				Logger::log(rc.status.getResponseDescription());
 				return OperationResult::ERROR;
 			}else{
 				byte rssi = rc.rssi;
@@ -231,7 +231,7 @@ OperationResult LoraTransmit::poll() {
 				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi, snr));
 				receive(loraMessage);
 		#ifdef ENABLE_RSSI
-				//Serial.print("RSSI: "); Serial.println(rc.rssi, DEC);
+				//Logger::log("RSSI: "); Logger::log(rc.rssi, DEC);
 		#endif
 		}
 	}
@@ -253,27 +253,27 @@ int LoraTransmit::DEBUG_getWaitingMessagesCount() {
 }
 
 void printParameters(struct Configuration configuration) {
-	Serial.println("----------------------------------------");
+	Logger::log("----------------------------------------");
 
-	Serial.print(F("HEAD : "));  Serial.print(configuration.COMMAND, HEX);Serial.print(" ");Serial.print(configuration.STARTING_ADDRESS, HEX);Serial.print(" ");Serial.println(configuration.LENGHT, HEX);
-	Serial.println(F(" "));
-	Serial.print(F("AddH : "));  Serial.println(configuration.ADDH, HEX);
-	Serial.print(F("AddL : "));  Serial.println(configuration.ADDL, HEX);
-	Serial.println(F(" "));
-	Serial.print(F("Chan : "));  Serial.print(configuration.CHAN, DEC); Serial.print(" -> "); Serial.println(configuration.getChannelDescription());
-	Serial.println(F(" "));
-	Serial.print(F("SpeedParityBit     : "));  Serial.print(configuration.SPED.uartParity, BIN);Serial.print(" -> "); Serial.println(configuration.SPED.getUARTParityDescription());
-	Serial.print(F("SpeedUARTDatte     : "));  Serial.print(configuration.SPED.uartBaudRate, BIN);Serial.print(" -> "); Serial.println(configuration.SPED.getUARTBaudRateDescription());
-	Serial.print(F("SpeedAirDataRate   : "));  Serial.print(configuration.SPED.airDataRate, BIN);Serial.print(" -> "); Serial.println(configuration.SPED.getAirDataRateDescription());
-	Serial.println(F(" "));
-	Serial.print(F("OptionSubPacketSett: "));  Serial.print(configuration.OPTION.subPacketSetting, BIN);Serial.print(" -> "); Serial.println(configuration.OPTION.getSubPacketSetting());
-	Serial.print(F("OptionTranPower    : "));  Serial.print(configuration.OPTION.transmissionPower, BIN);Serial.print(" -> "); Serial.println(configuration.OPTION.getTransmissionPowerDescription());
-	Serial.print(F("OptionRSSIAmbientNo: "));  Serial.print(configuration.OPTION.RSSIAmbientNoise, BIN);Serial.print(" -> "); Serial.println(configuration.OPTION.getRSSIAmbientNoiseEnable());
-	Serial.println(F(" "));
-	Serial.print(F("TransModeWORPeriod : "));  Serial.print(configuration.TRANSMISSION_MODE.WORPeriod, BIN);Serial.print(" -> "); Serial.println(configuration.TRANSMISSION_MODE.getWORPeriodByParamsDescription());
-	Serial.print(F("TransModeEnableLBT : "));  Serial.print(configuration.TRANSMISSION_MODE.enableLBT, BIN);Serial.print(" -> "); Serial.println(configuration.TRANSMISSION_MODE.getLBTEnableByteDescription());
-	Serial.print(F("TransModeEnableRSSI: "));  Serial.print(configuration.TRANSMISSION_MODE.enableRSSI, BIN);Serial.print(" -> "); Serial.println(configuration.TRANSMISSION_MODE.getRSSIEnableByteDescription());
-	Serial.print(F("TransModeFixedTrans: "));  Serial.print(configuration.TRANSMISSION_MODE.fixedTransmission, BIN);Serial.print(" -> "); Serial.println(configuration.TRANSMISSION_MODE.getFixedTransmissionDescription());
+	Logger::log(F("HEAD : "));  Logger::log(configuration.COMMAND, HEX);Logger::log(" ");Logger::log(configuration.STARTING_ADDRESS, HEX);Logger::log(" ");Logger::log(configuration.LENGHT, HEX);
+	Logger::log(F(" "));
+	Logger::log(F("AddH : "));  Logger::log(configuration.ADDH, HEX);
+	Logger::log(F("AddL : "));  Logger::log(configuration.ADDL, HEX);
+	Logger::log(F(" "));
+	Logger::log(F("Chan : "));  Logger::log(configuration.CHAN, DEC); Logger::log(" -> "); Logger::log(configuration.getChannelDescription());
+	Logger::log(F(" "));
+	Logger::log(F("SpeedParityBit     : "));  Logger::log(configuration.SPED.uartParity, BIN);Logger::log(" -> "); Logger::log(configuration.SPED.getUARTParityDescription());
+	Logger::log(F("SpeedUARTDatte     : "));  Logger::log(configuration.SPED.uartBaudRate, BIN);Logger::log(" -> "); Logger::log(configuration.SPED.getUARTBaudRateDescription());
+	Logger::log(F("SpeedAirDataRate   : "));  Logger::log(configuration.SPED.airDataRate, BIN);Logger::log(" -> "); Logger::log(configuration.SPED.getAirDataRateDescription());
+	Logger::log(F(" "));
+	Logger::log(F("OptionSubPacketSett: "));  Logger::log(configuration.OPTION.subPacketSetting, BIN);Logger::log(" -> "); Logger::log(configuration.OPTION.getSubPacketSetting());
+	Logger::log(F("OptionTranPower    : "));  Logger::log(configuration.OPTION.transmissionPower, BIN);Logger::log(" -> "); Logger::log(configuration.OPTION.getTransmissionPowerDescription());
+	Logger::log(F("OptionRSSIAmbientNo: "));  Logger::log(configuration.OPTION.RSSIAmbientNoise, BIN);Logger::log(" -> "); Logger::log(configuration.OPTION.getRSSIAmbientNoiseEnable());
+	Logger::log(F(" "));
+	Logger::log(F("TransModeWORPeriod : "));  Logger::log(configuration.TRANSMISSION_MODE.WORPeriod, BIN);Logger::log(" -> "); Logger::log(configuration.TRANSMISSION_MODE.getWORPeriodByParamsDescription());
+	Logger::log(F("TransModeEnableLBT : "));  Logger::log(configuration.TRANSMISSION_MODE.enableLBT, BIN);Logger::log(" -> "); Logger::log(configuration.TRANSMISSION_MODE.getLBTEnableByteDescription());
+	Logger::log(F("TransModeEnableRSSI: "));  Logger::log(configuration.TRANSMISSION_MODE.enableRSSI, BIN);Logger::log(" -> "); Logger::log(configuration.TRANSMISSION_MODE.getRSSIEnableByteDescription());
+	Logger::log(F("TransModeFixedTrans: "));  Logger::log(configuration.TRANSMISSION_MODE.fixedTransmission, BIN);Logger::log(" -> "); Logger::log(configuration.TRANSMISSION_MODE.getFixedTransmissionDescription());
 
-	Serial.println("----------------------------------------");
+	Logger::log("----------------------------------------");
 }
