@@ -17,7 +17,7 @@ std::shared_ptr<UpdateCommunication> UpdateCommunication::create() {
     return std::shared_ptr<UpdateCommunication>{s};
 }
 
-static char const OTA_FILE_LOCATION[] = "http://192.168.1.18:8000/firmware.bin";
+static char const OTA_FILE_LOCATION[] = "http://10.50.50.123:8000/firmware.bin";
 
 OperationResult UpdateCommunication::getNotified(std::shared_ptr<Message> message) {
     if(message->getIsPacketCorrect() && message->getContent() == "u") {
