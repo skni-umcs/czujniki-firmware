@@ -35,7 +35,7 @@ OperationResult BME280Sensor::setupSensor() {
 }
 
 std::map<std::string, std::string> BME280Sensor::getSensorData() {
-  sleep(1000);
+  delay(1000);
   sensors_event_t event;
   std::stringstream result;
 
