@@ -30,6 +30,9 @@ OperationResult PassthroughCommunication::transmit(std::string message, moduleAd
                 destination->send(message, destinationNode);
             }
         }
+        else {
+            Logger::log("Passthrough only accepts lora transmit!");
+        }
     }
     return OperationResult::SUCCESS;
 }
@@ -41,6 +44,9 @@ OperationResult PassthroughCommunication::transmit(std::shared_ptr<Message> mess
             if(loraTransmit->getWaitingMessagesCount() <= MAX_LORA_QUEUE_PASSTHROUGH) {
                 destination->send(message);
             }
+        }
+        else {
+            Logger::log("Passthrough only accepts lora transmit!");
         }
     }
     return OperationResult::SUCCESS;
