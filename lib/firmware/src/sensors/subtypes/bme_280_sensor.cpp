@@ -22,7 +22,7 @@ OperationResult BME280Sensor::setupSensor() {
 
   unsigned status;
 
-  status = bme.begin(0x76, &wire);  
+  status = bme.begin(0x77, &wire);  
   if (!status) {
     Logger::log("Could not find a valid BME280 sensor, address, sensor ID!");
     Logger::log("SensorID was: 0x"); Logger::log(bme.sensorID(),16);
