@@ -17,11 +17,12 @@
 #endif
 
 OperationResult BME280Sensor::setupSensor() {
-  Wire.begin(I2C_SDA, I2C_SCL);
+  TwoWire wire = TwoWire(0);
+  wire.begin(I2C_SDA, I2C_SCL);
 
   unsigned status;
 
-  status = bme.begin(0x76, &Wire);  
+  status = bme.begin(0x76, &wire);  
   if (!status) {
     Logger::log("Could not find a valid BME280 sensor, address, sensor ID!");
     Logger::log("SensorID was: 0x"); Logger::log(bme.sensorID(),16);
