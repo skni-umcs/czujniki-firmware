@@ -183,7 +183,7 @@ OperationResult LoraTransmit::advanceMessages() {
 }
 
 OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
-	if(DEBUG_getWaitingMessagesCount() <= 50) {
+	if(getWaitingMessagesCount() <= 50) {
 		Logger::logf("SCHEDULE SEND %s\n", message->createPacketForSending().c_str());
 		messages.push_back(message);
 	}
@@ -248,7 +248,7 @@ bool LoraTransmit::getCanTransmit() {
 	return canTransmit;
 }
 
-int LoraTransmit::DEBUG_getWaitingMessagesCount() {
+int LoraTransmit::getWaitingMessagesCount() {
 	return messages.size();
 }
 

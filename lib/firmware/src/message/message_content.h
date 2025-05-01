@@ -13,7 +13,8 @@ enum class TransmissionCode : char {
 
     //message types
     RESET = 'r',
-    SENSOR_READING = 'p',
+    TELEMETRY_READING = 'p',
+    SERVICE_READING = 's',
     TIME_SYNCHRONIZATION = 'o'
 };
 

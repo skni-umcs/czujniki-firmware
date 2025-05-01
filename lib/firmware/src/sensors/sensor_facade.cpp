@@ -25,7 +25,8 @@
 #define enableBME() digitalWrite(BME_POWER_PIN, HIGH); delay(1000);
 #define disableBME() digitalWrite(BME_POWER_PIN, LOW);
 
-const int DEFAULT_SENSOR_PERIOD_MS = 32000;
+const int DEFAULT_TELEMETRY_PERIOD_MS = 32000;
+const int DEFAULT_SERVICE_PERIOD_MS = 15000;
 uint32_t delayMS = 1000;
 
 SensorFacade::SensorFacade() {
@@ -33,18 +34,25 @@ SensorFacade::SensorFacade() {
 
 std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit> transmit, bool shouldSetupSensors) {
     auto facade = std::shared_ptr<SensorFacade>(new SensorFacade());
-    facade->sensorCommunication = SensorCommunication::create();
-    facade->sensorCommunication->subscribe(transmit);
+    facade->telemetryCommunication = SensorCommunication::create();
+    facade->telemetryCommunication->subscribe(transmit);
 
     if(shouldSetupSensors) {
-        facade->setupSensors(transmit);
+        facade->setupTelemetry(transmit);
+        facade->setupService(transmit);
     }
 
-    facade->timer.get()->setExecuteFunction([facade]() {
-       facade->sendAllSensors();
+    facade->telemetryTimer.get()->setExecuteFunction([facade]() {
+       facade->sendTelemetry();
     });
-    
-    facade->timer.get()->updateTime(DEFAULT_SENSOR_PERIOD_MS);
+    facade->telemetryTimer.get()->updateTime(DEFAULT_TELEMETRY_PERIOD_MS);
+
+    facade->serviceCommunication = ServiceCommunication::create();
+    facade->serviceCommunication->subscribe(transmit);
+    facade->serviceTimer.get()->setExecuteFunction([facade]() {
+       facade->sendService();
+    });
+    facade->serviceTimer.get()->updateTime(DEFAULT_SERVICE_PERIOD_MS);
 
     pinMode(BME_POWER_PIN, OUTPUT);
     disableBME();
@@ -52,14 +60,13 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     return facade;
 }
 
-std::string SensorFacade::getAllSensorsMessage() {
-    //TODO: prevent faulty sensor from crashing
+std::string SensorFacade::getTelemetry() {
     JsonDocument doc;
     JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
 
     enableBME();
-    for(auto const& sensor : sensors) {
+    for(auto const& sensor : telemetrySensors) {
         try {
             std::map<std::string, std::string> map = sensor->getSensorData();
             for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it) {
@@ -67,7 +74,7 @@ std::string SensorFacade::getAllSensorsMessage() {
             }
         }
         catch (int error) {
-            Logger::logf("EXCEPTION in sensor message with code: %d", error);
+            Logger::logf("EXCEPTION in telemetry sensor message with code: %d", error);
         }
     }
     disableBME();
@@ -76,12 +83,38 @@ std::string SensorFacade::getAllSensorsMessage() {
     return serializedJson;
 }
 
-void SensorFacade::sendAllSensors() {
-    MessageContent messageContent = MessageContent(TransmissionCode::SENSOR_READING, getAllSensorsMessage());
-    sensorCommunication->transmit(messageContent.getJson(), SERVER_ADDRESS);
+std::string SensorFacade::getService() {
+    JsonDocument doc;
+    JsonObject messages = doc.to<JsonObject>();
+    std::string serializedJson;
+
+    for(auto const& sensor : serviceSensors) {
+        try {
+            std::map<std::string, std::string> map = sensor->getSensorData();
+            for(std::map<std::string, std::string>::iterator it = map.begin(); it != map.end(); ++it) {
+                messages[it->first] = it->second;
+            }
+        }
+        catch (int error) {
+            Logger::logf("EXCEPTION in service sensor message with code: %d", error);
+        }
+    }
+    
+    serializeJson(doc, serializedJson);
+    return serializedJson;
 }
 
-OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTransmit) {
+OperationResult SensorFacade::sendTelemetry() {
+    MessageContent messageContent = MessageContent(TransmissionCode::TELEMETRY_READING, getTelemetry());
+    return telemetryCommunication->transmit(messageContent.getJson(), SERVER_ADDRESS);
+}
+
+OperationResult SensorFacade::sendService() {
+    MessageContent messageContent = MessageContent(TransmissionCode::SERVICE_READING, getService());
+    return telemetryCommunication->transmit(messageContent.getJson(), SERVER_ADDRESS);
+}
+
+OperationResult SensorFacade::setupTelemetry(std::shared_ptr<SmallTransmit> baseTransmit) {
     std::vector<std::unique_ptr<Sensor>> sensorCandidates = {};
     #if defined(esp32firebeetle) || defined(mini_test)
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
@@ -90,6 +123,23 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTr
         sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
         sensorCandidates.push_back(std::unique_ptr<BME280Sensor>(new BME280Sensor()));
         sensorCandidates.push_back(std::unique_ptr<BME680Sensor>(new BME680Sensor()));
+    #endif
+    for(std::unique_ptr<Sensor> & sensor : sensorCandidates) {
+        OperationResult setupResult = sensor->setupSensor();
+        if(setupResult == OperationResult::SUCCESS) {
+            addTelemetry(sensor);
+        }
+        
+    }
+    Logger::logf("Size of telemetry sensors %i\n", telemetrySensors.size());
+    return OperationResult::SUCCESS;
+}
+
+OperationResult SensorFacade::setupService(std::shared_ptr<SmallTransmit> baseTransmit) {
+    std::vector<std::unique_ptr<Sensor>> sensorCandidates = {};
+    #if defined(esp32firebeetle) || defined(mini_test)
+        
+    #else
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
         sensorCandidates.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
@@ -98,15 +148,15 @@ OperationResult SensorFacade::setupSensors(std::shared_ptr<SmallTransmit> baseTr
     for(std::unique_ptr<Sensor> & sensor : sensorCandidates) {
         OperationResult setupResult = sensor->setupSensor();
         if(setupResult == OperationResult::SUCCESS) {
-            addSensor(sensor);
+            addService(sensor);
         }
         
     }
-    Logger::logf("Size of sensors %i\n", sensors.size());
+    Logger::logf("Size of service sensors %i\n", telemetrySensors.size());
     return OperationResult::SUCCESS;
 }
 
 int SensorFacade::sensorsCount() {
-    return this->sensors.size();
+    return this->telemetrySensors.size();
 }
 

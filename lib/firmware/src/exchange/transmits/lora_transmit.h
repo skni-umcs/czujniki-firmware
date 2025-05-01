@@ -59,7 +59,7 @@ class LoraTransmit : public SmallTransmit
     int getSnr(int readRssi);
     int getNoise();
     bool getCanTransmit();
-    int DEBUG_getWaitingMessagesCount();
+    int getWaitingMessagesCount();
     OperationResult RENAMEadvanceMessages();
 };
 

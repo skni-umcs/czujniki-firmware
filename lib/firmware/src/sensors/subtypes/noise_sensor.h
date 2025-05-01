@@ -4,6 +4,7 @@
 #include "sensor.h"
 #include "exchange/transmits/lora_transmit.h"
 
+//TODO: rename to lora sensor
 class NoiseSensor : public Sensor {
     std::shared_ptr<LoraTransmit> transmit;
     
