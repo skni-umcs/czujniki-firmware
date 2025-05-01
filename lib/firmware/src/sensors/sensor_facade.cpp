@@ -22,8 +22,8 @@
 #include "subtypes/bme_constants.h"
 #include <utils/logger.h>
 
-#define enableBME() digitalWrite(BME_POWER_PIN, HIGH); delay(1000);
-#define disableBME() digitalWrite(BME_POWER_PIN, LOW);
+#define enableBME() pinMode(BME_POWER_PIN, OUTPUT); digitalWrite(BME_POWER_PIN, HIGH); delay(1000);
+#define disableBME() digitalWrite(BME_POWER_PIN, LOW); pinMode(BME_POWER_PIN, INPUT);
 
 const int DEFAULT_TELEMETRY_PERIOD_MS = 32000;
 const int DEFAULT_SERVICE_PERIOD_MS = 15000;
@@ -54,7 +54,6 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     });
     facade->serviceTimer.get()->updateTime(DEFAULT_SERVICE_PERIOD_MS);
 
-    pinMode(BME_POWER_PIN, OUTPUT);
     disableBME();
 
     return facade;
