@@ -22,7 +22,7 @@
 #include "subtypes/bme_constants.h"
 #include <utils/logger.h>
 
-#define enableBME() digitalWrite(BME_POWER_PIN, HIGH);
+#define enableBME() digitalWrite(BME_POWER_PIN, HIGH); delay(1000);
 #define disableBME() digitalWrite(BME_POWER_PIN, LOW);
 
 const int DEFAULT_SENSOR_PERIOD_MS = 32000;
