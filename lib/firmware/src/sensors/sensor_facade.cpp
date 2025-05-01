@@ -25,8 +25,8 @@
 #define enableBME() pinMode(BME_POWER_PIN, OUTPUT); digitalWrite(BME_POWER_PIN, HIGH); delay(1000);
 #define disableBME() digitalWrite(BME_POWER_PIN, LOW); pinMode(BME_POWER_PIN, INPUT);
 
-const int DEFAULT_TELEMETRY_PERIOD_MS = 32000;
-const int DEFAULT_SERVICE_PERIOD_MS = 15000;
+const int DEFAULT_SERVICE_PERIOD_MS = 30000;
+const int DEFAULT_TELEMETRY_PERIOD_MS = DEFAULT_SERVICE_PERIOD_MS*2;
 uint32_t delayMS = 1000;
 
 SensorFacade::SensorFacade() {
