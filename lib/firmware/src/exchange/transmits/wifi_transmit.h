@@ -24,6 +24,9 @@ class WifiTransmit : public BigTransmit, public SmallTransmit, public std::enabl
         std::map<String, String> getNetworks();
         void setupPollTask();
         OperationResult notifySubscribers(std::shared_ptr<Message> message);
+        TransmitType type() const override {
+            return TransmitType::WifiTransmit;
+        }
 };
 
 #endif

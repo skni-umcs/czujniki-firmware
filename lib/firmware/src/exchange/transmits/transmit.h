@@ -27,6 +27,7 @@ class Transmit
             subscribers.push_back(communication);
             return OperationResult::SUCCESS;
         }
+        virtual TransmitType type() const = 0;
 };
 
 #endif

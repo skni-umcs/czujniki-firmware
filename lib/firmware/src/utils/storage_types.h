@@ -21,4 +21,10 @@ enum class MessageType {
     TextMessage
 };
 
+enum class TransmitType {
+    LoraTransmit,
+    WifiTransmit,
+    OtherTransmit
+};
+
 #endif

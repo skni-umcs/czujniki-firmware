@@ -61,6 +61,9 @@ class LoraTransmit : public SmallTransmit
     bool getCanTransmit();
     int getWaitingMessagesCount();
     OperationResult RENAMEadvanceMessages();
+    TransmitType type() const override {
+      return TransmitType::LoraTransmit;
+    }
 };
 
 #endif

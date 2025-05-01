@@ -23,6 +23,9 @@ class DEBUG_timeTransmit : public SmallTransmit
     OperationResult receive(std::shared_ptr<Message> message) override;
     OperationResult updateNoise();
     int getSnr(int readRssi);
+    TransmitType type() const override {
+      return TransmitType::OtherTransmit;
+    }
 };
 
 #endif

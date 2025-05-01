@@ -10,6 +10,8 @@
 
 void printParameters(struct Configuration configuration);
 
+#define MAX_QUEUE 20
+
 // With FIXED RECEIVER configuration
 #define DESTINATION_ADDL 2
 // If you want use RSSI uncomment
@@ -183,7 +185,7 @@ OperationResult LoraTransmit::advanceMessages() {
 }
 
 OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) {
-	if(getWaitingMessagesCount() <= 50) {
+	if(getWaitingMessagesCount() <= MAX_QUEUE) {
 		Logger::logf("SCHEDULE SEND %s\n", message->createPacketForSending().c_str());
 		messages.push_back(message);
 	}

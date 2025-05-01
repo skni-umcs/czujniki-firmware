@@ -4,6 +4,9 @@
 #include <utils/other_utils.h>
 #include "utils/address_handler.h"
 #include <utils/logger.h>
+#include <exchange/transmits/lora_transmit.h>
+
+#define MAX_LORA_QUEUE_PASSTHROUGH 5
 
 const double SNR_WAIT_MULTIPLIER = 5;
 const int MINIMAL_SNR = -80;
@@ -16,6 +19,30 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
     message->decrementHopLimit();
     transmit(message);
+    return OperationResult::SUCCESS;
+}
+
+OperationResult PassthroughCommunication::transmit(std::string message, moduleAddress destinationNode) {
+    for(auto const& destination : transmitTo) {
+        if(destination->type() == TransmitType::LoraTransmit) {
+            std::shared_ptr<LoraTransmit> loraTransmit = std::static_pointer_cast<LoraTransmit>(destination);
+            if(loraTransmit->getWaitingMessagesCount() <= MAX_LORA_QUEUE_PASSTHROUGH) {
+                destination->send(message, destinationNode);
+            }
+        }
+    }
+    return OperationResult::SUCCESS;
+}
+
+OperationResult PassthroughCommunication::transmit(std::shared_ptr<Message> message) {
+    for(auto const& destination : transmitTo) {
+        if(destination->type() == TransmitType::LoraTransmit) {
+            std::shared_ptr<LoraTransmit> loraTransmit = std::static_pointer_cast<LoraTransmit>(destination);
+            if(loraTransmit->getWaitingMessagesCount() <= MAX_LORA_QUEUE_PASSTHROUGH) {
+                destination->send(message);
+            }
+        }
+    }
     return OperationResult::SUCCESS;
 }
 
