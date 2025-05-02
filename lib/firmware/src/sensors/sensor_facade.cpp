@@ -54,7 +54,7 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     });
     facade->serviceTimer.get()->updateTime(DEFAULT_SERVICE_PERIOD_MS);
 
-    disableBME();
+    enableBME();
 
     return facade;
 }
@@ -64,7 +64,6 @@ std::string SensorFacade::getTelemetry() {
     JsonObject messages = doc.to<JsonObject>();
     std::string serializedJson;
 
-    enableBME();
     for(auto const& sensor : telemetrySensors) {
         try {
             std::map<std::string, std::string> map = sensor->getSensorData();
@@ -76,7 +75,6 @@ std::string SensorFacade::getTelemetry() {
             Logger::logf("EXCEPTION in telemetry sensor message with code: %d", error);
         }
     }
-    disableBME();
     
     serializeJson(doc, serializedJson);
     return serializedJson;
