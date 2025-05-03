@@ -111,7 +111,7 @@ OperationResult SensorFacade::sendService() {
     return telemetryCommunication->transmit(messageContent.getJson(), SERVER_ADDRESS);
 }
 
-OperationResult SensorFacade::setupTelemetry(std::shared_ptr<SmallTransmit> baseTransmit) {
+OperationResult SensorFacade::setupTelemetry() {
     std::vector<std::unique_ptr<Sensor>> sensorCandidates = {};
     #if defined(esp32firebeetle) || defined(mini_test)
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
