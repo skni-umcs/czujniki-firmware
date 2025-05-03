@@ -34,12 +34,14 @@
 
 const int POLL_TIMER_PRIORITY = 1;
 
+#define ERROR_NOISE 256*2
+
 class LoraTransmit : public SmallTransmit
 {
   LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
   std::shared_ptr<Timer> pollTimer = Timer::create(POLL_TIMER_PRIORITY);
   std::shared_ptr<Timer> noiseUpdateTimer = Timer::create();
-  int noiseRaw; //TODO: think about initial value of noise in case of error?
+  int noiseRaw = ERROR_NOISE;
   std::deque<std::shared_ptr<Message>> messages;
   bool canTransmit = true;
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
@@ -60,7 +62,6 @@ class LoraTransmit : public SmallTransmit
     int getNoise();
     bool getCanTransmit();
     int getWaitingMessagesCount();
-    OperationResult RENAMEadvanceMessages();
     TransmitType type() const override {
       return TransmitType::LoraTransmit;
     }

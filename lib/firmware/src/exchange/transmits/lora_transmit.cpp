@@ -163,11 +163,6 @@ int airTime(std::shared_ptr<Message> message) {
 	return waitTime;
 }
 
-OperationResult LoraTransmit::RENAMEadvanceMessages() {
-
-	return OperationResult::SUCCESS;
-}
-
 OperationResult LoraTransmit::advanceMessages() {
 	if(messages.size() > 0) {
 		std::shared_ptr<Message> message = messages.front();
