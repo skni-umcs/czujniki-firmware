@@ -18,16 +18,21 @@ void test_add_sensor() {
     std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
     std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor();
-    sensorFacade->addSensor(testSensor);
-    TEST_ASSERT_EQUAL(1, sensorFacade->sensorsCount());
+    sensorFacade->addService(testSensor);
+    TEST_ASSERT_EQUAL(1, sensorFacade->serviceCount());
+
+    std::unique_ptr<Sensor> testTelemetry = std::unique_ptr<TestSensor>(new TestSensor());
+    testTelemetry->setupSensor();
+    sensorFacade->addTelemetry(testTelemetry);
+    TEST_ASSERT_EQUAL(1, sensorFacade->temeletryCount());
 }
 
 void test_sensor_message() {
     std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
     std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor();
-    sensorFacade->addSensor(testSensor);
-    std::string result = sensorFacade->getAllSensorsMessage();
+    sensorFacade->addTelemetry(testSensor);
+    std::string result = sensorFacade->getTelemetry();
 
     std::string expected = "{\"random prime number\":\"2137\"}";
     TEST_ASSERT_EQUAL_STRING(expected.c_str(), result.c_str());
@@ -37,8 +42,8 @@ void test_sensor_facade() {
     std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
     std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor();
-    sensorFacade->addSensor(testSensor);
-    sensorFacade->sendAllSensors();
+    sensorFacade->addTelemetry(testSensor);
+    sensorFacade->sendTelemetry();
 }
 
 void setup() {

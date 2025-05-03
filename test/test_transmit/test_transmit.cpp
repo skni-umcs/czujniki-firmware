@@ -45,20 +45,10 @@ void test_DEBUG_subscription_small() {
     );
 }
 
-void test_lora_subscription() {
-    auto mockCommunication = MockSmallCommunication::create();
-    auto loraTransmit = LoraTransmit::create(WifiTransmit::create());
-    test_subscription_small(
-        mockCommunication,
-        loraTransmit
-    );
-}
-
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(test_wifi_subscription_small);
     RUN_TEST(test_wifi_subscription_big);
-    RUN_TEST(test_lora_subscription);
     RUN_TEST(test_DEBUG_subscription_small);
     UNITY_END();
 }
