@@ -14,7 +14,7 @@
 #include <sensors/subtypes/bmp_sensor.h>
 #include <sensors/subtypes/cpu_sensor.h>
 #include <sensors/subtypes/humidity_temperature_sensor.h>
-#include <sensors/subtypes/noise_sensor.h>
+#include <sensors/subtypes/lora_sensor.h>
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
 #include <sensors/subtypes/heap_sensor.h>
@@ -139,7 +139,7 @@ OperationResult SensorFacade::setupService(std::shared_ptr<SmallTransmit> baseTr
     #else
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
-        sensorCandidates.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
+        sensorCandidates.push_back(std::unique_ptr<LoraSensor>(new LoraSensor(transmit)));
     #endif
     sensorCandidates.push_back(std::unique_ptr<HeapSensor>(new HeapSensor()));
     for(std::unique_ptr<Sensor> & sensor : sensorCandidates) {

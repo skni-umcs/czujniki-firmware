@@ -8,25 +8,15 @@
 // - Adafruit Unified Sensor Lib: https://github.com/adafruit/Adafruit_Sensor
 
 #include <Adafruit_Sensor.h>
-#include <DHT.h>
-#include <DHT_U.h>
-#include "sensors/subtypes/humidity_temperature_sensor.h"
 #include "sensors/sensor_facade.h"
-#include <sensors/subtypes/test_sensor.h>
-#include <iostream>
 #include "time/timer.h"
 #include <exchange/transmits/lora_transmit.h>
 #include <exchange/communications/service_communication.h>
 #include <exchange/communications/passthrough_communication.h>
-#include <Preferences.h>
 #include "utils/address_handler.h"
-#include <Adafruit_I2CDevice.h>
-#include <SPI.h>
 #include <message/message_decode_utils.h>
 #include "exchange/transmits/DEBUG_time_transmit.h"
 #include "exchange/transmits/wifi_transmit.h"
-#include "sensors/subtypes/cpu_sensor.h"
-#include "sensors/subtypes/noise_sensor.h"
 #include <vector>
 #include "exchange/communications/update_communication.h"
 #include "utils/logger.h"
