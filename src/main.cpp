@@ -14,7 +14,6 @@
 #include "sensors/sensor_facade.h"
 #include <sensors/subtypes/test_sensor.h>
 #include <iostream>
-#include "time/timer_update.h"
 #include "time/timer.h"
 #include <exchange/transmits/lora_transmit.h>
 #include <exchange/communications/service_communication.h>

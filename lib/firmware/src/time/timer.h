@@ -13,7 +13,6 @@ typedef std::function<bool()> timerConditionType;
 class Timer : public std::enable_shared_from_this<Timer>
 {
     int periodMs = 60000;
-    bool recentlyUpdated = false;
     executeFunctionType executeFunction = nullptr;
     timerConditionType timerCondition = nullptr;
     TaskHandle_t currentTask = NULL;
@@ -30,8 +29,6 @@ class Timer : public std::enable_shared_from_this<Timer>
         void setExecuteFunction(executeFunctionType executeFunction);
         timerConditionType getTimerCondition();
         void setTimerCondition(timerConditionType timerCondition);
-        bool getRecentlyUpdated();
-        void setRecentlyUpdated(bool recentlyUpdated);
         int getPeriodMs();
 
 };
