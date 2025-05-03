@@ -8,6 +8,8 @@
 #include <sstream>
 #include <utility>
 #include <cstdio>
+#include "time/time_constants.h"
+#include <iomanip>
 
 class Logger {
     static std::shared_ptr<Logger> instance;
@@ -29,6 +31,23 @@ class Logger {
         static OperationResult log(Args ... args) {
             if(getWifi()) {
                 std::ostringstream oss;
+
+                int h   = rtc.getHour();
+                int m   = rtc.getMinute();
+                int s   = rtc.getSecond();
+                int D   = rtc.getDay();
+                int M   = rtc.getMonth();
+                int Y   = rtc.getYear();
+                
+                oss << '['
+                    << std::setfill('0') << std::setw(2) << h << ':'
+                    << std::setfill('0') << std::setw(2) << m << ':'
+                    << std::setfill('0') << std::setw(2) << s << ' '
+                    << std::setfill('0') << std::setw(2) << D << '.'
+                    << std::setfill('0') << std::setw(2) << M << '.'
+                    << Y
+                    << "] ";        
+
                 appendArguments(oss, args...);
                 std::string message = oss.str();
                 getWifi()->send(message, 0);
