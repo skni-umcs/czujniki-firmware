@@ -38,7 +38,7 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     facade->telemetryCommunication->subscribe(transmit);
 
     if(shouldSetupSensors) {
-        facade->setupTelemetry(transmit);
+        facade->setupTelemetry();
         facade->setupService(transmit);
     }
 
