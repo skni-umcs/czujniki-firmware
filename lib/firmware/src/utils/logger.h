@@ -36,7 +36,7 @@ class Logger {
                 int m   = rtc.getMinute();
                 int s   = rtc.getSecond();
                 int D   = rtc.getDay();
-                int M   = rtc.getMonth();
+                int M   = rtc.getMonth()+1;
                 int Y   = rtc.getYear();
                 
                 oss << '['
@@ -72,7 +72,7 @@ class Logger {
                 int m   = rtc.getMinute();
                 int s   = rtc.getSecond();
                 int D   = rtc.getDay();
-                int M   = rtc.getMonth();
+                int M   = rtc.getMonth()+1;
                 int Y   = rtc.getYear();
                 
                 oss << '['
