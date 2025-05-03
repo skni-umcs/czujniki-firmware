@@ -35,17 +35,27 @@ OperationResult BME280Sensor::setupSensor() {
 }
 
 std::map<std::string, std::string> BME280Sensor::getSensorData() {
+  Logger::log("Start BME280 reading");
   sensors_event_t event;
   std::stringstream result;
 
+  Logger::log("BME HUMIDITY READ");
   int humidity = bme.readHumidity()*HUMIDITY_PRECISION;
+  Logger::log("BME TEMPERATURE READ");
   int temperature = bme.readTemperature()*TEMPERATURE_PRECISION;
+  Logger::log("BME PRESSURE READ");
   int pressure = bme.readPressure()/PRESSURE_CUT;
+  Logger::log("BME FINISH READS");
 
   std::map<std::string, std::string> resultMap;
+  Logger::log("BME INSERT HUMIDITY");
   resultMap.insert(std::make_pair(HUMIDITY_CODE, std::to_string(humidity)));
-  resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(temperature)));
+  Logger::log("BME INSERT TEMPERATURE");
+  resultMap.insert(std::make_pair(TEMPERATURE_CODE, std::to_string(temperature)));\
+  Logger::log("BME INSERT PRESSURE");
   resultMap.insert(std::make_pair(PRESSURE_CODE, std::to_string(pressure)));
+  Logger::log("BME INSERT FINISHED");
 
+  Logger::log("Finish BME280 reading");
   return resultMap;
 }
