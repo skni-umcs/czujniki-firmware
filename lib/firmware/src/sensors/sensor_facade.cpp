@@ -153,7 +153,7 @@ OperationResult SensorFacade::setupService(std::shared_ptr<SmallTransmit> baseTr
     return OperationResult::SUCCESS;
 }
 
-int SensorFacade::temeletryCount() {
+int SensorFacade::telemetryCount() {
     return this->telemetrySensors.size();
 }
 
