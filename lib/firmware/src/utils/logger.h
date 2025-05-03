@@ -65,7 +65,26 @@ class Logger {
                 std::string message;
                 message.resize(size);
                 std::snprintf(&message[0], size+1, str, args...);
-                getWifi()->send(message, 0);
+
+                std::ostringstream oss;
+
+                int h   = rtc.getHour();
+                int m   = rtc.getMinute();
+                int s   = rtc.getSecond();
+                int D   = rtc.getDay();
+                int M   = rtc.getMonth();
+                int Y   = rtc.getYear();
+                
+                oss << '['
+                    << std::setfill('0') << std::setw(2) << h << ':'
+                    << std::setfill('0') << std::setw(2) << m << ':'
+                    << std::setfill('0') << std::setw(2) << s << ' '
+                    << std::setfill('0') << std::setw(2) << D << '.'
+                    << std::setfill('0') << std::setw(2) << M << '.'
+                    << Y
+                    << "] ";
+
+                getWifi()->send(oss.str()+message, 0);
             }
             return OperationResult::SUCCESS;
         }
