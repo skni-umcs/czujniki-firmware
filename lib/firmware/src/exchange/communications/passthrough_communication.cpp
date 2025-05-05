@@ -18,6 +18,7 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 
 OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
     message->decrementHopLimit();
+    //TODO: scheduling transmit is not enough because you should wait as long as possible to make sure the message wasnt received from another node
     transmit(message);
     return OperationResult::SUCCESS;
 }
