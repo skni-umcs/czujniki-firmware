@@ -174,8 +174,7 @@ OperationResult LoraTransmit::advanceMessages() {
 		messages.pop_front();
 		physicalSend(message);
 		canTransmit = false;
-		//TODO: wait full air time
-		sendWaiter.get()->updateTime(airTime(message)/4);
+		sendWaiter.get()->updateTime(airTime(message));
 	}
 	else {
 		canTransmit = true;
