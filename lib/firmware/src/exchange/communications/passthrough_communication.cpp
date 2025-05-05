@@ -8,7 +8,7 @@
 
 #define MAX_LORA_QUEUE_PASSTHROUGH 5
 
-const double SNR_WAIT_MULTIPLIER = 5;
+const double SNR_WAIT_MULTIPLIER = 500;
 const int MINIMAL_SNR = -80;
 
 std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
