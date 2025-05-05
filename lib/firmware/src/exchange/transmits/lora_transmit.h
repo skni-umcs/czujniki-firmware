@@ -44,6 +44,7 @@ class LoraTransmit : public SmallTransmit
   bool canTransmit = true;
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
   std::shared_ptr<WifiTransmit> DEBUG_wifi;
+  int transmitCount = 0;
 
   public:
     static std::shared_ptr<LoraTransmit> create(std::shared_ptr<WifiTransmit> DEBUG_wifi);
@@ -60,6 +61,7 @@ class LoraTransmit : public SmallTransmit
     int getNoise();
     bool getCanTransmit();
     int getWaitingMessagesCount();
+    int getTransmitCount();
     OperationResult RENAMEadvanceMessages();
     TransmitType type() const override {
       return TransmitType::LoraTransmit;

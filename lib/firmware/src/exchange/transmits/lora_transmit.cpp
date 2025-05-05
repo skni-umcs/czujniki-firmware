@@ -114,6 +114,7 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
 	DEBUG_wifi->send(message);
 	std::string packet = message.get()->createPacketForSending();
 	Logger::logf("SEND %s\n", packet.c_str());
+	transmitCount++;
 	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
 	return OperationResult::SUCCESS;
 }
@@ -277,4 +278,8 @@ void printParameters(struct Configuration configuration) {
 	Logger::log(F("TransModeFixedTrans: "));  Logger::log(configuration.TRANSMISSION_MODE.fixedTransmission, BIN);Logger::log(" -> "); Logger::log(configuration.TRANSMISSION_MODE.getFixedTransmissionDescription());
 
 	Logger::log("----------------------------------------");
+}
+
+int LoraTransmit::getTransmitCount() {
+	return transmitCount;
 }
