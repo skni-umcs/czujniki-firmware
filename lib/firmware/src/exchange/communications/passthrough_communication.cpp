@@ -108,6 +108,7 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
     }
     std::shared_ptr<LoraMessage> loraMessage = std::static_pointer_cast<LoraMessage>(message);
 
+    Logger::logf("REBROADCAST CONDITION: %d", shouldRebroadcast(loraMessage));
     if (shouldRebroadcast(loraMessage)) {
         messageSet.emplace(loraMessage);
         int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
