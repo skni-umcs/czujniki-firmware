@@ -1,6 +1,5 @@
 #include "waiter.h"
 #include <iostream>
-#include "timer_update.h"
 #include <HardwareSerial.h>
 #include <utils/logger.h>
 
@@ -9,7 +8,6 @@ Waiter::Waiter() {}
 std::shared_ptr<Waiter> Waiter::create(int taskPriority) {
     auto timerPtr = std::shared_ptr<Waiter>(new Waiter());
     timerPtr->taskPriority = taskPriority;
-    //TimerUpdate::addSubscriber(timerPtr);
     return timerPtr;
 }
 

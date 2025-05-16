@@ -31,7 +31,8 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
             serviceSensors.push_back(std::move(sensor));
             return OperationResult::SUCCESS;
         }
-        int sensorsCount();
-        OperationResult setupTelemetry(std::shared_ptr<SmallTransmit> baseTransmit);
+        int telemetryCount();
+        int serviceCount();
+        OperationResult setupTelemetry();
         OperationResult setupService(std::shared_ptr<SmallTransmit> baseTransmit);
 };

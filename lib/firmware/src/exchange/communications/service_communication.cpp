@@ -6,7 +6,6 @@
 #include <ArduinoJson.h>
 #include "message/message_decode_utils.h"
 #include "time/time_constants.h"
-#include <time/timer_update.h>
 #include <message/message_content.h>
 #include <utils/logger.h>
 
@@ -98,7 +97,7 @@ OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     unsigned long currentTime = rtc.getEpoch();
     unsigned long RTT = currentTime-lastAskTime;
     Logger::logf("I waited from %i to %i with RTT of %i, new time will be %i\n", lastAskTime, currentTime, RTT, serverTime+RTT/2);
-    TimerUpdate::setTime(serverTime+RTT/2);
+    rtc.setTime(serverTime+RTT/2);
     lastAskTime = DIDNT_ASK;
     Logger::logf("Current time after update: %lu\n", rtc.getEpoch());
 

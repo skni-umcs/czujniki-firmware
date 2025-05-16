@@ -9,7 +9,6 @@
 #include <Adafruit_I2CDevice.h>
 #include <SPI.h>
 #include <time/timer.h>
-#include <time/timer_update.h>
 
 void testDeleteTaskAfterTimeUpdate() {
     std::shared_ptr<Timer> timer = Timer::create();

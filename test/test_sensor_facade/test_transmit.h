@@ -12,6 +12,9 @@ class TestTransmit : public SmallTransmit
         OperationResult send(std::string message, moduleAddress moduleAddress) override;
         OperationResult send(std::shared_ptr<Message> message) override;
         OperationResult receive(std::shared_ptr<Message> message) override;
+        TransmitType type() const override {
+            return TransmitType::OtherTransmit;
+        }
 };
 
 #endif

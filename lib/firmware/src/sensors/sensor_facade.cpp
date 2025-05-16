@@ -14,7 +14,7 @@
 #include <sensors/subtypes/bmp_sensor.h>
 #include <sensors/subtypes/cpu_sensor.h>
 #include <sensors/subtypes/humidity_temperature_sensor.h>
-#include <sensors/subtypes/noise_sensor.h>
+#include <sensors/subtypes/lora_sensor.h>
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
 #include <sensors/subtypes/heap_sensor.h>
@@ -38,7 +38,7 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     facade->telemetryCommunication->subscribe(transmit);
 
     if(shouldSetupSensors) {
-        facade->setupTelemetry(transmit);
+        facade->setupTelemetry();
         facade->setupService(transmit);
     }
 
@@ -111,7 +111,7 @@ OperationResult SensorFacade::sendService() {
     return telemetryCommunication->transmit(messageContent.getJson(), SERVER_ADDRESS);
 }
 
-OperationResult SensorFacade::setupTelemetry(std::shared_ptr<SmallTransmit> baseTransmit) {
+OperationResult SensorFacade::setupTelemetry() {
     std::vector<std::unique_ptr<Sensor>> sensorCandidates = {};
     #if defined(esp32firebeetle) || defined(mini_test)
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
@@ -139,7 +139,7 @@ OperationResult SensorFacade::setupService(std::shared_ptr<SmallTransmit> baseTr
     #else
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
-        sensorCandidates.push_back(std::unique_ptr<NoiseSensor>(new NoiseSensor(transmit)));
+        sensorCandidates.push_back(std::unique_ptr<LoraSensor>(new LoraSensor(transmit)));
     #endif
     sensorCandidates.push_back(std::unique_ptr<HeapSensor>(new HeapSensor()));
     for(std::unique_ptr<Sensor> & sensor : sensorCandidates) {
@@ -153,7 +153,10 @@ OperationResult SensorFacade::setupService(std::shared_ptr<SmallTransmit> baseTr
     return OperationResult::SUCCESS;
 }
 
-int SensorFacade::sensorsCount() {
+int SensorFacade::telemetryCount() {
     return this->telemetrySensors.size();
 }
 
+int SensorFacade::serviceCount() {
+    return this->serviceSensors.size();
+}

@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <Adafruit_BMP085.h>
-#include "noise_sensor.h"
+#include "lora_sensor.h"
 #include <sstream>
 #include <utils/logger.h>
 
@@ -8,11 +8,11 @@ const std::string NOISE_CODE = "n";
 const std::string QUEUE_CODE = "q";
 const std::string TRANSMITS_CODE = "r";
 
-NoiseSensor::NoiseSensor(std::shared_ptr<LoraTransmit> transmit) {
+LoraSensor::LoraSensor(std::shared_ptr<LoraTransmit> transmit) {
   this->transmit = transmit;
 }
 
-OperationResult NoiseSensor::setupSensor() {
+OperationResult LoraSensor::setupSensor() {
   if(transmit == nullptr) {
     Logger::log("Can't read lora data, no lora transmit");
     return OperationResult::NOT_FOUND;
@@ -21,7 +21,7 @@ OperationResult NoiseSensor::setupSensor() {
   return OperationResult::SUCCESS;
 }
 
-std::map<std::string, std::string> NoiseSensor::getSensorData() {
+std::map<std::string, std::string> LoraSensor::getSensorData() {
   std::map<std::string, std::string> resultMap;
   if(transmit == nullptr) {
     Logger::log("Can't read lora data, no lora transmit");
