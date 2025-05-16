@@ -24,7 +24,7 @@ void test_add_sensor() {
     std::unique_ptr<Sensor> testTelemetry = std::unique_ptr<TestSensor>(new TestSensor());
     testTelemetry->setupSensor();
     sensorFacade->addTelemetry(testTelemetry);
-    TEST_ASSERT_EQUAL(1, sensorFacade->temeletryCount());
+    TEST_ASSERT_EQUAL(1, sensorFacade->telemetryCount());
 }
 
 void test_sensor_message() {
