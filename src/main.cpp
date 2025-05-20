@@ -21,10 +21,10 @@
 #include "exchange/communications/update_communication.h"
 #include "utils/logger.h"
 
-#if defined(esp32firebeetle)
+#if defined(production)
 using TRANSMIT_TYPE = DEBUG_timeTransmit;
 #else
-using TRANSMIT_TYPE = LoraTransmit;
+using TRANSMIT_TYPE = DEBUG_timeTransmit;
 #endif
 
 
