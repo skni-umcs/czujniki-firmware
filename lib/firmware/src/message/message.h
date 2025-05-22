@@ -74,6 +74,7 @@ class GeneratedMessage : public Message {
 class TextMessage : public Message {
     public:
     TextMessage(std::string content);
+    virtual std::string createPacket(bool addSelf = false) override;
     MessageType type() const override {
         return MessageType::TextMessage;
     }

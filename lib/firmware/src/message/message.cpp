@@ -212,3 +212,7 @@ TextMessage::TextMessage(
 ) : Message({}, 0, content, {}, 0) {
 
 }
+
+std::string TextMessage::createPacket(bool addSelf = false) {
+    return content;
+}
