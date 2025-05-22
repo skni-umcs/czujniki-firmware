@@ -65,6 +65,7 @@ class LoraMessage : public Message {
 class GeneratedMessage : public Message {
     public:
     GeneratedMessage(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
+    static std::shared_ptr<GeneratedMessage> fromText(std::string text, moduleAddress destination);
     MessageType type() const override {
         return MessageType::GeneratedMessage;
     }

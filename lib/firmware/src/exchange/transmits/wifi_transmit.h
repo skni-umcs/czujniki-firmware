@@ -15,7 +15,6 @@ class WifiTransmit : public BigTransmit, public SmallTransmit, public std::enabl
     public:
         static std::shared_ptr<WifiTransmit> create();
         bool isKnownNetwork(String ssid);
-        OperationResult send(std::string message, moduleAddress destinationNode) override;
         OperationResult send(std::shared_ptr<Message> message) override;
         OperationResult receive(std::shared_ptr<Message> message) override;
         String getBestNetworkSsid();

@@ -21,7 +21,6 @@ const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5*60000;
 const int MAX_MESSAGE_ADVANCE_MS = 60*60000;
 const int CHANNEL = 39;
-const unsigned char HOP_START_LIMIT = 100;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
@@ -192,20 +191,6 @@ OperationResult LoraTransmit::scheduleMessage(std::shared_ptr<Message> message) 
 
 OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
 	scheduleMessage(message);
-    return OperationResult::SUCCESS;
-}
-
-OperationResult LoraTransmit::send(std::string content, moduleAddress destinationNode) {
-	auto senders = std::vector<moduleAddress>();
-	auto rssi = std::vector<std::string>();
-	std::shared_ptr<GeneratedMessage> message = std::shared_ptr<GeneratedMessage>(new GeneratedMessage(
-		senders,
-		destinationNode,
-		content,
-		rssi,
-		HOP_START_LIMIT
-	));
-	send(message);
     return OperationResult::SUCCESS;
 }
 

@@ -7,6 +7,8 @@
 #include <utils/address_handler.h>
 #include <utils/logger.h>
 
+const unsigned char HOP_START_LIMIT = 100;
+
 Message::Message() {}
 
 Message::Message(
@@ -59,6 +61,19 @@ GeneratedMessage::GeneratedMessage(
     unsigned char hopLimit
 ) : Message(senders, destination, content, rssi, hopLimit) {
 
+}
+
+std::shared_ptr<GeneratedMessage> GeneratedMessage::fromText(std::string text, moduleAddress destination) {
+	auto senders = std::vector<moduleAddress>();
+	auto rssi = std::vector<std::string>();
+	auto message = std::shared_ptr<GeneratedMessage>(new GeneratedMessage(
+		senders,
+		destination,
+		text,
+		rssi,
+		HOP_START_LIMIT
+	));
+    return message;
 }
 
 std::vector<moduleAddress> Message::getSenders() {

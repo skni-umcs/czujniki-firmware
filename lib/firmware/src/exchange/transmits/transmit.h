@@ -14,7 +14,6 @@ class Transmit
     std::vector<std::shared_ptr<TCommunication>> subscribers;
 
     public:
-        virtual OperationResult send(std::string message, moduleAddress destinationNode) = 0;
         virtual OperationResult send(std::shared_ptr<Message> message) = 0;
         virtual OperationResult receive(std::shared_ptr<Message> message) = 0;
         OperationResult notifySubscribers(std::shared_ptr<Message> message) {

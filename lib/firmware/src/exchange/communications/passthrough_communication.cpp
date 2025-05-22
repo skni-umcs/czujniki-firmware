@@ -28,7 +28,7 @@ OperationResult PassthroughCommunication::transmit(std::string message, moduleAd
         if(destination->type() == TransmitType::LoraTransmit) {
             std::shared_ptr<LoraTransmit> loraTransmit = std::static_pointer_cast<LoraTransmit>(destination);
             if(loraTransmit->getWaitingMessagesCount() <= MAX_LORA_QUEUE_PASSTHROUGH) {
-                destination->send(message, destinationNode);
+                destination->send(GeneratedMessage::fromText(message, destinationNode));
             }
         }
         else {

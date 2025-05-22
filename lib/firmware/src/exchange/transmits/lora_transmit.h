@@ -54,7 +54,6 @@ class LoraTransmit : public SmallTransmit
     OperationResult poll();
     OperationResult physicalSend(std::shared_ptr<Message> message);
     OperationResult advanceMessages();
-    OperationResult send(std::string message, moduleAddress destinationNode) override;
     OperationResult send(std::shared_ptr<Message> message) override;
     OperationResult scheduleMessage(std::shared_ptr<Message> message);
     OperationResult receive(std::shared_ptr<Message> message) override;

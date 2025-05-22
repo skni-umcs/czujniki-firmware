@@ -18,7 +18,6 @@ class DEBUG_timeTransmit : public SmallTransmit
     static std::shared_ptr<DEBUG_timeTransmit> create(std::shared_ptr<WifiTransmit> DEBUG_wifi);
     void setup();
     OperationResult poll();
-    OperationResult send(std::string message, moduleAddress destinationNode) override;
     OperationResult send(std::shared_ptr<Message> message) override;
     OperationResult receive(std::shared_ptr<Message> message) override;
     OperationResult updateNoise();

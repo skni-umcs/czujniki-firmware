@@ -77,7 +77,8 @@ void ServiceCommunication::sendResetReason() {
     serializeJson(doc, serializedJson);
     MessageContent packetMessage = MessageContent(TransmissionCode::RESET, serializedJson);
 
-    this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
+    auto message = GeneratedMessage::fromText(packetMessage.getJson(), SERVER_ADDRESS);
+    this->transmit(message);
 }
 
 OperationResult ServiceCommunication::askForTime() {

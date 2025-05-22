@@ -31,7 +31,7 @@ class Communication : public std::enable_shared_from_this<Derived>
         virtual OperationResult getNotified(std::shared_ptr<Message> message) = 0;
         virtual OperationResult transmit(std::string message, moduleAddress destinationNode) {
             for(auto const& destination : transmitTo) {
-                destination->send(message, destinationNode);
+                destination->send(GeneratedMessage::fromText(message, destinationNode));
             }
             return OperationResult::SUCCESS;
         }
