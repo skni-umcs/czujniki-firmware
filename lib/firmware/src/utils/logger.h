@@ -50,7 +50,7 @@ class Logger {
 
                 appendArguments(oss, args...);
                 std::string message = oss.str();
-                getWifi()->send(GeneratedMessage::fromText(message, 0));
+                getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(message)));
             }
             return OperationResult::SUCCESS;
         }
@@ -84,7 +84,7 @@ class Logger {
                     << Y
                     << "] ";
 
-                getWifi()->send(GeneratedMessage::fromText(oss.str()+message, 0));
+                getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(oss.str()+message)));
             }
             return OperationResult::SUCCESS;
         }
