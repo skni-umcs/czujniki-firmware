@@ -12,8 +12,6 @@ class SensorCommunication : public SmallCommunication {
 
     public:
         static std::shared_ptr<SensorCommunication> create();
-        OperationResult transmit(std::string message, moduleAddress destinationNode) override;
-        OperationResult transmit(std::shared_ptr<Message> message) override;
         OperationResult getNotified(std::shared_ptr<Message> message) override;
 };
 
