@@ -11,9 +11,7 @@
 #include <vector>
 #include <sensors/subtypes/bme_280_sensor.h>
 #include <sensors/subtypes/bme_680_sensor.h>
-#include <sensors/subtypes/bmp_sensor.h>
 #include <sensors/subtypes/cpu_sensor.h>
-#include <sensors/subtypes/humidity_temperature_sensor.h>
 #include <sensors/subtypes/lora_sensor.h>
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
@@ -116,8 +114,6 @@ OperationResult SensorFacade::setupTelemetry() {
     #if defined(esp32firebeetle) || defined(mini_test)
         sensorCandidates.push_back(std::unique_ptr<TestSensor>(new TestSensor()));
     #else
-        sensorCandidates.push_back(std::unique_ptr<BMPSensor>(new BMPSensor()));
-        sensorCandidates.push_back(std::unique_ptr<HumidityTemperatureSensor>(new HumidityTemperatureSensor()));
         sensorCandidates.push_back(std::unique_ptr<BME280Sensor>(new BME280Sensor()));
         sensorCandidates.push_back(std::unique_ptr<BME680Sensor>(new BME680Sensor()));
     #endif

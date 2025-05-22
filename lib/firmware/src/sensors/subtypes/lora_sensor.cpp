@@ -1,5 +1,4 @@
 #include <Wire.h>
-#include <Adafruit_BMP085.h>
 #include "lora_sensor.h"
 #include <sstream>
 #include <utils/logger.h>

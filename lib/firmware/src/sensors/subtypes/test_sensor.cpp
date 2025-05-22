@@ -1,8 +1,6 @@
 #include "test_sensor.h"
 #include <string>
 #include <Adafruit_Sensor.h>
-#include <DHT.h>
-#include <DHT_U.h>
 #include <string>
 #include <sstream>
 
