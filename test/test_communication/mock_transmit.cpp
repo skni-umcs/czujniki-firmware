@@ -19,10 +19,6 @@ OperationResult MockTransmit::send(std::shared_ptr<Message> message) {
     return OperationResult::SUCCESS;
 }
 
-OperationResult MockTransmit::send(std::string content, moduleAddress destinationNode) {
-    return OperationResult::SUCCESS;
-}
-
 OperationResult MockTransmit::receive(std::shared_ptr<Message> message) {
     return OperationResult::SUCCESS;
 }

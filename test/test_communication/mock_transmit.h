@@ -12,7 +12,6 @@ class MockTransmit : public SmallTransmit, public BigTransmit
 {
   public:
     static std::shared_ptr<MockTransmit> create();
-    virtual OperationResult send(std::string message, moduleAddress destinationNode) override;
     virtual OperationResult send(std::shared_ptr<Message> message) override;
     virtual OperationResult receive(std::shared_ptr<Message> message) override;
     TransmitType type() const override {
