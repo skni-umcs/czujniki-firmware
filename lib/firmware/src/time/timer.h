@@ -13,6 +13,7 @@ typedef std::function<bool()> timerConditionType;
 class Timer : public std::enable_shared_from_this<Timer>
 {
     int periodMs = 60000;
+    //TODO: remove update skips
     bool recentlyUpdated = false;
     executeFunctionType executeFunction = nullptr;
     timerConditionType timerCondition = nullptr;
