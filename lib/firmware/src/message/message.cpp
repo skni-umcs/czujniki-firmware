@@ -213,6 +213,6 @@ TextMessage::TextMessage(
 
 }
 
-std::string TextMessage::createPacket(bool addSelf = false) {
+std::string TextMessage::createPacket(bool addSelf) {
     return content;
 }
