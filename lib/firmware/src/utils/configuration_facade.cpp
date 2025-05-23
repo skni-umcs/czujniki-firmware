@@ -1,23 +1,25 @@
 #include "configuration_facade.h"
-#include "Preferences.h"
 #include "logger.h"
-
-Preferences preferences;
+#include "preferences_constant.h"
 
 OperationResult ConfigurationFacade::setLoraTransmit(std::shared_ptr<LoraTransmit> loraTransmit) {
     this->loraTransmit = loraTransmit;
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ConfigurationFacade::setPassthroughCommunication(std::shared_ptr<PassthroughCommunication> passthroughCommunication) {
     this->passthroughCommunication = passthroughCommunication;
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ConfigurationFacade::setSensorFacade(std::shared_ptr<SensorFacade> sensorFacade) {
     this->sensorFacade = sensorFacade;
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ConfigurationFacade::setServiceCommunication(std::shared_ptr<ServiceCommunication> serviceCommunication) {
     this->serviceCommunication = serviceCommunication;
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ConfigurationFacade::saveOption(const char* optionKey, int value) {

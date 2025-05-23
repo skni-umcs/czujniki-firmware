@@ -6,7 +6,6 @@
 #include "exchange/transmits/lora_transmit.h"
 #include <exchange/communications/passthrough_communication.h>
 #include <sensors/sensor_facade.h>
-#include "Preferences.h"
 
 #define CONFIGURATION_ERROR_INT -1
 

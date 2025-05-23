@@ -4,10 +4,9 @@
 #include <HardwareSerial.h>
 #include <string>
 #include "string_utils.h"
-#include <Preferences.h>
 #include "logger.h"
+#include "preferences_constant.h"
 
-Preferences preferences;
 std::shared_ptr<AddressHandler> AddressHandler::instance;
 
 std::shared_ptr<AddressHandler> AddressHandler::getInstance() {
