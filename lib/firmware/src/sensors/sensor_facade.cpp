@@ -23,8 +23,6 @@
 #define enableBME() pinMode(BME_POWER_PIN, OUTPUT); digitalWrite(BME_POWER_PIN, HIGH); delay(1000);
 #define disableBME() digitalWrite(BME_POWER_PIN, LOW); pinMode(BME_POWER_PIN, INPUT);
 
-const int DEFAULT_SERVICE_PERIOD_MS = 31000;
-const int DEFAULT_TELEMETRY_PERIOD_MS = DEFAULT_SERVICE_PERIOD_MS*2;
 uint32_t delayMS = 1000;
 
 SensorFacade::SensorFacade() {
@@ -43,14 +41,14 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     facade->telemetryTimer.get()->setExecuteFunction([facade]() {
        facade->sendTelemetry();
     });
-    facade->telemetryTimer.get()->updateTime(DEFAULT_TELEMETRY_PERIOD_MS);
+    facade->telemetryTimer.get()->updateTime(facade->getTelemetryPeriodMs());
 
     facade->serviceCommunication = ServiceCommunication::create();
     facade->serviceCommunication->subscribe(transmit);
     facade->serviceTimer.get()->setExecuteFunction([facade]() {
        facade->sendService();
     });
-    facade->serviceTimer.get()->updateTime(DEFAULT_SERVICE_PERIOD_MS);
+    facade->serviceTimer.get()->updateTime(facade->getServicePeriodMs());
 
     enableBME();
 
@@ -155,4 +153,20 @@ int SensorFacade::telemetryCount() {
 
 int SensorFacade::serviceCount() {
     return this->serviceSensors.size();
+}
+
+OperationResult SensorFacade::setServicePeriodMs(int servicePeriodMs) {
+    this->servicePeriodMs = servicePeriodMs;
+}
+
+OperationResult SensorFacade::setTelemetryPeriodMs(int telemetryPeriodMs) {
+    this->telemetryPeriodMs = telemetryPeriodMs;
+}
+
+int SensorFacade::getServicePeriodMs() {
+    return servicePeriodMs;
+}
+
+int SensorFacade::getTelemetryPeriodMs() {
+    return telemetryPeriodMs;
 }

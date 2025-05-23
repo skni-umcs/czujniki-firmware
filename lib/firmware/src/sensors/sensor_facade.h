@@ -5,6 +5,9 @@
 #include "time/timer.h"
 #include <exchange/communications/service_communication.h>
 
+const int DEFAULT_SERVICE_PERIOD_MS = 31000;
+const int DEFAULT_TELEMETRY_PERIOD_MS = DEFAULT_SERVICE_PERIOD_MS*2;
+
 class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
 
     std::vector<std::unique_ptr<Sensor>> telemetrySensors;
@@ -13,6 +16,8 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
     std::shared_ptr<ServiceCommunication> serviceCommunication;
     std::shared_ptr<Timer> telemetryTimer = Timer::create();
     std::shared_ptr<Timer> serviceTimer  = Timer::create();
+    int servicePeriodMs = DEFAULT_SERVICE_PERIOD_MS;
+    int telemetryPeriodMs = DEFAULT_TELEMETRY_PERIOD_MS;
     
     SensorFacade();
     public:
@@ -35,4 +40,8 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
         int serviceCount();
         OperationResult setupTelemetry();
         OperationResult setupService(std::shared_ptr<SmallTransmit> baseTransmit);
+        OperationResult setServicePeriodMs(int servicePeriodMs);
+        OperationResult setTelemetryPeriodMs(int telemetryPeriodMs);
+        int getServicePeriodMs();
+        int getTelemetryPeriodMs();
 };

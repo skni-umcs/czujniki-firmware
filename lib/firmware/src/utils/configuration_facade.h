@@ -6,6 +6,9 @@
 #include "exchange/transmits/lora_transmit.h"
 #include <exchange/communications/passthrough_communication.h>
 #include <sensors/sensor_facade.h>
+#include "Preferences.h"
+
+#define CONFIGURATION_ERROR_INT -1
 
 class ConfigurationFacade {
     std::shared_ptr<LoraTransmit> loraTransmit = nullptr;
@@ -18,6 +21,14 @@ class ConfigurationFacade {
         OperationResult setPassthroughCommunication(std::shared_ptr<PassthroughCommunication> passthroughCommunication);
         OperationResult setSensorFacade(std::shared_ptr<SensorFacade> sensorFacade);
         OperationResult setServiceCommunication(std::shared_ptr<ServiceCommunication> serviceCommunication);
+        OperationResult saveOption(const char* optionKey, int value);
+        int readOption(const char* optionKey);
+
+        //sensor facade
+        OperationResult setServicePeriodMs(int servicePeriodMs, bool shouldSave = true);
+        OperationResult setTelemetryPeriodMs(int telemetryPeriodMs, bool shouldSave = true);
+        int getServicePeriodMs();
+        int getTelemetryPeriodMs();
 };
 
 #endif
