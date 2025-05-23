@@ -157,10 +157,12 @@ int SensorFacade::serviceCount() {
 
 OperationResult SensorFacade::setServicePeriodMs(int servicePeriodMs) {
     this->servicePeriodMs = servicePeriodMs;
+    return OperationResult::SUCCESS;
 }
 
 OperationResult SensorFacade::setTelemetryPeriodMs(int telemetryPeriodMs) {
     this->telemetryPeriodMs = telemetryPeriodMs;
+    return OperationResult::SUCCESS;
 }
 
 int SensorFacade::getServicePeriodMs() {

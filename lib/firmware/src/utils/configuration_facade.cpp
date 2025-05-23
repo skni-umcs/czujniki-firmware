@@ -34,14 +34,16 @@ int ConfigurationFacade::readOption(const char* optionKey) {
 OperationResult ConfigurationFacade::setServicePeriodMs(int servicePeriodMs, bool shouldSave) {
     const char* optionName = "service_period_ms";
 
+    std::cout << this->sensorFacade << std::endl;
     if(this->sensorFacade == nullptr) {
         Logger::log("Configuration facade doesn't have a sensor facade pointer");
         return OperationResult::ERROR;
     }
-    this->sensorFacade->setServicePeriodMs(servicePeriodMs);
+    this->sensorFacade->setServicePeriodMs(servicePeriodMs);\
     if(shouldSave) {
         saveOption(optionName, servicePeriodMs);
     }
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ConfigurationFacade::setTelemetryPeriodMs(int servicePeriodMs, bool shouldSave) {
@@ -55,6 +57,7 @@ OperationResult ConfigurationFacade::setTelemetryPeriodMs(int servicePeriodMs, b
     if(shouldSave) {
         saveOption(optionName, servicePeriodMs);
     }
+    return OperationResult::SUCCESS;
 }
 
 int ConfigurationFacade::getServicePeriodMs() {

@@ -9,6 +9,7 @@
 
 #define CONFIGURATION_ERROR_INT -1
 
+//TODO: implement save and read from preferences
 class ConfigurationFacade {
     std::shared_ptr<LoraTransmit> loraTransmit = nullptr;
     std::shared_ptr<PassthroughCommunication> passthroughCommunication = nullptr;
