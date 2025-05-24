@@ -102,11 +102,15 @@ OperationResult ServiceCommunication::setLastAskTime(unsigned long lastAskTime) 
 }
 
 OperationResult ServiceCommunication::setAskTimeoutMs(int askTimeoutMs) {
+    askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
     this->askTimeoutMs = askTimeoutMs;
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ServiceCommunication::setTimeSyncPeriodMs(int timeSyncPeriodMs) {
     this->timeSyncPeriodMs = timeSyncPeriodMs;
+    timeSyncTimer.get()->updateTime(timeSyncPeriodMs);
+    return OperationResult::SUCCESS;
 }
 
 int ServiceCommunication::getAskTimeoutMs() {

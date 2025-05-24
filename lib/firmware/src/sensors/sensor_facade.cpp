@@ -159,11 +159,13 @@ int SensorFacade::serviceCount() {
 
 OperationResult SensorFacade::setServicePeriodMs(int servicePeriodMs) {
     this->servicePeriodMs = servicePeriodMs;
+    serviceTimer.get()->updateTime(servicePeriodMs);
     return OperationResult::SUCCESS;
 }
 
 OperationResult SensorFacade::setTelemetryPeriodMs(int telemetryPeriodMs) {
     this->telemetryPeriodMs = telemetryPeriodMs;
+    telemetryTimer.get()->updateTime(telemetryPeriodMs);
     return OperationResult::SUCCESS;
 }
 
