@@ -50,12 +50,9 @@ class Logger {
             appendArguments(oss, args...);
             std::string message = oss.str();
             if(getWifi()) {
-                Serial.println(message.c_str());
-                //getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(message)));
+                getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(message)));
             }
-            else {
-                Serial.println(message.c_str());
-            }
+            Serial.println(message.c_str());
             return OperationResult::SUCCESS;
         }
 
@@ -87,14 +84,10 @@ class Logger {
                 << Y
                 << "] ";
             if(getWifi()) {
-                oss << message.c_str();
-                Serial.println(oss.str().c_str());
-                //getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(oss.str()+message)));
+                getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(oss.str()+message)));
             }
-            else {
-                oss << message.c_str();
-                Serial.println(oss.str().c_str());
-            }
+            oss << message.c_str();
+            Serial.println(oss.str().c_str());
             return OperationResult::SUCCESS;
         }
         static std::shared_ptr<WifiTransmit> getWifi();
