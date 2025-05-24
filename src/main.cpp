@@ -22,7 +22,7 @@
 #include "utils/logger.h"
 
 #if defined(production)
-using TRANSMIT_TYPE = LoraTransmit;
+using TRANSMIT_TYPE = DEBUG_timeTransmit;
 #else
 using TRANSMIT_TYPE = DEBUG_timeTransmit;
 #endif
