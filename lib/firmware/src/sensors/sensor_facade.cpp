@@ -50,11 +50,8 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
         facade->sendTelemetry();
     });
 
-    std::shared_ptr<Waiter> telemetryWaiter = Waiter::create();
-    telemetryWaiter->setExecuteFunction([facade]() {
-        facade->telemetryTimer.get()->updateTime(facade->getTelemetryPeriodMs());
-    });
-    telemetryWaiter->updateTime(TELEMETRY_DELAY_MS);
+    delay(TELEMETRY_DELAY_MS);
+    facade->telemetryTimer.get()->updateTime(facade->getTelemetryPeriodMs());
 
     enableBME();
 
