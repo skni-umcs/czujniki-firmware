@@ -53,8 +53,7 @@ class Logger {
                 getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(message)));
             }
             else {
-                Serial.println("printin");
-                //Serial.println(message.c_str());
+                Serial.println(message.c_str());
             }
             return OperationResult::SUCCESS;
         }
@@ -91,8 +90,7 @@ class Logger {
             }
             else {
                 oss << message.c_str();
-                Serial.println("printin f");
-                //Serial.println(oss.str().c_str());
+                Serial.println(oss.str().c_str());
             }
             return OperationResult::SUCCESS;
         }

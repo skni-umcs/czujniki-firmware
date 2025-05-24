@@ -29,10 +29,8 @@ bool WifiTransmit::isKnownNetwork(String ssid) {
 
 std::shared_ptr<WifiTransmit> WifiTransmit::create() {
     auto wifiTransmit = std::shared_ptr<WifiTransmit>(new WifiTransmit());
-    if(wifiTransmit->setup() == OperationResult::SUCCESS) {
-        return wifiTransmit;
-    }
-    return nullptr;
+    wifiTransmit->setup();
+    return wifiTransmit;
 }
 
 String WifiTransmit::getBestNetworkSsid() {
@@ -87,10 +85,10 @@ OperationResult WifiTransmit::setup() {
     if (bestNetworkSsid != NO_NETWORK_SSID) {
         WiFi.begin(bestNetworkSsid, getNetworks().at(bestNetworkSsid));
         server.begin();
-        setupPollTask();
-        return OperationResult::SUCCESS;
     }
-    return OperationResult::NOT_FOUND;
+
+    setupPollTask();
+    return OperationResult::SUCCESS;
 }
 
 OperationResult WifiTransmit::poll() {
