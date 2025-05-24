@@ -32,13 +32,15 @@ void setup() {
   delay(1000);
 
   auto wifiTransmit = WifiTransmit::create();
-  Logger::setWifi(wifiTransmit);
+  if(wifiTransmit) {
+    Logger::setWifi(wifiTransmit);
+  }
 
   delay(5000);
   AddressHandler::getInstance().get()->initializeAddress();
 
 
-  auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
+  auto transmit = TRANSMIT_TYPE::create(wifiTransmit); //TODO: wifi transmit not necessary here
   delay(1000);
   
   auto serviceCommunication = ServiceCommunication::create();
