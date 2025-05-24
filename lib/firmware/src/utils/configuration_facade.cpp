@@ -4,6 +4,8 @@
 
 const char* SERVICE_PERIOD_OPTION = "service_period_ms";
 const char* TELEMETRY_PERIOD_OPTION = "telemetry_period_ms";
+const char* ASK_TIMEOUT_OPTION = "service_time_ask_timeout_ms";
+const char* TIME_SYNC_PERIOD_OPTION = "time_sync_period_ms";
 #define NO_SAVE false
 
 OperationResult ConfigurationFacade::plugLoraTransmit(std::shared_ptr<LoraTransmit> loraTransmit) {
@@ -18,15 +20,15 @@ OperationResult ConfigurationFacade::plugPassthroughCommunication(std::shared_pt
 
 OperationResult ConfigurationFacade::plugSensorFacade(std::shared_ptr<SensorFacade> sensorFacade) {
     this->sensorFacade = sensorFacade;
-    std::cout << this->sensorFacade->getServicePeriodMs() << std::endl;
     setServicePeriodMs(readOption(SERVICE_PERIOD_OPTION), NO_SAVE);
-    std::cout << this->sensorFacade->getServicePeriodMs() << std::endl;
     setTelemetryPeriodMs(readOption(TELEMETRY_PERIOD_OPTION), NO_SAVE);
     return OperationResult::SUCCESS;
 }
 
 OperationResult ConfigurationFacade::plugServiceCommunication(std::shared_ptr<ServiceCommunication> serviceCommunication) {
     this->serviceCommunication = serviceCommunication;
+    setAskTimeoutMs(readOption(ASK_TIMEOUT_OPTION));
+    setTimeSyncPeriodMs(readOption(TIME_SYNC_PERIOD_OPTION));
     return OperationResult::SUCCESS;
 }
 
@@ -87,4 +89,52 @@ int ConfigurationFacade::getTelemetryPeriodMs() {
         return CONFIGURATION_ERROR_INT;
     }
     return this->sensorFacade->getTelemetryPeriodMs();
+}
+
+OperationResult ConfigurationFacade::setAskTimeoutMs(int askTimeoutMs, bool shouldSave) {
+    if (askTimeoutMs == CONFIGURATION_ERROR_INT) {
+        Logger::log("Set ask timeout ms got error as timeout to set");
+        return OperationResult::ERROR;
+    }
+    if (this->serviceCommunication == nullptr) {
+        Logger::log("Set ask timeout doesn't have a service communication pointer");
+        return OperationResult::ERROR;
+    }
+    this->serviceCommunication->setAskTimeoutMs(askTimeoutMs);
+    if (shouldSave) {
+        saveOption(ASK_TIMEOUT_OPTION, askTimeoutMs);
+    }
+    return OperationResult::SUCCESS;
+}
+
+OperationResult ConfigurationFacade::setTimeSyncPeriodMs(int timeSyncPeriodMs, bool shouldSave) {
+    if (timeSyncPeriodMs == CONFIGURATION_ERROR_INT) {
+        Logger::log("Set time sync period ms got error as period to set");
+        return OperationResult::ERROR;
+    }
+    if (this->serviceCommunication == nullptr) {
+        Logger::log("Set time sync period doesn't have a service communication pointer");
+        return OperationResult::ERROR;
+    }
+    this->serviceCommunication->setTimeSyncPeriodMs(timeSyncPeriodMs);
+    if (shouldSave) {
+        saveOption(TIME_SYNC_PERIOD_OPTION, timeSyncPeriodMs);
+    }
+    return OperationResult::SUCCESS;
+}
+
+int ConfigurationFacade::getAskTimeoutMs() {
+    if (this->serviceCommunication == nullptr) {
+        Logger::log("Get ask timeout doesn't have a service communication pointer");
+        return CONFIGURATION_ERROR_INT;
+    }
+    return this->serviceCommunication->getAskTimeoutMs();
+}
+
+int ConfigurationFacade::getTimeSyncPeriodMs() {
+    if (this->serviceCommunication == nullptr) {
+        Logger::log("Get time sync period doesn't have a service communication pointer");
+        return CONFIGURATION_ERROR_INT;
+    }
+    return this->serviceCommunication->getTimeSyncPeriodMs();
 }

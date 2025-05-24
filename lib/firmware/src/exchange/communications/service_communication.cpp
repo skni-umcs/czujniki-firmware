@@ -9,9 +9,6 @@
 #include <message/message_content.h>
 #include <utils/logger.h>
 
-static int ASK_TIMEOUT_MS = 10000;
-static int TIME_SYNC_PERIOD_MS = FULL_WEEK_MS;
-
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
 
@@ -23,12 +20,12 @@ std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
         Logger::logf("last ask time %d \n",  serviceCommunication->getLastAskTime());
         return serviceCommunication->getLastAskTime() != DIDNT_ASK;
     });
-    serviceCommunication->askTimeTimeoutTimer.get()->updateTime(ASK_TIMEOUT_MS);
+    serviceCommunication->askTimeTimeoutTimer.get()->updateTime(serviceCommunication->askTimeoutMs);
     
     serviceCommunication->timeSyncTimer.get()->setExecuteFunction([serviceCommunication]() {
         serviceCommunication->askForTime();
     });
-    serviceCommunication->timeSyncTimer.get()->updateTime(TIME_SYNC_PERIOD_MS);     
+    serviceCommunication->timeSyncTimer.get()->updateTime(serviceCommunication->timeSyncPeriodMs);     
 
 
     return serviceCommunication;
@@ -102,4 +99,20 @@ unsigned long ServiceCommunication::getLastAskTime() {
 OperationResult ServiceCommunication::setLastAskTime(unsigned long lastAskTime) {
     this->lastAskTime = lastAskTime;
     return OperationResult::SUCCESS;
+}
+
+OperationResult ServiceCommunication::setAskTimeoutMs(int askTimeoutMs) {
+    this->askTimeoutMs = askTimeoutMs;
+}
+
+OperationResult ServiceCommunication::setTimeSyncPeriodMs(int timeSyncPeriodMs) {
+    this->timeSyncPeriodMs = timeSyncPeriodMs;
+}
+
+int ServiceCommunication::getAskTimeoutMs() {
+    return askTimeoutMs;
+}
+
+int ServiceCommunication::getTimeSyncPeriodMs() {
+    return timeSyncPeriodMs;
 }

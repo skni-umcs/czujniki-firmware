@@ -29,6 +29,12 @@ class ConfigurationFacade {
         OperationResult setTelemetryPeriodMs(int telemetryPeriodMs, bool shouldSave = true);
         int getServicePeriodMs();
         int getTelemetryPeriodMs();
+
+        //service communication
+        OperationResult setAskTimeoutMs(int askTimeoutMs, bool shouldSave = true);
+        OperationResult setTimeSyncPeriodMs(int timeSyncPeriodMs, bool shouldSave = true);
+        int getAskTimeoutMs();
+        int getTimeSyncPeriodMs();
 };
 
 #endif
