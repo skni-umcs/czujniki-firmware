@@ -30,6 +30,8 @@ SensorFacade::SensorFacade() {
 
 std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit> transmit, bool shouldSetupSensors) {
     auto facade = std::shared_ptr<SensorFacade>(new SensorFacade());
+    std::cout << facade->getServicePeriodMs() << std::endl;
+    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
     facade->telemetryCommunication = SensorCommunication::create();
     facade->telemetryCommunication->subscribe(transmit);
 

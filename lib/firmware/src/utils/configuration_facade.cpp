@@ -18,7 +18,9 @@ OperationResult ConfigurationFacade::plugPassthroughCommunication(std::shared_pt
 
 OperationResult ConfigurationFacade::plugSensorFacade(std::shared_ptr<SensorFacade> sensorFacade) {
     this->sensorFacade = sensorFacade;
+    std::cout << this->sensorFacade->getServicePeriodMs() << std::endl;
     setServicePeriodMs(readOption(SERVICE_PERIOD_OPTION), NO_SAVE);
+    std::cout << this->sensorFacade->getServicePeriodMs() << std::endl;
     setTelemetryPeriodMs(readOption(TELEMETRY_PERIOD_OPTION), NO_SAVE);
     return OperationResult::SUCCESS;
 }
@@ -34,13 +36,20 @@ OperationResult ConfigurationFacade::saveOption(const char* optionKey, int value
 }
 
 int ConfigurationFacade::readOption(const char* optionKey) {
+    if(!preferences.isKey(optionKey)) {
+        return CONFIGURATION_ERROR_INT;
+    }
     return preferences.getUShort(optionKey);
 }
 
 OperationResult ConfigurationFacade::setServicePeriodMs(int servicePeriodMs, bool shouldSave) {
     std::cout << this->sensorFacade << std::endl;
+    if(servicePeriodMs == CONFIGURATION_ERROR_INT) {
+        Logger::log("Set service period ms got error as period to set");
+        return OperationResult::ERROR;
+    }
     if(this->sensorFacade == nullptr) {
-        Logger::log("Configuration facade doesn't have a sensor facade pointer");
+        Logger::log("Set service period doesn't have a sensor facade pointer");
         return OperationResult::ERROR;
     }
     this->sensorFacade->setServicePeriodMs(servicePeriodMs);\
@@ -50,14 +59,18 @@ OperationResult ConfigurationFacade::setServicePeriodMs(int servicePeriodMs, boo
     return OperationResult::SUCCESS;
 }
 
-OperationResult ConfigurationFacade::setTelemetryPeriodMs(int servicePeriodMs, bool shouldSave) {
-    if(this->sensorFacade == nullptr) {
-        Logger::log("Configuration facade doesn't have a sensor facade pointer");
+OperationResult ConfigurationFacade::setTelemetryPeriodMs(int telemetryPeriodMs, bool shouldSave) {
+    if(telemetryPeriodMs == CONFIGURATION_ERROR_INT) {
+        Logger::log("Set telemetry period ms got error as period to set");
         return OperationResult::ERROR;
     }
-    this->sensorFacade->setTelemetryPeriodMs(servicePeriodMs);
+    if(this->sensorFacade == nullptr) {
+        Logger::log("Set telemetry period doesn't have a sensor facade pointer");
+        return OperationResult::ERROR;
+    }
+    this->sensorFacade->setTelemetryPeriodMs(telemetryPeriodMs);
     if(shouldSave) {
-        saveOption(TELEMETRY_PERIOD_OPTION, servicePeriodMs);
+        saveOption(TELEMETRY_PERIOD_OPTION, telemetryPeriodMs);
     }
     return OperationResult::SUCCESS;
 }

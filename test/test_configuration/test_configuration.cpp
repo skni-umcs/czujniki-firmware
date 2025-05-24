@@ -14,6 +14,8 @@ void test_set_service_period_no_save_and_reset() {
     auto sensor1 = SensorFacade::create(std::shared_ptr<SmallTransmit>(new MockTransmit()));
     configuration1.plugSensorFacade(sensor1);
 
+    TEST_ASSERT_EQUAL(DEFAULT_SERVICE_PERIOD_MS, configuration1.getServicePeriodMs());
+
     // Set without saving
     TEST_ASSERT_EQUAL(OperationResult::SUCCESS, configuration1.setServicePeriodMs(12345, false));
     TEST_ASSERT_EQUAL(12345, configuration1.getServicePeriodMs());
@@ -39,8 +41,6 @@ void test_set_service_period_with_save_and_reset() {
     ConfigurationFacade configuration2;
     auto sensor2 = SensorFacade::create(std::shared_ptr<SmallTransmit>(new MockTransmit()));
     configuration2.plugSensorFacade(sensor2);
-    int saved = configuration2.readOption("service_period_ms");
-    sensor2->setServicePeriodMs(saved);
     TEST_ASSERT_EQUAL(23456, sensor2->getServicePeriodMs());
 }
 
