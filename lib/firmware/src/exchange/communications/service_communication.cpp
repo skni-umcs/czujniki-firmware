@@ -11,16 +11,6 @@
 
 static int ASK_TIMEOUT_MS = 10000;
 static int TIME_SYNC_PERIOD_MS = FULL_WEEK_MS;
-int startTimestamp = 0;
-int coile = 32;
-
-int predictedMessages(int timestamp) {
-  int difference = timestamp-startTimestamp;
-  return difference/coile;
-
-}
-
-
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
