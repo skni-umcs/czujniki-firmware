@@ -17,10 +17,10 @@ class ConfigurationFacade {
     std::shared_ptr<ServiceCommunication> serviceCommunication = nullptr;
 
     public:
-        OperationResult setLoraTransmit(std::shared_ptr<LoraTransmit> loraTransmit);
-        OperationResult setPassthroughCommunication(std::shared_ptr<PassthroughCommunication> passthroughCommunication);
-        OperationResult setSensorFacade(std::shared_ptr<SensorFacade> sensorFacade);
-        OperationResult setServiceCommunication(std::shared_ptr<ServiceCommunication> serviceCommunication);
+        OperationResult plugLoraTransmit(std::shared_ptr<LoraTransmit> loraTransmit);
+        OperationResult plugPassthroughCommunication(std::shared_ptr<PassthroughCommunication> passthroughCommunication);
+        OperationResult plugSensorFacade(std::shared_ptr<SensorFacade> sensorFacade);
+        OperationResult plugServiceCommunication(std::shared_ptr<ServiceCommunication> serviceCommunication);
         OperationResult saveOption(const char* optionKey, int value);
         int readOption(const char* optionKey);
 
