@@ -29,62 +29,68 @@ class Logger {
 
         template<typename... Args>
         static OperationResult log(Args ... args) {
+            std::ostringstream oss;
+
+            int h   = rtc.getHour();
+            int m   = rtc.getMinute();
+            int s   = rtc.getSecond();
+            int D   = rtc.getDay();
+            int M   = rtc.getMonth()+1;
+            int Y   = rtc.getYear();
+            
+            oss << '['
+                << std::setfill('0') << std::setw(2) << h << ':'
+                << std::setfill('0') << std::setw(2) << m << ':'
+                << std::setfill('0') << std::setw(2) << s << ' '
+                << std::setfill('0') << std::setw(2) << D << '.'
+                << std::setfill('0') << std::setw(2) << M << '.'
+                << Y
+                << "] ";        
+
+            appendArguments(oss, args...);
+            std::string message = oss.str();
             if(getWifi()) {
-                std::ostringstream oss;
-
-                int h   = rtc.getHour();
-                int m   = rtc.getMinute();
-                int s   = rtc.getSecond();
-                int D   = rtc.getDay();
-                int M   = rtc.getMonth()+1;
-                int Y   = rtc.getYear();
-                
-                oss << '['
-                    << std::setfill('0') << std::setw(2) << h << ':'
-                    << std::setfill('0') << std::setw(2) << m << ':'
-                    << std::setfill('0') << std::setw(2) << s << ' '
-                    << std::setfill('0') << std::setw(2) << D << '.'
-                    << std::setfill('0') << std::setw(2) << M << '.'
-                    << Y
-                    << "] ";        
-
-                appendArguments(oss, args...);
-                std::string message = oss.str();
                 getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(message)));
+            }
+            else {
+                Serial.println(message.c_str());
             }
             return OperationResult::SUCCESS;
         }
 
         template<typename... Args>
         static OperationResult logf(const char* str, Args ... args) {
+            int size = std::snprintf(nullptr, 0, str, args...);
+            if(size < 0) {
+                return OperationResult::ERROR;
+            }
+            std::string message;
+            message.resize(size);
+            std::snprintf(&message[0], size+1, str, args...);
+
+            std::ostringstream oss;
+
+            int h   = rtc.getHour();
+            int m   = rtc.getMinute();
+            int s   = rtc.getSecond();
+            int D   = rtc.getDay();
+            int M   = rtc.getMonth()+1;
+            int Y   = rtc.getYear();
+            
+            oss << '['
+                << std::setfill('0') << std::setw(2) << h << ':'
+                << std::setfill('0') << std::setw(2) << m << ':'
+                << std::setfill('0') << std::setw(2) << s << ' '
+                << std::setfill('0') << std::setw(2) << D << '.'
+                << std::setfill('0') << std::setw(2) << M << '.'
+                << Y
+                << "] ";
             if(getWifi()) {
-                int size = std::snprintf(nullptr, 0, str, args...);
-                if(size < 0) {
-                    return OperationResult::ERROR;
-                }
-                std::string message;
-                message.resize(size);
-                std::snprintf(&message[0], size+1, str, args...);
-
-                std::ostringstream oss;
-
-                int h   = rtc.getHour();
-                int m   = rtc.getMinute();
-                int s   = rtc.getSecond();
-                int D   = rtc.getDay();
-                int M   = rtc.getMonth()+1;
-                int Y   = rtc.getYear();
-                
-                oss << '['
-                    << std::setfill('0') << std::setw(2) << h << ':'
-                    << std::setfill('0') << std::setw(2) << m << ':'
-                    << std::setfill('0') << std::setw(2) << s << ' '
-                    << std::setfill('0') << std::setw(2) << D << '.'
-                    << std::setfill('0') << std::setw(2) << M << '.'
-                    << Y
-                    << "] ";
-
                 getWifi()->send(std::shared_ptr<TextMessage>(new TextMessage(oss.str()+message)));
+            }
+            else {
+                oss << message.c_str();
+                Serial.println(oss.str().c_str());
             }
             return OperationResult::SUCCESS;
         }
