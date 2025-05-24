@@ -100,6 +100,7 @@ OperationResult ConfigurationFacade::setAskTimeoutMs(int askTimeoutMs, bool shou
         Logger::log("Set ask timeout doesn't have a service communication pointer");
         return OperationResult::ERROR;
     }
+    std::cout << "i only want yo gone" << std::endl;
     this->serviceCommunication->setAskTimeoutMs(askTimeoutMs);
     if (shouldSave) {
         saveOption(ASK_TIMEOUT_OPTION, askTimeoutMs);

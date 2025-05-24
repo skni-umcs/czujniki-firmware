@@ -102,8 +102,11 @@ OperationResult ServiceCommunication::setLastAskTime(unsigned long lastAskTime) 
 }
 
 OperationResult ServiceCommunication::setAskTimeoutMs(int askTimeoutMs) {
-    askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
     this->askTimeoutMs = askTimeoutMs;
+    std::cout << "timer counting on!!!!!!!!" << std::endl;
+    //TODO: fix timeout timer faulty condition
+    // /askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
+    std::cout << "timedddddddddddddddr counting on!!!!!!!!" << std::endl;
     return OperationResult::SUCCESS;
 }
 
