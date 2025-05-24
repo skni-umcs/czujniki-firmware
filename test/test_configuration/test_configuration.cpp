@@ -29,14 +29,9 @@ void test_null_service_communication() {
 void test_set_ask_timeout_no_save_and_get() {
     ConfigurationFacade configuration;
     auto service = ServiceCommunication::create();
-     std::cout << "dwadwadwdadwwad plug" << std::endl;
     configuration.plugServiceCommunication(service);
-    std::cout << "after plug" << std::endl;
-
     TEST_ASSERT_EQUAL(DEFAULT_ASK_TIMEOUT_MS, configuration.getAskTimeoutMs());
-    std::cout << "rrrrrrrrrrrrrrrrrrrrrrrrr" << std::endl;
     TEST_ASSERT_EQUAL(OperationResult::SUCCESS, configuration.setAskTimeoutMs(9876, false));
-    std::cout << "rrrrrrrrrrrrrrrrrrrrrrrrr" << std::endl;
     TEST_ASSERT_EQUAL(9876, configuration.getAskTimeoutMs());
 }
 

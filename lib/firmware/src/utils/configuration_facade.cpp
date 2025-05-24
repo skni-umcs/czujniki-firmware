@@ -45,7 +45,6 @@ int ConfigurationFacade::readOption(const char* optionKey) {
 }
 
 OperationResult ConfigurationFacade::setServicePeriodMs(int servicePeriodMs, bool shouldSave) {
-    std::cout << this->sensorFacade << std::endl;
     if(servicePeriodMs == CONFIGURATION_ERROR_INT) {
         Logger::log("Set service period ms got error as period to set");
         return OperationResult::ERROR;
@@ -100,7 +99,6 @@ OperationResult ConfigurationFacade::setAskTimeoutMs(int askTimeoutMs, bool shou
         Logger::log("Set ask timeout doesn't have a service communication pointer");
         return OperationResult::ERROR;
     }
-    std::cout << "i only want yo gone" << std::endl;
     this->serviceCommunication->setAskTimeoutMs(askTimeoutMs);
     if (shouldSave) {
         saveOption(ASK_TIMEOUT_OPTION, askTimeoutMs);
