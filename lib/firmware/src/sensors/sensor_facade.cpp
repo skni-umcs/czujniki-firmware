@@ -24,6 +24,7 @@
 #define disableBME() digitalWrite(BME_POWER_PIN, LOW); pinMode(BME_POWER_PIN, INPUT);
 
 uint32_t delayMS = 1000;
+#define TELEMETRY_DELAY_MS 20000
 
 SensorFacade::SensorFacade() {
 }
@@ -34,23 +35,28 @@ std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit
     std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
     facade->telemetryCommunication = SensorCommunication::create();
     facade->telemetryCommunication->subscribe(transmit);
+    facade->serviceCommunication = ServiceCommunication::create();
+    facade->serviceCommunication->subscribe(transmit);
 
     if(shouldSetupSensors) {
         facade->setupTelemetry();
         facade->setupService(transmit);
     }
 
-    facade->telemetryTimer.get()->setExecuteFunction([facade]() {
-       facade->sendTelemetry();
-    });
-    facade->telemetryTimer.get()->updateTime(facade->getTelemetryPeriodMs());
-
-    facade->serviceCommunication = ServiceCommunication::create();
-    facade->serviceCommunication->subscribe(transmit);
     facade->serviceTimer.get()->setExecuteFunction([facade]() {
        facade->sendService();
     });
     facade->serviceTimer.get()->updateTime(facade->getServicePeriodMs());
+
+    facade->telemetryTimer.get()->setExecuteFunction([facade]() {
+        facade->sendTelemetry();
+    });
+
+    std::shared_ptr<Waiter> telemetryWaiter = Waiter::create();
+    telemetryWaiter->setExecuteFunction([facade]() {
+        facade->telemetryTimer.get()->updateTime(facade->getTelemetryPeriodMs());
+    });
+    telemetryWaiter->updateTime(TELEMETRY_DELAY_MS);
 
     enableBME();
 
