@@ -18,10 +18,9 @@ void timerTask(void* timerObjectRawPointer) {
 
     auto condition = timerPtr->get()->getTimerCondition();
     while(condition == nullptr || condition()) {
-        if(timerPtr->get()->getExecuteFunction() != nullptr && !timerPtr->get()->getRecentlyUpdated()) {
+        if(timerPtr->get()->getExecuteFunction() != nullptr) {
             timerPtr->get()->getExecuteFunction()();
         }
-        timerPtr->get()->setRecentlyUpdated(false);
         vTaskDelayUntil(&xLastWakeTime, timerPtr->get()->getPeriodMs());
     }
     vTaskDelete(NULL);
@@ -52,12 +51,11 @@ void Timer::updateTimeNoSkip(int period) {
 
 void Timer::updateTime(int period) {
     //TODO: are skips even neccesary anymore?
-    this->recentlyUpdated = true;
     updateTimeNoSkip(period);
 }
 
 void Timer::onTimerUpdate() {
-    this->recentlyUpdated = true;
+
 }
 
 executeFunctionType Timer::getExecuteFunction() {
@@ -77,11 +75,11 @@ void Timer::setTimerCondition(timerConditionType timerCondition) {
 }
 
 bool Timer::getRecentlyUpdated() {
-    return this->recentlyUpdated;
+    return false;
 }
 
 void Timer::setRecentlyUpdated(bool recentlyUpdated) {
-    this->recentlyUpdated = recentlyUpdated;
+
 }
 
 int Timer::getPeriodMs() {

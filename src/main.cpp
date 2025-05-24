@@ -41,12 +41,13 @@ void setup() {
   auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
   delay(1000);
   
+  auto sensorCommunication = SensorCommunication::create();
+
   auto serviceCommunication = ServiceCommunication::create();
   serviceCommunication.get()->subscribe(transmit);
   serviceCommunication.get()->sendResetReason();
-  serviceCommunication.get()->askForTime();
 
-  std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit);
+  std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit, sensorCommunication, serviceCommunication);
 
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);

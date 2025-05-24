@@ -21,7 +21,12 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
     
     SensorFacade();
     public:
-        static std::shared_ptr<SensorFacade> create(std::shared_ptr<SmallTransmit> transmit, bool shouldSetupSensors = true);
+        static std::shared_ptr<SensorFacade> create(
+            std::shared_ptr<SmallTransmit> transmit, 
+            std::shared_ptr<SensorCommunication> telemetryCommunication,
+            std::shared_ptr<ServiceCommunication> serviceCommunication,
+            bool shouldSetupSensors = true
+        );
         std::string getTelemetry();
         std::string getService();
         OperationResult sendTelemetry();

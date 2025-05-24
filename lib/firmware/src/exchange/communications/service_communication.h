@@ -28,6 +28,7 @@ class ServiceCommunication : public SmallCommunication {
         static std::shared_ptr<ServiceCommunication> create();
         OperationResult getNotified(std::shared_ptr<Message> message) override;
         void sendResetReason();
+        OperationResult timeSync();
         OperationResult askForTime();
         OperationResult updateTime(unsigned long serverTime);
         unsigned long getLastAskTime();

@@ -29,11 +29,16 @@ uint32_t delayMS = 1000;
 SensorFacade::SensorFacade() {
 }
 
-std::shared_ptr<SensorFacade> SensorFacade::create(std::shared_ptr<SmallTransmit> transmit, bool shouldSetupSensors) {
+std::shared_ptr<SensorFacade> SensorFacade::create(
+    std::shared_ptr<SmallTransmit> transmit, 
+    std::shared_ptr<SensorCommunication> telemetryCommunication,
+    std::shared_ptr<ServiceCommunication> serviceCommunication,
+    bool shouldSetupSensors
+) {
     auto facade = std::shared_ptr<SensorFacade>(new SensorFacade());
-    facade->telemetryCommunication = SensorCommunication::create();
+    facade->telemetryCommunication = telemetryCommunication;
     facade->telemetryCommunication->subscribe(transmit);
-    facade->serviceCommunication = ServiceCommunication::create();
+    facade->serviceCommunication = serviceCommunication;
     facade->serviceCommunication->subscribe(transmit);
 
     if(shouldSetupSensors) {

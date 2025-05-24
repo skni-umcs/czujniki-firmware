@@ -11,22 +11,11 @@
 
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
-
-    serviceCommunication->setLastAskTime(DIDNT_ASK);
-    serviceCommunication->askTimeTimeoutTimer.get()->setExecuteFunction([serviceCommunication]() {
-        serviceCommunication->askForTime();
-    });
-    serviceCommunication->askTimeTimeoutTimer.get()->setTimerCondition([serviceCommunication]() {
-        Logger::logf("last ask time %d \n",  serviceCommunication->getLastAskTime());
-        return serviceCommunication->getLastAskTime() != DIDNT_ASK;
-    });
-    serviceCommunication->askTimeTimeoutTimer.get()->updateTime(serviceCommunication->askTimeoutMs);
     
     serviceCommunication->timeSyncTimer.get()->setExecuteFunction([serviceCommunication]() {
-        serviceCommunication->askForTime();
+        serviceCommunication->timeSync();
     });
-    serviceCommunication->timeSyncTimer.get()->updateTime(serviceCommunication->timeSyncPeriodMs);     
-
+    serviceCommunication->timeSyncTimer.get()->updateTime(serviceCommunication->timeSyncPeriodMs);
 
     return serviceCommunication;
 }
@@ -66,6 +55,17 @@ void ServiceCommunication::sendResetReason() {
 
     auto message = GeneratedMessage::fromText(packetMessage.getJson(), SERVER_ADDRESS);
     this->transmit(message);
+}
+
+OperationResult ServiceCommunication::timeSync() {
+    setLastAskTime(DIDNT_ASK);
+    Serial.println("bbbbbbbbbbbbbbbbbbbbbb");
+    askTimeTimeoutTimer.get()->setExecuteFunction([this]() {
+        Serial.println("eeeeeeeeeeeeeeeeeeee");
+        askForTime();
+    });
+    askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
+    return OperationResult::SUCCESS;
 }
 
 OperationResult ServiceCommunication::askForTime() {
