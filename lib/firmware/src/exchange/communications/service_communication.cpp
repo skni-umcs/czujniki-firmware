@@ -58,10 +58,7 @@ void ServiceCommunication::sendResetReason() {
 }
 
 OperationResult ServiceCommunication::timeSync() {
-    setLastAskTime(DIDNT_ASK);
-    Serial.println("bbbbbbbbbbbbbbbbbbbbbb");
     askTimeTimeoutTimer.get()->setExecuteFunction([this]() {
-        Serial.println("eeeeeeeeeeeeeeeeeeee");
         askForTime();
     });
     askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
@@ -77,16 +74,22 @@ OperationResult ServiceCommunication::askForTime() {
     return OperationResult::SUCCESS;
 }
 
+OperationResult ServiceCommunication::disableAskTimeout() {
+    askTimeTimeoutTimer.get()->setExecuteFunction([]() {});
+    askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
+    return OperationResult::SUCCESS;
+}
+
 OperationResult ServiceCommunication::updateTime(unsigned long serverTime) {
     if(lastAskTime == DIDNT_ASK) {
         return OperationResult::OPERATION_IGNORED;
     }
-
     unsigned long currentTime = rtc.getEpoch();
     unsigned long RTT = currentTime-lastAskTime;
     Logger::logf("I waited from %i to %i with RTT of %i, new time will be %i\n", lastAskTime, currentTime, RTT, serverTime+RTT/2);
     rtc.setTime(serverTime+RTT/2);
     lastAskTime = DIDNT_ASK;
+    disableAskTimeout();
     Logger::logf("Current time after update: %lu\n", rtc.getEpoch());
 
     return OperationResult::SUCCESS;

@@ -30,6 +30,7 @@ class ServiceCommunication : public SmallCommunication {
         void sendResetReason();
         OperationResult timeSync();
         OperationResult askForTime();
+        OperationResult disableAskTimeout();
         OperationResult updateTime(unsigned long serverTime);
         unsigned long getLastAskTime();
         OperationResult setLastAskTime(unsigned long lastAskTime);
