@@ -89,6 +89,8 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit>
     auto loraTransmit = new LoraTransmit();
 	loraTransmit->DEBUG_wifi = DEBUG_wifi;
 
+    loraTransmit->setup();
+
     loraTransmit->pollTimer.get()->setExecuteFunction([loraTransmit]() {
        loraTransmit->poll();
     });
@@ -104,8 +106,6 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit>
 	});
 	loraTransmit->sendWaiter.get()->updateTime(1000);
 	loraTransmit->sendWaiter.get()->changeTimerTask();
-
-    loraTransmit->setup();
     return std::shared_ptr<LoraTransmit>{loraTransmit};
 }
 
