@@ -16,8 +16,7 @@ void timerTask(void* timerObjectRawPointer) {
     TickType_t xLastWakeTime;
     xLastWakeTime = xTaskGetTickCount();
 
-    auto condition = timerPtr->get()->getTimerCondition();
-    while(condition == nullptr || condition()) {
+    while(true) {
         if(timerPtr->get()->getExecuteFunction() != nullptr) {
             timerPtr->get()->getExecuteFunction()();
         }
@@ -44,18 +43,9 @@ void Timer::changeTimerTask() {
     }
 }
 
-void Timer::updateTimeNoSkip(int period) {
+void Timer::updateTime(int period) {
     this->periodMs = period;
     this->changeTimerTask();
-}
-
-void Timer::updateTime(int period) {
-    //TODO: are skips even neccesary anymore?
-    updateTimeNoSkip(period);
-}
-
-void Timer::onTimerUpdate() {
-
 }
 
 executeFunctionType Timer::getExecuteFunction() {
@@ -64,22 +54,6 @@ executeFunctionType Timer::getExecuteFunction() {
 
 void Timer::setExecuteFunction(executeFunctionType executeFunction) {
     this->executeFunction = executeFunction;
-}
-
-timerConditionType Timer::getTimerCondition() {
-    return this->timerCondition;
-}
-
-void Timer::setTimerCondition(timerConditionType timerCondition) {
-    this->timerCondition = timerCondition;
-}
-
-bool Timer::getRecentlyUpdated() {
-    return false;
-}
-
-void Timer::setRecentlyUpdated(bool recentlyUpdated) {
-
 }
 
 int Timer::getPeriodMs() {
