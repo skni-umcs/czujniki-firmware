@@ -70,6 +70,7 @@ OperationResult ServiceCommunication::askForTime() {
     MessageContent packetMessage = MessageContent(TransmissionCode::TIME_SYNCHRONIZATION, "t");
     Logger::log(this->getLastAskTime());
     Logger::log("lastAskTime");
+    //TODO: Fix double transmit on time sync
     this->transmit(packetMessage.getJson(), SERVER_ADDRESS);
     return OperationResult::SUCCESS;
 }
