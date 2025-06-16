@@ -12,10 +12,10 @@
 std::shared_ptr<ServiceCommunication> ServiceCommunication::create() {
     auto serviceCommunication = std::shared_ptr<ServiceCommunication>(new ServiceCommunication());
     
-    // serviceCommunication->timeSyncTimer.get()->setExecuteFunction([serviceCommunication]() {
-    //     serviceCommunication->timeSync();
-    // });
-    // serviceCommunication->timeSyncTimer.get()->updateTime(serviceCommunication->timeSyncPeriodMs);
+    serviceCommunication->timeSyncTimer.get()->setExecuteFunction([serviceCommunication]() {
+        serviceCommunication->timeSync();
+    });
+    serviceCommunication->timeSyncTimer.get()->updateTime(serviceCommunication->timeSyncPeriodMs);
 
     return serviceCommunication;
 }
