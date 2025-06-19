@@ -15,7 +15,7 @@
 auto testTransmit = std::shared_ptr<TestTransmit>{new TestTransmit()};
 
 void test_add_sensor() {
-    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
+    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, SensorCommunication::create(), ServiceCommunication::create(), false);
     std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor();
     sensorFacade->addService(testSensor);
@@ -28,7 +28,7 @@ void test_add_sensor() {
 }
 
 void test_sensor_message() {
-    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
+    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, SensorCommunication::create(), ServiceCommunication::create(), false);
     std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor();
     sensorFacade->addTelemetry(testSensor);
@@ -39,7 +39,7 @@ void test_sensor_message() {
 }
 
 void test_sensor_facade() {
-    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, false);
+    std::shared_ptr<SensorFacade> sensorFacade = SensorFacade::create(testTransmit, SensorCommunication::create(), ServiceCommunication::create(), false);
     std::unique_ptr<Sensor> testSensor = std::unique_ptr<TestSensor>(new TestSensor());
     testSensor->setupSensor();
     sensorFacade->addTelemetry(testSensor);
