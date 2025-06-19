@@ -49,8 +49,8 @@ void setup() {
 
   std::shared_ptr<SensorFacade> facade = SensorFacade::create(transmit, sensorCommunication, serviceCommunication);
 
-  // auto passthroughCommunication = PassthroughCommunication::create();
-  // passthroughCommunication.get()->subscribe(transmit);
+  auto passthroughCommunication = PassthroughCommunication::create();
+  passthroughCommunication.get()->subscribe(transmit);
 
   auto updateCommunication = UpdateCommunication::create();
   updateCommunication->subscribe(wifiTransmit);
