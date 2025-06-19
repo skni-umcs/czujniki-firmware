@@ -103,7 +103,7 @@ OperationResult PassthroughCommunication::afterWait(std::shared_ptr<LoraMessage>
 }
 
 OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_ptr<Message> message) {
-    vTaskSuspendAll();
+    //vTaskSuspendAll();
     std::vector<std::shared_ptr<LoraMessage>> toErase;
     for (const auto& oldMessage : messageSet) {
         if (oldMessage->getWasTransmitted()) {
@@ -120,7 +120,7 @@ OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_pt
     for (const auto& key : toErase) {
         messageSet.erase(key);
     }
-    xTaskResumeAll();
+    //xTaskResumeAll();
     return OperationResult::SUCCESS;
 }
 
