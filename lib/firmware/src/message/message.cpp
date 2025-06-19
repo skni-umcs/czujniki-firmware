@@ -111,6 +111,15 @@ bool Message::getIsPacketCorrect() {
     return isPacketCorrect;
 }
 
+bool Message::getShouldTransmit() {
+    return shouldTransmit;
+}
+
+OperationResult Message::setShouldTransmit(bool shouldTransmit) {
+    this->shouldTransmit = shouldTransmit;
+    return OperationResult::SUCCESS;
+}
+
 OperationResult Message::decrementHopLimit() {
     if(hopLimit == 0) {
         Logger::log("Can't decrement hopLimit further");
