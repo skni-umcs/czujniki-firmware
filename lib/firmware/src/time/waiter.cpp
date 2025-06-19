@@ -13,7 +13,6 @@ std::shared_ptr<Waiter> Waiter::create(int taskPriority) {
 
 void waiterTask(void* timerObjectRawPointer) {
     std::shared_ptr<Waiter>* timerPtr = static_cast<std::shared_ptr<Waiter>*>(timerObjectRawPointer);
-    Logger::log("y");
     while(true) {
         vTaskDelay(timerPtr->get()->getWaitMs());
         if(timerPtr->get()->getExecuteFunction() != nullptr) {
@@ -49,14 +48,6 @@ executeFunctionType Waiter::getExecuteFunction() {
 
 void Waiter::setExecuteFunction(executeFunctionType executeFunction) {
     this->executeFunction = executeFunction;
-}
-
-timerConditionType Waiter::getTimerCondition() {
-    return this->timerCondition;
-}
-
-void Waiter::setTimerCondition(timerConditionType timerCondition) {
-    this->timerCondition = timerCondition;
 }
 
 int Waiter::getWaitMs() {
