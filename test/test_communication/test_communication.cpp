@@ -88,7 +88,21 @@ void test_service_time_update_ignore_didnt_ask() {
     TEST_ASSERT_TRUE(rtc.getEpoch() < testEpoch);
 }
 
-
+void test_passthrough_update_set_from_new_message() {
+    auto senders = std::vector<moduleAddress>{55, 133};
+    auto hopLimit = 2;
+    auto rssi = std::vector<std::string>{"RSSI37"};
+    auto snr = -90;
+    int currentRssi = 250;
+    auto oldMessage = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr));
+    auto newMessage = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr));
+    passthroughCommunication->getNotified(oldMessage);
+    TEST_ASSERT_TRUE(oldMessage->getShouldTransmit());
+    TEST_ASSERT_EQUAL(1, passthroughCommunication->getMessageSetLength());
+    passthroughCommunication->updateSetFromNewMessage(newMessage);
+    TEST_ASSERT_FALSE(oldMessage->getShouldTransmit());
+    TEST_ASSERT_EQUAL(0, passthroughCommunication->getMessageSetLength());
+}
 
 void setup() {
     UNITY_BEGIN();
@@ -100,6 +114,7 @@ void setup() {
     RUN_TEST(test_passthrough_no_message_in_set);
     RUN_TEST(test_service_time_update);
     RUN_TEST(test_service_time_update_ignore_didnt_ask);
+    RUN_TEST(test_passthrough_update_set_from_new_message);
     UNITY_END();
 }
 

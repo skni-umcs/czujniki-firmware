@@ -99,6 +99,25 @@ OperationResult PassthroughCommunication::afterWait(std::shared_ptr<LoraMessage>
     return OperationResult::SUCCESS;
 }
 
+OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_ptr<Message> message) {
+    vTaskSuspendAll();
+    std::vector<std::shared_ptr<LoraMessage>> toErase;
+    for (const auto& oldMessage : messageSet) {
+        if (oldMessage->getWasTransmitted()) {
+            toErase.push_back(oldMessage);
+        }
+        else if(oldMessage->isSameMessage(message)) {
+            oldMessage->setShouldTransmit(false);
+            toErase.push_back(oldMessage);
+        }
+    }
+    for (const auto& key : toErase) {
+        messageSet.erase(key);
+    }
+    xTaskResumeAll();
+    return OperationResult::SUCCESS;
+}
+
 OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> message) {
     if(!message->getIsPacketCorrect()) {
         return OperationResult::OPERATION_IGNORED;
@@ -116,17 +135,23 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         if(passDelay < 1) {
             passDelay = 1;
         }
-        Logger::logf("czekam %i\n", passDelay);
-        delay(passDelay);
+        Logger::logf("PASSTHROUGH WAIT %i s\n", passDelay);
 
-        waiter.get()->setExecuteFunction([this, loraMessage]() {
+        auto waiter = Waiter::create();
+        waiter.get()->setExecuteFunction([this, loraMessage, waiter]() {
             this->afterWait(loraMessage);
+            this->waiters.erase(waiter);
         });
         waiter.get()->updateTime(passDelay);
         waiter.get()->changeTimerTask();
+        waiters.emplace(waiter);
 
         return OperationResult::SUCCESS;
     }
     return OperationResult::OPERATION_IGNORED;
 
+}
+
+int PassthroughCommunication::getMessageSetLength() {
+    return messageSet.size();
 }
