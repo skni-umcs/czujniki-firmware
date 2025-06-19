@@ -165,11 +165,16 @@ int airTime(std::shared_ptr<Message> message) {
 
 OperationResult LoraTransmit::advanceMessages() {
 	if(messages.size() > 0) {
-		std::shared_ptr<Message> message = messages.front();
-		messages.pop_front();
-		physicalSend(message);
-		canTransmit = false;
-		sendWaiter.get()->updateTime(airTime(message));
+		while(messages.size() > 0) {
+			std::shared_ptr<Message> message = messages.front();
+			messages.pop_front();
+			if(message->getShouldTransmit()) {
+				physicalSend(message);
+				canTransmit = false;
+				sendWaiter.get()->updateTime(airTime(message));
+				break;
+			}
+		}
 	}
 	else {
 		canTransmit = true;
