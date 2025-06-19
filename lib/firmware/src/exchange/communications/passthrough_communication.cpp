@@ -72,8 +72,10 @@ std::set<std::shared_ptr<LoraMessage>> PassthroughCommunication::getSameMessages
 }
 
 OperationResult PassthroughCommunication::removeSameMessages(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
+    message->setShouldTransmit(false);
     messageSet.erase(message);
     for (auto rebroadcastedMessage : rebroadcastedMessages) {
+        rebroadcastedMessage->setShouldTransmit(false);
         messageSet.erase(rebroadcastedMessage);
     }
     return OperationResult::SUCCESS;
@@ -126,6 +128,7 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         Logger::log("Passthrough got non-lora message, discarding");
         return OperationResult::ERROR;
     }
+    updateSetFromNewMessage(message);
     std::shared_ptr<LoraMessage> loraMessage = std::static_pointer_cast<LoraMessage>(message);
 
     Logger::logf("REBROADCAST CONDITION: %d", shouldRebroadcast(loraMessage));
