@@ -24,6 +24,7 @@ class Message {
     unsigned char hopLimit;
     bool isPacketCorrect = true;
     bool shouldTransmit = true;
+    bool wasTransmitted = false;
     public:
         Message();
         Message(std::vector<moduleAddress> senders, moduleAddress destination, std::string content, std::vector<std::string> rssi, unsigned char hopLimit);
@@ -38,7 +39,9 @@ class Message {
         virtual unsigned char getHopLimit();
         virtual bool getIsPacketCorrect();
         virtual bool getShouldTransmit();
+        virtual bool getWasTransmitted();
         OperationResult setShouldTransmit(bool shouldTransmit);
+        OperationResult setWasTransmitted(bool wasTransmitted);
         virtual std::string getPacket();
         virtual OperationResult decrementHopLimit();
         virtual std::string createAddressTable();

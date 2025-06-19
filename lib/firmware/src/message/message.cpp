@@ -120,6 +120,15 @@ OperationResult Message::setShouldTransmit(bool shouldTransmit) {
     return OperationResult::SUCCESS;
 }
 
+bool Message::getWasTransmitted() {
+    return wasTransmitted;
+}
+
+OperationResult Message::setWasTransmitted(bool wasTransmitted) {
+    this->wasTransmitted = wasTransmitted;
+    return OperationResult::SUCCESS;
+}
+
 OperationResult Message::decrementHopLimit() {
     if(hopLimit == 0) {
         Logger::log("Can't decrement hopLimit further");
