@@ -23,6 +23,7 @@ OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessag
     return OperationResult::SUCCESS;
 }
 
+//TODO: remove
 OperationResult PassthroughCommunication::transmit(std::string message, moduleAddress destinationNode) {
     for(auto const& destination : transmitTo) {
         if(destination->type() == TransmitType::LoraTransmit) {
