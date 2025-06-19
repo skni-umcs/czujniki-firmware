@@ -7,6 +7,7 @@
 
 class PassthroughCommunication : public SmallCommunication {
 
+    //TODO: replace with a priority queue
     std::set<std::shared_ptr<LoraMessage>> messageSet;
     std::set<std::shared_ptr<Waiter>> waiters;
 
