@@ -10,6 +10,7 @@
 
 const double SNR_WAIT_MULTIPLIER = 500;
 const int MINIMAL_SNR = -80;
+const int MAXMIMUM_PASSTHROUGH_MESSAGES = 50;
 
 std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
     auto passthroughCommunication = new PassthroughCommunication();
@@ -110,6 +111,9 @@ OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_pt
         }
         else if(oldMessage->isSameMessage(message)) {
             oldMessage->setShouldTransmit(false);
+            toErase.push_back(oldMessage);
+        }
+        else if(messageSet.size()-toErase.size() > MAXMIMUM_PASSTHROUGH_MESSAGES) {
             toErase.push_back(oldMessage);
         }
     }
