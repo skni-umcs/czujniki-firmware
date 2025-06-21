@@ -144,6 +144,7 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         }
         Logger::logf("PASSTHROUGH WAIT %i s\n", passDelay);
 
+        //TODO: rewrite to receive task and send task
         auto waiter = Waiter::create();
         waiter.get()->setExecuteFunction([this, loraMessage, waiter]() {
             this->afterWait(loraMessage);
