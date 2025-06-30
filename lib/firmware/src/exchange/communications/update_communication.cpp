@@ -46,7 +46,7 @@ OperationResult UpdateCommunication::update() {
 
             if (written != contentLength) {
                 Logger::logf("Written only %d/%d bytes. Abort.\n", written, contentLength);
-                http.end(); // Close connection before returning
+                http.end();
                 return OperationResult::ERROR;
             }
 
@@ -54,30 +54,29 @@ OperationResult UpdateCommunication::update() {
                 Logger::log("OTA update finished!");
                 if (Update.isFinished()) {
                     Logger::log("Update successfully completed. Rebooting...");
-                    http.end(); // Close HTTP connection before restarting
+                    http.end();
                     ESP.restart();
                 } else {
                     Logger::log("Update not finished. Something went wrong.");
-                    http.end(); // Close connection on error
+                    http.end();
                     return OperationResult::ERROR;
                 }
             } else {
                 Logger::logf("Error Occurred. Error #: %d\n", Update.getError());
-                http.end(); // Close connection on error
+                http.end();
                 return OperationResult::ERROR;
             }
         } else {
             Logger::log("Not enough space to begin OTA.");
-            http.end(); // Close connection on error
+            http.end();
             return OperationResult::ERROR;
         }
     } else {
         Logger::logf("Failed to download firmware. HTTP error: %d\n", httpCode);
-        http.end(); // Close connection on error
+        http.end();
         return OperationResult::ERROR;
     }
 
-    // This line is unreachable if update succeeds, but included for safety
     http.end();
     return OperationResult::SUCCESS;
 }

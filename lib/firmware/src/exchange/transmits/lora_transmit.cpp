@@ -127,7 +127,6 @@ double calculateToA(
     bool explicitHeader = true,
     int preambleLength = 8
 ) {
-    // Wszystkie czasy w milisekundach
     double tSym = (pow(2, sf) / (bw * 1000.0)) * 1000.0;
     double tPreamble = (preambleLength + 4.25) * tSym;
     

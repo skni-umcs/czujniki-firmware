@@ -16,7 +16,6 @@
 const int POLL_PERIOD_MS = 100; // low value for testing
 WiFiServer server(80);
 
-//TODO: rewrite connection logic, reverse 
 moduleAddress parseNodeId(const String &idMsg) {
     return idMsg.toInt();
 }
