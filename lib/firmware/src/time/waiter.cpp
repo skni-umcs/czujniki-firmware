@@ -39,7 +39,6 @@ void Waiter::changeTimerTask() {
 
 void Waiter::updateTime(int period) {
     this->waitMS = period;
-    //changeTimerTask();
 }
 
 executeFunctionType Waiter::getExecuteFunction() {
