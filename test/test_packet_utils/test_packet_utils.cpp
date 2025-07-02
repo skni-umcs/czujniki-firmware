@@ -280,8 +280,8 @@ void stress_test() {
 }
 
 void big_crc_overflow() {
-    std::string packet = "~$63$3$e0$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 2137\\\"]\",\"c\":63}^f14e1278~";
-    std::string validatedPart = "$63$3$e0$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 2137\\\"]\",\"c\":63}^";
+    std::string packet = "~$63$3$e0$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 5\\\"]\",\"c\":63}^f14e1278~";
+    std::string validatedPart = "$63$3$e0$37$0^{\"t\":\"p\",\"m\":\"[\\\"random prime number: 5\\\"]\",\"c\":63}^";
     uint32_t expected = 4048425592;
 
     TEST_ASSERT_TRUE(isPacketCorrect(packet));
