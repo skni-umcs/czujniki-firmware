@@ -27,7 +27,7 @@ void Waiter::changeTimerTask() {
 
     auto* taskPtr = new std::shared_ptr<Waiter>(shared_from_this());
 
-    const int bytesNeeded = 2560*2; //temporary value thats working
+    const int bytesNeeded = 2560*2;
     const char* taskName = "timerTask";
     void* taskArgument = static_cast<void*>(taskPtr);
     TaskHandle_t* const taskHandle = &this->currentTask;
