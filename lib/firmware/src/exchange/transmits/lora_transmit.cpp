@@ -118,6 +118,7 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
 	return OperationResult::SUCCESS;
 }
 
+//equation from: https://cdn.sparkfun.com/assets/learn_tutorials/8/0/4/RFM95_96_97_98W.pdf page 27
 double calculateToA(
     int size,
     int sf,
