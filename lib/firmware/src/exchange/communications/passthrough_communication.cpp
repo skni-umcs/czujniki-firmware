@@ -77,7 +77,7 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
     if (!vectorContains(messageSet, loraMessage)) {
         return alreadyRebroadcasted();
     }
-
+    messageSet.pop_back();
     std::vector<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
 
     if (sameMessages.empty()) {
@@ -97,7 +97,6 @@ OperationResult PassthroughCommunication::processNewMessage() {
 
 
     sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
-        this->messageSet.pop_back();
         this->rebroadcastAfterWait(loraMessage);
         this->ponderAfterWait();
     });
