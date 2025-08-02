@@ -108,6 +108,7 @@ OperationResult PassthroughCommunication::processNewMessage() {
 
 OperationResult PassthroughCommunication::ponderAfterWait() {
     if(!isSendWaiting && !messageSet.empty()) {
+        Logger::log("Start new passthrough ponder loop");
         isSendWaiting = true;
         processNewMessage();
     }
