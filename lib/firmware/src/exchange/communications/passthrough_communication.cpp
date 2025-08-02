@@ -94,6 +94,7 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
 
 OperationResult PassthroughCommunication::processNewMessage() {
     std::shared_ptr<LoraMessage> loraMessage = messageSet.back();
+    Logger::logf("PASSTHROUGH process new message %s", loraMessage->getPacket().c_str());
     int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
     if(passDelay < 1) {
         passDelay = 1;
