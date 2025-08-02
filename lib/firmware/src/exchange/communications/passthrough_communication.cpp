@@ -77,7 +77,10 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
     if (!vectorContains(messageSet, loraMessage)) {
         return alreadyRebroadcasted();
     }
+    int debugSizeBefore = messageSet.size();
     messageSet.pop_back();
+    int debugSizeAfter = messageSet.size();
+    Logger::logf("Popped up, messageSet decreased from %d to %d", debugSizeBefore, debugSizeAfter);
     std::vector<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
 
     if (sameMessages.empty()) {
@@ -151,6 +154,8 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
     Logger::logf("REBROADCAST CONDITION: %d", shouldRebroadcast(loraMessage));
     if (shouldRebroadcast(loraMessage)) {
         messageSet.emplace(messageSet.begin(), loraMessage);
+        int size = messageSet.size();
+        Logger::logf("Emplaced message in passthrough, size: %d", size);
         ponderAfterWait();
         return OperationResult::SUCCESS;
     }
