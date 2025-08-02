@@ -77,6 +77,8 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
     if (!vectorContains(messageSet, loraMessage)) {
         return alreadyRebroadcasted();
     }
+    std::shared_ptr<LoraMessage> lastLoraMessage = messageSet.back();
+    Logger::logf("rebroadcastAfterWait removing message %s", lastLoraMessage->getPacket().c_str());
     int debugSizeBefore = messageSet.size();
     messageSet.pop_back();
     int debugSizeAfter = messageSet.size();
