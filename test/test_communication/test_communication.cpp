@@ -69,8 +69,8 @@ void test_passthrough_no_message_in_set() {
     auto snr = -90;
     int currentRssi = 250;
     auto message = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr));
-    std::set<std::shared_ptr<LoraMessage>> set;
-    passthroughCommunication->removeSameMessages(set, message);
+    std::vector<std::shared_ptr<LoraMessage>> messages;
+    passthroughCommunication->removeSameMessages(messages, message);
 }
 
 void test_service_time_update() {
@@ -92,16 +92,31 @@ void test_passthrough_update_set_from_new_message() {
     auto senders = std::vector<moduleAddress>{55, 133};
     auto hopLimit = 2;
     auto rssi = std::vector<std::string>{"RSSI37"};
-    auto snr = -90;
+    auto snr = -10;
     int currentRssi = 250;
     auto oldMessage = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr));
     auto newMessage = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "test", rssi, hopLimit, currentRssi, snr));
     passthroughCommunication->getNotified(oldMessage);
     TEST_ASSERT_TRUE(oldMessage->getShouldTransmit());
     TEST_ASSERT_EQUAL(1, passthroughCommunication->getMessageSetLength());
+    TEST_ASSERT_TRUE(passthroughCommunication->getIsSendWaiting());
     passthroughCommunication->updateSetFromNewMessage(newMessage);
     TEST_ASSERT_FALSE(oldMessage->getShouldTransmit());
     TEST_ASSERT_EQUAL(0, passthroughCommunication->getMessageSetLength());
+}
+
+void test_passthrough_after_wait() {
+    auto senders = std::vector<moduleAddress>{55, 133};
+    auto hopLimit = 2;
+    auto rssi = std::vector<std::string>{"RSSI37"};
+    auto snr = -90;
+    int currentRssi = 250;
+    auto message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "1", rssi, hopLimit, currentRssi, snr));
+    auto message2 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "2", rssi, hopLimit, currentRssi, snr));
+    auto message3 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "3", rssi, hopLimit, currentRssi, snr));
+    passthroughCommunication->getNotified(message1);
+    passthroughCommunication->getNotified(message2);
+    passthroughCommunication->getNotified(message3);
 }
 
 void setup() {
@@ -115,6 +130,7 @@ void setup() {
     RUN_TEST(test_service_time_update);
     RUN_TEST(test_service_time_update_ignore_didnt_ask);
     RUN_TEST(test_passthrough_update_set_from_new_message);
+    RUN_TEST(test_passthrough_after_wait);
     UNITY_END();
 }
 

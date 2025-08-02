@@ -24,22 +24,6 @@ OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessag
     return OperationResult::SUCCESS;
 }
 
-//TODO: remove
-OperationResult PassthroughCommunication::transmit(std::string message, moduleAddress destinationNode) {
-    for(auto const& destination : transmitTo) {
-        if(destination->type() == TransmitType::LoraTransmit) {
-            std::shared_ptr<LoraTransmit> loraTransmit = std::static_pointer_cast<LoraTransmit>(destination);
-            if(loraTransmit->getWaitingMessagesCount() <= MAX_LORA_QUEUE_PASSTHROUGH) {
-                destination->send(GeneratedMessage::fromText(message, destinationNode));
-            }
-        }
-        else {
-            Logger::log("Passthrough only accepts lora transmit!");
-        }
-    }
-    return OperationResult::SUCCESS;
-}
-
 OperationResult PassthroughCommunication::transmit(std::shared_ptr<Message> message) {
     for(auto const& destination : transmitTo) {
         if(destination->type() == TransmitType::LoraTransmit) {
@@ -60,24 +44,24 @@ OperationResult alreadyRebroadcasted() {
     return OperationResult::SUCCESS;
 }
 
-std::set<std::shared_ptr<LoraMessage>> PassthroughCommunication::getSameMessages(std::shared_ptr<LoraMessage> message) {
-    std::set<std::shared_ptr<LoraMessage>> result;
+std::vector<std::shared_ptr<LoraMessage>> PassthroughCommunication::getSameMessages(std::shared_ptr<LoraMessage> message) {
+    std::vector<std::shared_ptr<LoraMessage>> result;
 
     for (auto setMessage : messageSet) {
         if(message != setMessage && message->isSameMessage(setMessage)) {
-            result.emplace(setMessage);
+            result.emplace(result.begin(), setMessage);
         }
     }
 
     return result;
 }
 
-OperationResult PassthroughCommunication::removeSameMessages(std::set<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
+OperationResult PassthroughCommunication::removeSameMessages(std::vector<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
     message->setShouldTransmit(false);
-    messageSet.erase(message);
+    vectorErase(messageSet, message);
     for (auto rebroadcastedMessage : rebroadcastedMessages) {
         rebroadcastedMessage->setShouldTransmit(false);
-        messageSet.erase(rebroadcastedMessage);
+        vectorErase(messageSet, rebroadcastedMessage);
     }
     return OperationResult::SUCCESS;
 }
@@ -88,12 +72,12 @@ bool PassthroughCommunication::shouldRebroadcast(std::shared_ptr<LoraMessage> me
     message->getDestination() != AddressHandler::getInstance()->readAddress();
 }
 
-OperationResult PassthroughCommunication::afterWait(std::shared_ptr<LoraMessage> loraMessage) {
-    if (!setContains(messageSet, loraMessage)) {
+OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<LoraMessage> loraMessage) {
+    if (!vectorContains(messageSet, loraMessage)) {
         return alreadyRebroadcasted();
     }
 
-    std::set<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
+    std::vector<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
 
     if (sameMessages.empty()) {
         rebroadcast(loraMessage);
@@ -102,8 +86,37 @@ OperationResult PassthroughCommunication::afterWait(std::shared_ptr<LoraMessage>
     return OperationResult::SUCCESS;
 }
 
+OperationResult PassthroughCommunication::processNewMessage() {
+    std::shared_ptr<LoraMessage> loraMessage = messageSet.back();
+    int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
+    if(passDelay < 1) {
+        passDelay = 1;
+    }
+    Logger::logf("PASSTHROUGH WAIT %i s\n", passDelay);
+
+
+    sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
+        this->messageSet.pop_back();
+        this->rebroadcastAfterWait(loraMessage);
+        this->ponderAfterWait();
+    });
+    sendWaiter.get()->updateTime(passDelay);
+    sendWaiter.get()->changeTimerTask();
+    return OperationResult::SUCCESS;
+}
+
+OperationResult PassthroughCommunication::ponderAfterWait() {
+    if(!isSendWaiting && !messageSet.empty()) {
+        isSendWaiting = true;
+        processNewMessage();
+    }
+    else {
+        isSendWaiting = false;
+    }
+    return OperationResult::SUCCESS;
+}
+
 OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_ptr<Message> message) {
-    //vTaskSuspendAll();
     std::vector<std::shared_ptr<LoraMessage>> toErase;
     for (const auto& oldMessage : messageSet) {
         if (oldMessage->getWasTransmitted()) {
@@ -118,9 +131,8 @@ OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_pt
         }
     }
     for (const auto& key : toErase) {
-        messageSet.erase(key);
+        vectorErase(messageSet, key);
     }
-    //xTaskResumeAll();
     return OperationResult::SUCCESS;
 }
 
@@ -137,23 +149,8 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
 
     Logger::logf("REBROADCAST CONDITION: %d", shouldRebroadcast(loraMessage));
     if (shouldRebroadcast(loraMessage)) {
-        messageSet.emplace(loraMessage);
-        int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
-        if(passDelay < 1) {
-            passDelay = 1;
-        }
-        Logger::logf("PASSTHROUGH WAIT %i s\n", passDelay);
-
-        //TODO: rewrite to receive task and send task
-        auto waiter = Waiter::create();
-        waiter.get()->setExecuteFunction([this, loraMessage, waiter]() {
-            this->afterWait(loraMessage);
-            this->waiters.erase(waiter);
-        });
-        waiter.get()->updateTime(passDelay);
-        waiter.get()->changeTimerTask();
-        waiters.emplace(waiter);
-
+        messageSet.emplace(messageSet.begin(), loraMessage);
+        ponderAfterWait();
         return OperationResult::SUCCESS;
     }
     return OperationResult::OPERATION_IGNORED;
@@ -162,4 +159,8 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
 
 int PassthroughCommunication::getMessageSetLength() {
     return messageSet.size();
+}
+
+bool PassthroughCommunication::getIsSendWaiting() {
+    return isSendWaiting;
 }
