@@ -104,6 +104,7 @@ OperationResult PassthroughCommunication::processNewMessage() {
 
     sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
         this->rebroadcastAfterWait(loraMessage);
+        this->isSendWaiting = false;
         this->ponderAfterWait();
     });
     sendWaiter.get()->updateTime(passDelay);
