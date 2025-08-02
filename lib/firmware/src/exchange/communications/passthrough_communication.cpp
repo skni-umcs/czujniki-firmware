@@ -103,6 +103,7 @@ OperationResult PassthroughCommunication::processNewMessage() {
 
 
     sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
+        Logger::log("PASSTHROUGH execute afterwait");
         this->rebroadcastAfterWait(loraMessage);
         this->isSendWaiting = false;
         this->ponderAfterWait();
