@@ -112,7 +112,7 @@ OperationResult PassthroughCommunication::ponderAfterWait() {
         isSendWaiting = true;
         processNewMessage();
     }
-    else {
+    else if (messageSet.empty()) {
         isSendWaiting = false;
     }
     return OperationResult::SUCCESS;
