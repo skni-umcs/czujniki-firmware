@@ -73,6 +73,7 @@ bool PassthroughCommunication::shouldRebroadcast(std::shared_ptr<LoraMessage> me
 }
 
 OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<LoraMessage> loraMessage) {
+    Logger::logf("rebroadcastAfterWait for %s", loraMessage->getPacket().c_str());
     if (!vectorContains(messageSet, loraMessage)) {
         return alreadyRebroadcasted();
     }
