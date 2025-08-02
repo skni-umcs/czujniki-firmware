@@ -99,7 +99,7 @@ OperationResult PassthroughCommunication::processNewMessage() {
     if(passDelay < 1) {
         passDelay = 1;
     }
-    Logger::logf("PASSTHROUGH WAIT %i s\n", passDelay);
+    Logger::logf("PASSTHROUGH WAIT %i ms\n", passDelay);
 
 
     sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
