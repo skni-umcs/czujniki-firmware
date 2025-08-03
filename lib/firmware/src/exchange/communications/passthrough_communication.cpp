@@ -93,7 +93,6 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
 }
 
 OperationResult PassthroughCommunication::processNewMessage() {
-    this->isOldLoop = true;
     std::shared_ptr<LoraMessage> loraMessage = messageSet.back();
     Logger::logf("PASSTHROUGH process new message %s", loraMessage->getPacket().c_str());
     int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
@@ -114,9 +113,10 @@ OperationResult PassthroughCommunication::processNewMessage() {
 }
 
 OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
-    Logger::log("ponderAfterWait");
+    Logger::logf("ponderAfterWait %d %d %d", isLoop, isOldLoop, messageSet.empty());
     if (!isOldLoop || isLoop) {
         if (!messageSet.empty()) {
+            isOldLoop = true;
             processNewMessage();
         }
         else {
