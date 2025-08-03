@@ -108,7 +108,7 @@ OperationResult PassthroughCommunication::processNewMessage() {
         this->isSendWaiting = false;
         this->ponderAfterWait();
     });
-    sendWaiter.get()->updateTime(passDelay);
+    sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
     sendWaiter.get()->changeTimerTask();
     return OperationResult::SUCCESS;
 }
