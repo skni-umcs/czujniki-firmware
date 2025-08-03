@@ -93,6 +93,7 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
 }
 
 OperationResult PassthroughCommunication::processNewMessage() {
+    this->isOldLoop = true;
     std::shared_ptr<LoraMessage> loraMessage = messageSet.back();
     Logger::logf("PASSTHROUGH process new message %s", loraMessage->getPacket().c_str());
     int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
@@ -105,22 +106,22 @@ OperationResult PassthroughCommunication::processNewMessage() {
     sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
         Logger::log("PASSTHROUGH execute afterwait");
         this->rebroadcastAfterWait(loraMessage);
-        this->isSendWaiting = false;
-        this->ponderAfterWait();
+        this->ponderAfterWait(true);
     });
     sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
     sendWaiter.get()->changeTimerTask();
     return OperationResult::SUCCESS;
 }
 
-OperationResult PassthroughCommunication::ponderAfterWait() {
-    if(!isSendWaiting && !messageSet.empty()) {
-        Logger::log("Start new passthrough ponder loop");
-        isSendWaiting = true;
-        processNewMessage();
-    }
-    else if (messageSet.empty()) {
-        isSendWaiting = false;
+OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
+    Logger::log("ponderAfterWait");
+    if (!isOldLoop || isLoop) {
+        if (!messageSet.empty()) {
+            processNewMessage();
+        }
+        else {
+            isOldLoop = false;
+        }
     }
     return OperationResult::SUCCESS;
 }
@@ -161,7 +162,7 @@ OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> m
         messageSet.emplace(messageSet.begin(), loraMessage);
         int size = messageSet.size();
         Logger::logf("Emplaced message in passthrough, size: %d", size);
-        ponderAfterWait();
+        ponderAfterWait(false);
         return OperationResult::SUCCESS;
     }
     return OperationResult::OPERATION_IGNORED;
@@ -173,5 +174,5 @@ int PassthroughCommunication::getMessageSetLength() {
 }
 
 bool PassthroughCommunication::getIsSendWaiting() {
-    return isSendWaiting;
+    return isOldLoop;
 }

@@ -9,7 +9,7 @@ class PassthroughCommunication : public SmallCommunication {
 
     std::vector<std::shared_ptr<LoraMessage>> messageSet;
     std::shared_ptr<Waiter> sendWaiter = Waiter::create();;
-    bool isSendWaiting = false;
+    bool isOldLoop = false;
 
     protected:
         PassthroughCommunication() {};
@@ -24,7 +24,7 @@ class PassthroughCommunication : public SmallCommunication {
         OperationResult transmit(std::shared_ptr<Message> message) override;
         bool shouldRebroadcast(std::shared_ptr<LoraMessage> message);
         OperationResult rebroadcastAfterWait(std::shared_ptr<LoraMessage> loraMessage);
-        OperationResult ponderAfterWait();
+        OperationResult ponderAfterWait(bool isLoop);
         OperationResult processNewMessage();
         int getMessageSetLength();
         bool getIsSendWaiting();
