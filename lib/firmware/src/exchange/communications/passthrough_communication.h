@@ -11,6 +11,11 @@ class PassthroughCommunication : public SmallCommunication {
     std::shared_ptr<Waiter> sendWaiter = Waiter::create();;
     bool isOldLoopActive = false;
 
+    TaskHandle_t passthroughTaskHandle = nullptr;
+    std::shared_ptr<LoraMessage> scheduledMessage = nullptr;
+    TickType_t scheduledDelayTicks = 0;
+    static void passthroughTaskFunc(void* pvParameters);
+
     protected:
         PassthroughCommunication() {};
 

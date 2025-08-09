@@ -93,27 +93,64 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
 }
 
 OperationResult PassthroughCommunication::processNewMessage() {
-    std::shared_ptr<LoraMessage> loraMessage = messageSet.back();
+    auto loraMessage = messageSet.back();
     Logger::logf("PASSTHROUGH process new message %s", loraMessage->getPacket().c_str());
-    int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
-    if(passDelay < 1) {
-        passDelay = 1;
-    }
+    int passDelay = (int)((double)(loraMessage->getSnr() - MINIMAL_SNR) * SNR_WAIT_MULTIPLIER);
+    if (passDelay < 1) passDelay = 1;
     Logger::logf("PASSTHROUGH WAIT %i ms\n", passDelay);
 
+    // create task once (use a larger stack to avoid overflow)
+    if (!passthroughTaskHandle) {
+        // increase stack size: adjust if needed (ESP32 often needs 4k-8k)
+        const uint32_t stackWords = configMINIMAL_STACK_SIZE * 6;
+        if (xTaskCreate(
+                PassthroughCommunication::passthroughTaskFunc,
+                "PassthroughTask",
+                stackWords,
+                this,
+                tskIDLE_PRIORITY + 2,
+                &passthroughTaskHandle) != pdPASS) {
+            Logger::log("PASSTHROUGH failed to create task");
+            // Replace with your actual error enum if you have one
+            return OperationResult::SUCCESS;
+        }
+    }
 
-    sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
-        Logger::log("PASSTHROUGH execute afterwait");
-        this->rebroadcastAfterWait(loraMessage);
-        this->ponderAfterWait(true);
-    });
-    Logger::log("PASSTHROUGH before updateTime");
-    sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
-    Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
-    isOldLoopActive = false;
-    sendWaiter.get()->changeTimerTask();
-    isOldLoopActive = true;
+    // ensure at least 1 ms of delay (avoid zero-tick)
+    int msDelay = passDelay / 15;
+    if (msDelay < 1) msDelay = 1;
+    scheduledMessage = loraMessage;
+    scheduledDelayTicks = pdMS_TO_TICKS(msDelay);
+
+    // notify task to (re)start the wait
+    xTaskNotifyGive(passthroughTaskHandle);
+
+    Logger::log("PASSTHROUGH scheduled (freertos)");
     return OperationResult::SUCCESS;
+}
+
+void PassthroughCommunication::passthroughTaskFunc(void* pvParameters) {
+    auto *self = static_cast<PassthroughCommunication*>(pvParameters);
+    for (;;) {
+        // Wait until a schedule arrives
+        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+
+        while (true) {
+            auto localMsg = self->scheduledMessage;
+            TickType_t localDelay = self->scheduledDelayTicks;
+            if (!localMsg) break;
+
+            // localDelay should be >= 1 tick thanks to the guard above
+            BaseType_t got = xTaskNotifyWait(0, 0, nullptr, localDelay);
+            if (got == pdFALSE) { // timeout -> execute
+                Logger::log("PASSTHROUGH execute afterwait (freertos)");
+                self->rebroadcastAfterWait(localMsg);
+                self->ponderAfterWait(true);
+                break; // done for this scheduledMessage
+            }
+            // else notified -> loop and read updated scheduledMessage
+        }
+    }
 }
 
 OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
