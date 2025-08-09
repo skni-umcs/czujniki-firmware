@@ -174,6 +174,9 @@ OperationResult LoraTransmit::advanceMessages() {
 				sendWaiter.get()->updateTime(airTime(message));
 				break;
 			}
+			else {
+				Logger::logf("LORATRANSMIT Message %s won't be broadcasted", message->getPacket().c_str());
+			}
 		}
 	}
 	else {
