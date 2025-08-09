@@ -23,6 +23,7 @@ void waiterTask(void* timerObjectRawPointer) {
 }
 
 void Waiter::changeTimerTask() {
+    Logger::log("WAITER changeTimerTask");
     deleteTimerTask();
 
     auto* taskPtr = new std::shared_ptr<Waiter>(shared_from_this());

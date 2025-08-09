@@ -107,7 +107,9 @@ OperationResult PassthroughCommunication::processNewMessage() {
         this->rebroadcastAfterWait(loraMessage);
         this->ponderAfterWait(true);
     });
+    Logger::log("PASSTHROUGH before updateTime");
     sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
+    Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
     sendWaiter.get()->changeTimerTask();
     return OperationResult::SUCCESS;
 }
