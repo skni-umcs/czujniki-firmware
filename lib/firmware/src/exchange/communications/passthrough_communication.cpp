@@ -120,6 +120,7 @@ OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
             processNewMessage();
         }
         else {
+            Logger::logf("PASSTHROUGH set empty for isLoop: %d", isLoop);
             isOldLoopActive = false;
         }
     }
