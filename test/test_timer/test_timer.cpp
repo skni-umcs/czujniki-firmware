@@ -19,9 +19,21 @@ void testDeleteTaskAfterTimeUpdate() {
     TEST_ASSERT_LESS_OR_EQUAL(10, numberOfTasks); //the default background tasks are usually 6-8
 }
 
+void testDeleteTaskAfterTimeUpdateWaiter() {
+    std::shared_ptr<Waiter> timer = Waiter::create();
+    for(int i = 0;i<50;++i) {
+        timer.get()->updateTime(100000);
+        timer.get()->changeTimerTask();
+    }
+    UBaseType_t numberOfTasks = uxTaskGetNumberOfTasks();
+    TEST_ASSERT_LESS_OR_EQUAL(10, numberOfTasks); //the default background tasks are usually 6-8
+}
+
+
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(testDeleteTaskAfterTimeUpdate);
+    RUN_TEST(testDeleteTaskAfterTimeUpdateWaiter);
     UNITY_END();
 }
 

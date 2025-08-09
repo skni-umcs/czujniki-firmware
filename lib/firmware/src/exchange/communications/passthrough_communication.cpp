@@ -111,6 +111,7 @@ OperationResult PassthroughCommunication::processNewMessage() {
     sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
     Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
     sendWaiter.get()->changeTimerTask();
+    sendWaiter.get()->changeTimerTask();
     return OperationResult::SUCCESS;
 }
 
