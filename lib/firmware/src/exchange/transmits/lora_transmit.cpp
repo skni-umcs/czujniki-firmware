@@ -20,7 +20,7 @@ void printParameters(struct Configuration configuration);
 const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5*60000;
 const int MAX_MESSAGE_ADVANCE_MS = 60*60000;
-const int CHANNEL = 39;
+const int CHANNEL = 20;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
@@ -72,6 +72,9 @@ void LoraTransmit::setup() {
 	configuration.TRANSMISSION_MODE.fixedTransmission = FT_FIXED_TRANSMISSION; // Enable repeater mode
 	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
+	configuration.TRANSMISSION_MODE.enableLBT = 1;
+	configuration.Crypt.CRYPT_H = 1;
+	configuration.Crypt.CRYPT_L = 1;
 	configuration.OPTION.transmissionPower = POWER_10;
 	configuration.CHAN = CHANNEL;
 	configuration.ADDL = address & 0x00ff;
