@@ -95,22 +95,22 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
 OperationResult PassthroughCommunication::processNewMessage() {
     std::shared_ptr<LoraMessage> loraMessage = messageSet.back();
     Logger::logf("PASSTHROUGH process new message %s", loraMessage->getPacket().c_str());
-    int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
-    if(passDelay < 1) {
-        passDelay = 1;
-    }
-    Logger::logf("PASSTHROUGH WAIT %i ms\n", passDelay);
-
 
     sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
         Logger::log("PASSTHROUGH execute afterwait");
+        int passDelay = (int)((double)(loraMessage->getSnr()-MINIMAL_SNR)*SNR_WAIT_MULTIPLIER);
+        if(passDelay < 1) {
+            passDelay = 1;
+        }
+        Logger::logf("PASSTHROUGH WAIT %i ms\n", passDelay);
+        delay(passDelay/15); //TODO: FIX /15
         this->rebroadcastAfterWait(loraMessage);
         this->ponderAfterWait(true);
     });
     Logger::log("PASSTHROUGH before updateTime");
-    sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
-    Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
-    sendWaiter.get()->changeTimerTask();
+    sendWaiter.get()->updateTime(1);
+    //Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
+    //sendWaiter.get()->changeTimerTask();
     return OperationResult::SUCCESS;
 }
 
