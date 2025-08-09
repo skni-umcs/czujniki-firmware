@@ -119,6 +119,18 @@ void test_passthrough_after_wait() {
     passthroughCommunication->getNotified(message3);
 }
 
+void test_passthrough_ponder_empty_loop() {
+    passthroughCommunication->ponderAfterWait(true);
+
+    auto senders = std::vector<moduleAddress>{55, 133};
+    auto hopLimit = 2;
+    auto rssi = std::vector<std::string>{"RSSI37"};
+    auto snr = -90;
+    int currentRssi = 250;
+    auto message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 1, "1", rssi, hopLimit, currentRssi, snr));
+    passthroughCommunication->ponderAfterWait(true);
+}
+
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(test_sensor_subscription);
@@ -131,6 +143,7 @@ void setup() {
     RUN_TEST(test_service_time_update_ignore_didnt_ask);
     RUN_TEST(test_passthrough_update_set_from_new_message);
     RUN_TEST(test_passthrough_after_wait);
+    RUN_TEST(test_passthrough_ponder_empty_loop);
     UNITY_END();
 }
 
