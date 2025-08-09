@@ -62,7 +62,9 @@ int Waiter::getWaitMs() {
 
 OperationResult Waiter::deleteTimerTask() {
     if(this->currentTask != NULL) {
+        Logger::log("WAITER before vTaskDelete");
         vTaskDelete(this->currentTask);
+        Logger::log("WAITER after vTaskDelete");
         this->currentTask = NULL;
         return OperationResult::SUCCESS;
     }
