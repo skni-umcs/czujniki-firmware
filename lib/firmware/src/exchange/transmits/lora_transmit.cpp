@@ -73,8 +73,8 @@ void LoraTransmit::setup() {
 	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
 	configuration.TRANSMISSION_MODE.enableLBT = 1;
-	configuration.Crypt.CRYPT_H = 1;
-	configuration.Crypt.CRYPT_L = 1;
+	configuration.CRYPT.CRYPT_H = 1;
+	configuration.CRYPT.CRYPT_L = 1;
 	configuration.OPTION.transmissionPower = POWER_10;
 	configuration.CHAN = CHANNEL;
 	configuration.ADDL = address & 0x00ff;
