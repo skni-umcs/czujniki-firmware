@@ -25,6 +25,7 @@ void waiterTask(void* timerObjectRawPointer) {
 void Waiter::changeTimerTask() {
     Logger::log("WAITER changeTimerTask");
     deleteTimerTask();
+    Logger::log("WAITER after deleteTimerTask");
 
     auto* taskPtr = new std::shared_ptr<Waiter>(shared_from_this());
 
@@ -32,6 +33,7 @@ void Waiter::changeTimerTask() {
     const char* taskName = "timerTask";
     void* taskArgument = static_cast<void*>(taskPtr);
     TaskHandle_t* const taskHandle = &this->currentTask;
+    Logger::log("WAITER before xTaskCreate");
     int heap_status = xTaskCreate(waiterTask, taskName, bytesNeeded, taskArgument, taskPriority, taskHandle);
     if(heap_status != 1) {
         Logger::log("HEAP OVERLOAD");
