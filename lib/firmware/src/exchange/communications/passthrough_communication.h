@@ -9,7 +9,7 @@ class PassthroughCommunication : public SmallCommunication {
 
     std::vector<std::shared_ptr<LoraMessage>> messageSet;
     std::shared_ptr<Waiter> sendWaiter = Waiter::create();;
-    bool isOldLoop = false;
+    bool isOldLoopActive = false;
 
     protected:
         PassthroughCommunication() {};

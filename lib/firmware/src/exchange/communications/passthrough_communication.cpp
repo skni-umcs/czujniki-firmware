@@ -113,14 +113,14 @@ OperationResult PassthroughCommunication::processNewMessage() {
 }
 
 OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
-    Logger::logf("ponderAfterWait %d %d %d", isLoop, isOldLoop, messageSet.empty());
-    if (!isOldLoop || isLoop) {
+    Logger::logf("ponderAfterWait %d %d %d", isLoop, isOldLoopActive, messageSet.empty());
+    if (!isOldLoopActive || isLoop) {
         if (!messageSet.empty()) {
-            isOldLoop = true;
+            isOldLoopActive = true;
             processNewMessage();
         }
         else {
-            isOldLoop = false;
+            isOldLoopActive = false;
         }
     }
     return OperationResult::SUCCESS;
@@ -137,9 +137,11 @@ OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_pt
             toErase.push_back(oldMessage);
         }
         else if(messageSet.size()-toErase.size() > MAXMIMUM_PASSTHROUGH_MESSAGES) {
+            //oldMessage->setShouldTransmit(false); //TODO: uncomment
             toErase.push_back(oldMessage);
         }
     }
+    Logger::logf("PASSTHROUGH ERASE %d messages", toErase.size());
     for (const auto& key : toErase) {
         vectorErase(messageSet, key);
     }
@@ -174,5 +176,5 @@ int PassthroughCommunication::getMessageSetLength() {
 }
 
 bool PassthroughCommunication::getIsSendWaiting() {
-    return isOldLoop;
+    return isOldLoopActive;
 }
