@@ -35,6 +35,9 @@ void Waiter::changeTimerTask() {
     if(heap_status != 1) {
         Logger::log("HEAP OVERLOAD");
     }
+    else {
+        Logger::logf("WAITER TASK created with code %d", heap_status);
+    }
 }
 
 void Waiter::updateTime(int period) {
