@@ -102,19 +102,16 @@ OperationResult PassthroughCommunication::processNewMessage() {
     Logger::logf("PASSTHROUGH WAIT %i ms\n", passDelay);
 
 
-    // sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
-    //     Logger::log("PASSTHROUGH execute afterwait");
-    //     this->rebroadcastAfterWait(loraMessage);
-    //     this->ponderAfterWait(true);
-    // });
-    // Logger::log("PASSTHROUGH before updateTime");
-    // sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
-    // Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
-    // sendWaiter.get()->changeTimerTask();
-    delay(passDelay);
-    Logger::log("PASSTHROUGH execute afterwait");
-    rebroadcastAfterWait(loraMessage);
-    ponderAfterWait(true);
+    sendWaiter.get()->setExecuteFunction([this, loraMessage]() {
+        Logger::log("PASSTHROUGH execute afterwait");
+        this->rebroadcastAfterWait(loraMessage);
+        this->ponderAfterWait(true);
+    });
+    Logger::log("PASSTHROUGH before updateTime");
+    sendWaiter.get()->updateTime(passDelay/15); //TODO: FIX /15
+    Logger::log("PASSTHROUGH before changeTimerTask (waiter)");
+    sendWaiter.get()->changeTimerTask();
+    sendWaiter.get()->changeTimerTask();
     return OperationResult::SUCCESS;
 }
 
