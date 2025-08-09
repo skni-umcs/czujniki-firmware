@@ -122,7 +122,9 @@ OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
         else {
             Logger::logf("PASSTHROUGH set empty for isLoop: %d", isLoop);
             isOldLoopActive = false;
-            sendWaiter->updateTime(1000000000);
+            sendWaiter.get()->setExecuteFunction([]() {
+            });
+            sendWaiter->updateTime(1000000);
             sendWaiter->changeTimerTask();
         }
     }
