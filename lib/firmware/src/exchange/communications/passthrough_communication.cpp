@@ -88,7 +88,9 @@ OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<L
     if (sameMessages.empty()) {
         rebroadcast(loraMessage);
     }
-    removeSameMessages(sameMessages, loraMessage);
+    else {
+        removeSameMessages(sameMessages, loraMessage);
+    }
     return OperationResult::SUCCESS;
 }
 
