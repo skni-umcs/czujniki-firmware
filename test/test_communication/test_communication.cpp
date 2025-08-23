@@ -13,23 +13,6 @@
 #include "mock_transmit.h"
 #include <exchange/communications/sensor_communication.h>
 #include <exchange/communications/update_communication.h>
-#include <exchange/communications/config_communication.h>
-#include "utils/address_handler.h"
-
-const moduleAddress TEST_MODULE_ADDRESS = 28;
-
-class MockAddressHandler : public AddressHandler {
-    public:
-        moduleAddress readAddress() override;
-};
-
-moduleAddress MockAddressHandler::readAddress() {
-    return TEST_MODULE_ADDRESS;
-}
-
-void setupAddressHandler() {
-    AddressHandler::_DEBUG_setInstance(std::shared_ptr<AddressHandler>(new MockAddressHandler()));
-}
 
 void test_subscription_small(std::shared_ptr<SmallCommunication> communication, std::shared_ptr<SmallTransmit> transmit) {
     communication->subscribe(transmit);
@@ -148,34 +131,6 @@ void test_passthrough_ponder_empty_loop() {
     passthroughCommunication->ponderAfterWait(true);
 }
 
-
-void test_service_config_change() {
-    auto serviceCommunication = ServiceCommunication::create();
-    auto sensorFacade = SensorFacade::create(MockTransmit::create(), SensorCommunication::create(), serviceCommunication);
-    auto configCommunication = ConfigCommunication::create(sensorFacade, serviceCommunication);
-
-    auto senders = std::vector<moduleAddress>{55, 133};
-    auto hopLimit = 2;
-    auto rssi = std::vector<std::string>{"RSSI37"};
-    auto snr = -90;
-    int currentRssi = 250;
-    auto message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "t501", rssi, hopLimit, currentRssi, snr));
-    configCommunication->getNotified(message1);
-    TEST_ASSERT_EQUAL(501*1000, sensorFacade->getTelemetryPeriodMs());
-
-    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "s502", rssi, hopLimit, currentRssi, snr));
-    configCommunication->getNotified(message1);
-    TEST_ASSERT_EQUAL(502*1000, sensorFacade->getServicePeriodMs());
-
-    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "a31", rssi, hopLimit, currentRssi, snr));
-    configCommunication->getNotified(message1);
-    TEST_ASSERT_EQUAL(31*1000, serviceCommunication->getAskTimeoutMs());
-
-    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "p32", rssi, hopLimit, currentRssi, snr));
-    configCommunication->getNotified(message1);
-    TEST_ASSERT_EQUAL(32*1000, serviceCommunication->getTimeSyncPeriodMs());
-}
-
 void setup() {
     UNITY_BEGIN();
     RUN_TEST(test_sensor_subscription);
@@ -189,7 +144,6 @@ void setup() {
     RUN_TEST(test_passthrough_update_set_from_new_message);
     RUN_TEST(test_passthrough_after_wait);
     RUN_TEST(test_passthrough_ponder_empty_loop);
-    RUN_TEST(test_service_config_change);
     UNITY_END();
 }
 

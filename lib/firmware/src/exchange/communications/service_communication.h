@@ -38,7 +38,6 @@ class ServiceCommunication : public SmallCommunication {
         OperationResult setTimeSyncPeriodMs(int timeSyncPeriodMs);
         int getAskTimeoutMs();
         int getTimeSyncPeriodMs();
-        OperationResult modifyConfig(std::string);
 
 };
 

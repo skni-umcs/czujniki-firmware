@@ -15,8 +15,7 @@ enum class TransmissionCode : char {
     RESET = 'r',
     TELEMETRY_READING = 'p',
     SERVICE_READING = 's',
-    TIME_SYNCHRONIZATION = 'o',
-    CONFIG_DATA = 'u'
+    TIME_SYNCHRONIZATION = 'o'
 };
 
 class MessageContent {
