@@ -157,29 +157,31 @@ void test_config_change() {
     configFacade->plugServiceCommunication(serviceCommunication);
     auto configCommunication = ConfigCommunication::create(configFacade);
 
-    auto senders = std::vector<moduleAddress>{55, 133};
+    auto senders = std::vector<moduleAddress>{55, 133}; 
     auto hopLimit = 2;
     auto rssi = std::vector<std::string>{"RSSI37"};
     auto snr = -90;
     int currentRssi = 250;
-    auto message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "t501", rssi, hopLimit, currentRssi, snr));
+
+    auto message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 255, "{\"t\": \"u\",\"m\": \"t501\",\"c\": 63}", rssi, hopLimit, currentRssi, snr));
     configCommunication->getNotified(message1);
     TEST_ASSERT_EQUAL(501*1000, sensorFacade->getTelemetryPeriodMs());
 
-    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "s502", rssi, hopLimit, currentRssi, snr));
+    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 255, "{\"t\": \"u\",\"m\": \"s502\",\"c\": 63}", rssi, hopLimit, currentRssi, snr));
     configCommunication->getNotified(message1);
     TEST_ASSERT_EQUAL(502*1000, sensorFacade->getServicePeriodMs());
 
-    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "a31", rssi, hopLimit, currentRssi, snr));
+    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 255, "{\"t\": \"u\",\"m\": \"a31\",\"c\": 63}", rssi, hopLimit, currentRssi, snr));
     configCommunication->getNotified(message1);
     TEST_ASSERT_EQUAL(31*1000, serviceCommunication->getAskTimeoutMs());
 
-    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, TEST_MODULE_ADDRESS, "p32", rssi, hopLimit, currentRssi, snr));
+    message1 = std::shared_ptr<LoraMessage>(new LoraMessage(senders, 255, "{\"t\": \"u\",\"m\": \"p32\",\"c\": 63}", rssi, hopLimit, currentRssi, snr));
     configCommunication->getNotified(message1);
     TEST_ASSERT_EQUAL(32*1000, serviceCommunication->getTimeSyncPeriodMs());
 }
 
 void setup() {
+    setupAddressHandler();
     UNITY_BEGIN();
     RUN_TEST(test_sensor_subscription);
     RUN_TEST(test_passthrough_subscription);

@@ -4,6 +4,7 @@
 #include <ArduinoJson.h>
 #include "time/time_constants.h"
 #include <utils/logger.h>
+#include <iostream>
 
 MessageContent::MessageContent(TransmissionCode type, std::string message) {
     this->type = type;
@@ -39,7 +40,6 @@ std::string MessageContent::getJson() {
 MessageContent MessageContent::fromJson(std::string jsonString) {
     JsonDocument doc;
     DeserializationError error = deserializeJson(doc, jsonString);
-    
     if (error) {
         Logger::logf("Failed to deserialize json %s", jsonString.c_str());
 		return MessageContent(TransmissionCode::ERROR_CODE, "");

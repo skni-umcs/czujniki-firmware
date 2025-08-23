@@ -139,6 +139,7 @@ OperationResult Message::decrementHopLimit() {
 }
 
 bool Message::isCurrentDestination() {
+    std::cout << getDestination() << " " << AddressHandler::getInstance()->readAddress() << std::endl;
     return getDestination() == AddressHandler::getInstance()->readAddress();
 }
 

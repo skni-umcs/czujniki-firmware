@@ -22,14 +22,12 @@ OperationResult ConfigCommunication::getNotified(std::shared_ptr<Message> messag
         Logger::logf("config is notified of invalid packet %s\n", message.get()->getPacket().c_str());
         return OperationResult::ERROR;
     }
-    if(!message->isCurrentDestination()) {
-        return OperationResult::OPERATION_IGNORED;
-    }
+    //No current destination check - configs are global and broadcasted
     MessageContent serverMessage = MessageContent::fromJson(message->getContent());
     TransmissionCode messageType = serverMessage.getType();
     switch(messageType) {
         case(TransmissionCode::CONFIG_UPDATE):
-            updateConfig(message->getContent());
+            updateConfig(serverMessage.getDetails());
             break;
     }
     return OperationResult::SUCCESS;
@@ -38,7 +36,7 @@ OperationResult ConfigCommunication::updateConfig(std::string configDetails) {
     if (configDetails.empty()) {
         return OperationResult::ERROR;
     }
-
+    
     char cmd = static_cast<char>(std::tolower(static_cast<unsigned char>(configDetails[0])));
     std::string arg = configDetails.substr(1);
 
@@ -66,7 +64,8 @@ OperationResult ConfigCommunication::updateConfig(std::string configDetails) {
             }
 
             case 'r': {
-                //todo: implement
+                //TODO: implement
+                //TODO: to a current destination check since main function doesnt
                 return OperationResult::NOT_FOUND;
             }
 
