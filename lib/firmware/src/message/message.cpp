@@ -7,7 +7,7 @@
 #include <utils/address_handler.h>
 #include <utils/logger.h>
 
-const unsigned char HOP_START_LIMIT = 100;
+const unsigned char HOP_START_LIMIT = 10;
 
 Message::Message() {}
 

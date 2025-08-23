@@ -14,7 +14,7 @@ void DEBUG_timeTransmit::setup() {
 	Logger::log("Setupping DEBUG_timeTransmit");
 }
 
-std::shared_ptr<DEBUG_timeTransmit> DEBUG_timeTransmit::create(std::shared_ptr<WifiTransmit> DEBUG_wifi) {
+std::shared_ptr<DEBUG_timeTransmit> DEBUG_timeTransmit::create() {
     auto loraTransmit = new DEBUG_timeTransmit();
 
     loraTransmit->setup();

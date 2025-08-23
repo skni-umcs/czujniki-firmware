@@ -88,9 +88,9 @@ void LoraTransmit::setup() {
 	updateNoise();
 }
 
-std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit> DEBUG_wifi) {
+std::shared_ptr<LoraTransmit> LoraTransmit::create() {
     auto loraTransmit = new LoraTransmit();
-	loraTransmit->DEBUG_wifi = DEBUG_wifi;
+	//loraTransmit->DEBUG_wifi = DEBUG_wifi;
 
     loraTransmit->setup();
 
@@ -113,7 +113,6 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create(std::shared_ptr<WifiTransmit>
 }
 
 OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
-	DEBUG_wifi->send(message);
 	std::string packet = message.get()->createPacketForSending();
 	Logger::logf("SEND %s\n", packet.c_str());
 	transmitCount++;

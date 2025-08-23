@@ -45,11 +45,10 @@ class LoraTransmit : public SmallTransmit
   std::deque<std::shared_ptr<Message>> messages;
   bool canTransmit = true;
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
-  std::shared_ptr<WifiTransmit> DEBUG_wifi;
   int transmitCount = 0;
 
   public:
-    static std::shared_ptr<LoraTransmit> create(std::shared_ptr<WifiTransmit> DEBUG_wifi);
+    static std::shared_ptr<LoraTransmit> create();
     void setup();
     OperationResult poll();
     OperationResult physicalSend(std::shared_ptr<Message> message);

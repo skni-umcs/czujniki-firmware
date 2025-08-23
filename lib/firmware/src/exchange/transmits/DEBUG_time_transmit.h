@@ -15,7 +15,7 @@ class DEBUG_timeTransmit : public SmallTransmit
   int noisedB;
 
   public:
-    static std::shared_ptr<DEBUG_timeTransmit> create(std::shared_ptr<WifiTransmit> DEBUG_wifi);
+    static std::shared_ptr<DEBUG_timeTransmit> create();
     void setup();
     OperationResult poll();
     OperationResult send(std::shared_ptr<Message> message) override;

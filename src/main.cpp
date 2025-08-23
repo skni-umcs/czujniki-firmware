@@ -33,14 +33,14 @@ void setup() {
   Serial.begin(9600);
   delay(1000);
 
-  auto wifiTransmit = WifiTransmit::create();
-  Logger::setWifi(wifiTransmit);
+  // auto wifiTransmit = WifiTransmit::create();
+  // Logger::setWifi(wifiTransmit);
 
   delay(5000);
   AddressHandler::getInstance().get()->initializeAddress();
 
 
-  auto transmit = TRANSMIT_TYPE::create(wifiTransmit);
+  auto transmit = TRANSMIT_TYPE::create();//wifiTransmit);
   delay(1000);
   
   auto sensorCommunication = SensorCommunication::create();
@@ -54,8 +54,8 @@ void setup() {
   auto passthroughCommunication = PassthroughCommunication::create();
   passthroughCommunication.get()->subscribe(transmit);
 
-  auto updateCommunication = UpdateCommunication::create();
-  updateCommunication->subscribe(wifiTransmit);
+  //auto updateCommunication = UpdateCommunication::create();
+  //updateCommunication->subscribe(wifiTransmit);
 
   auto configurationFacade = std::shared_ptr<ConfigurationFacade>(new ConfigurationFacade());
   #if defined(production)
