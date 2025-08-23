@@ -1,3 +1,6 @@
+#ifndef SENSORFACADE_H
+#define SENSORFACADE_H
+
 #include "subtypes/sensor.h"
 #include <vector>
 #include <memory>
@@ -50,3 +53,5 @@ class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
         int getServicePeriodMs();
         int getTelemetryPeriodMs();
 };
+
+#endif
