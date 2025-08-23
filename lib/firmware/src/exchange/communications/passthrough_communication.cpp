@@ -19,7 +19,6 @@ std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
 
 OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
     message->decrementHopLimit();
-    //TODO: scheduling transmit is not enough because you should wait as long as possible to make sure the message wasnt received from another node
     transmit(message);
     return OperationResult::SUCCESS;
 }
@@ -171,7 +170,7 @@ OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_pt
             toErase.push_back(oldMessage);
         }
         else if(messageSet.size()-toErase.size() > MAXMIMUM_PASSTHROUGH_MESSAGES) {
-            //oldMessage->setShouldTransmit(false); //TODO: uncomment
+            oldMessage->setShouldTransmit(false);
             toErase.push_back(oldMessage);
         }
     }
