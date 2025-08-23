@@ -107,8 +107,7 @@ OperationResult ServiceCommunication::setLastAskTime(unsigned long lastAskTime) 
 
 OperationResult ServiceCommunication::setAskTimeoutMs(int askTimeoutMs) {
     this->askTimeoutMs = askTimeoutMs;
-    //TODO: fix timeout timer faulty condition
-    // /askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
+    askTimeTimeoutTimer.get()->updateTime(askTimeoutMs);
     return OperationResult::SUCCESS;
 }
 
