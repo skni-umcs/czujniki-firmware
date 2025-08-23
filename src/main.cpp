@@ -20,6 +20,8 @@
 #include <vector>
 #include "exchange/communications/update_communication.h"
 #include "utils/logger.h"
+#include "utils/configuration_facade.h"
+#include <exchange/communications/config_communication.h>
 
 #if defined(production)
 using TRANSMIT_TYPE = LoraTransmit;
@@ -55,6 +57,17 @@ void setup() {
   auto updateCommunication = UpdateCommunication::create();
   updateCommunication->subscribe(wifiTransmit);
 
+  auto configurationFacade = std::shared_ptr<ConfigurationFacade>(new ConfigurationFacade());
+  #if defined(production)
+    configurationFacade->plugLoraTransmit(transmit);
+  #endif
+  configurationFacade->plugPassthroughCommunication(passthroughCommunication);
+  configurationFacade->plugSensorFacade(facade);
+  configurationFacade->plugServiceCommunication(serviceCommunication);
+  
+  auto configCommunication = ConfigCommunication::create(configurationFacade);
+  configCommunication->subscribe(transmit);
+  
 }
 
 void loop() {

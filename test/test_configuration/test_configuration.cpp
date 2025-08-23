@@ -33,6 +33,7 @@ void test_set_ask_timeout_no_save_and_get() {
     TEST_ASSERT_EQUAL(DEFAULT_ASK_TIMEOUT_MS, configuration.getAskTimeoutMs());
     TEST_ASSERT_EQUAL(OperationResult::SUCCESS, configuration.setAskTimeoutMs(9876, false));
     TEST_ASSERT_EQUAL(9876, configuration.getAskTimeoutMs());
+    TEST_ASSERT_EQUAL(9876, service->getAskTimeoutMs());
 }
 
 void test_set_time_sync_and_save() {
@@ -43,6 +44,7 @@ void test_set_time_sync_and_save() {
     TEST_ASSERT_EQUAL(DEFAULT_TIME_SYNC_PERIOD_MS, configuration.getTimeSyncPeriodMs());
     TEST_ASSERT_EQUAL(OperationResult::SUCCESS, configuration.setTimeSyncPeriodMs(123456, true));
     TEST_ASSERT_EQUAL(123456, configuration.getTimeSyncPeriodMs());
+    TEST_ASSERT_EQUAL(123456, service->getTimeSyncPeriodMs());
 }
 
 void test_set_invalid_values() {
