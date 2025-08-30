@@ -17,7 +17,7 @@ class ConfigCommunication : public SmallCommunication {
     public:
         static std::shared_ptr<ConfigCommunication> create(std::shared_ptr<ConfigurationFacade> configFacade);
         OperationResult getNotified(std::shared_ptr<Message> message) override;
-        OperationResult updateConfig(std::string message);
+        OperationResult updateConfig(std::string message, moduleAddress destination);
 
 };
 

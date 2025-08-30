@@ -8,6 +8,7 @@
 #include "time/time_constants.h"
 #include <message/message_content.h>
 #include <utils/logger.h>
+#include <utils/address_handler.h>
 
 std::shared_ptr<ConfigCommunication> ConfigCommunication::create(std::shared_ptr<ConfigurationFacade> configFacade) {
     auto configCommunication = std::shared_ptr<ConfigCommunication>(new ConfigCommunication());
@@ -22,17 +23,17 @@ OperationResult ConfigCommunication::getNotified(std::shared_ptr<Message> messag
         Logger::logf("config is notified of invalid packet %s\n", message.get()->getPacket().c_str());
         return OperationResult::ERROR;
     }
-    //No current destination check - configs are global and broadcasted
+    //No current destination check - configs are global and broadcasted unless specified otherwise in the updateConfig switch case
     MessageContent serverMessage = MessageContent::fromJson(message->getContent());
     TransmissionCode messageType = serverMessage.getType();
     switch(messageType) {
         case(TransmissionCode::CONFIG_UPDATE):
-            updateConfig(serverMessage.getDetails());
+            updateConfig(serverMessage.getDetails(), message->getDestination());
             break;
     }
     return OperationResult::SUCCESS;
 }
-OperationResult ConfigCommunication::updateConfig(std::string configDetails) {
+OperationResult ConfigCommunication::updateConfig(std::string configDetails, moduleAddress destination) {
     if (configDetails.empty()) {
         return OperationResult::ERROR;
     }
@@ -64,9 +65,11 @@ OperationResult ConfigCommunication::updateConfig(std::string configDetails) {
             }
 
             case 'r': {
-                //TODO: implement
-                //TODO: to a current destination check since main function doesnt
-                return OperationResult::NOT_FOUND;
+                if(destination == AddressHandler::getInstance()->readAddress()) {
+                    ESP.restart();
+                    return OperationResult::SUCCESS;
+                }
+                return OperationResult::OPERATION_IGNORED;
             }
 
             case 't': {

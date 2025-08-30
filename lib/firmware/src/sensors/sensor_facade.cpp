@@ -26,6 +26,12 @@
 uint32_t delayMS = 1000;
 #define TELEMETRY_DELAY_MS 20000
 
+static void sensor_reset_task(void *pvParameters) {
+    vTaskDelay(pdMS_TO_TICKS(SECONDS_IN_MINUTE * MS_IN_SECOND));
+    ESP.restart();
+    vTaskDelete(NULL);
+}
+
 SensorFacade::SensorFacade() {
 }
 
@@ -131,6 +137,9 @@ OperationResult SensorFacade::setupTelemetry() {
         
     }
     Logger::logf("Size of telemetry sensors %i\n", telemetrySensors.size());
+    if(telemetrySensors.size() == 0) {
+        xTaskCreate(sensor_reset_task, "sensor_reset", 4096, nullptr, 1, nullptr);
+    }
     return OperationResult::SUCCESS;
 }
 
