@@ -41,7 +41,7 @@ void test_wifi_subscription_big() {
 void test_DEBUG_subscription_small() {
     test_subscription_small(
         MockSmallCommunication::create(),
-        DEBUG_timeTransmit::create(WifiTransmit::create())
+        DEBUG_timeTransmit::create()
     );
 }
 
