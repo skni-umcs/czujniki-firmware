@@ -8,8 +8,8 @@
 #include "time/timer.h"
 #include <exchange/communications/service_communication.h>
 
-const int DEFAULT_SERVICE_PERIOD_MS = 60000*2+30000;
-const int DEFAULT_TELEMETRY_PERIOD_MS = DEFAULT_SERVICE_PERIOD_MS*2;
+const int DEFAULT_SERVICE_PERIOD_MS = 60000*4;
+const int DEFAULT_TELEMETRY_PERIOD_MS = 60000*5;
 
 class SensorFacade : public std::enable_shared_from_this<SensorFacade> {
 
