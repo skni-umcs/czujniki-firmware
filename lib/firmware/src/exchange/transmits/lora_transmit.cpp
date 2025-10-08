@@ -279,6 +279,8 @@ OperationResult LoraTransmit::poll() {
 				Logger::log(rc.status.getResponseDescription());
 				return OperationResult::ERROR;
 			}else{
+				updateNoise();
+				delay(10);
 				byte rssi = rc.rssi;
 				int snr = getSnr((int)rssi);
 				auto loraMessage = std::shared_ptr<LoraMessage>(new LoraMessage(fromWString(rc.data), rssi, snr));
