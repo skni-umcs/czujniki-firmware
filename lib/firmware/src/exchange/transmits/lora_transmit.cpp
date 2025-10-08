@@ -174,11 +174,13 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 }
 
 OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
-	std::string packet = message.get()->createPacketForSending();
-	Logger::logf("SEND %s\n", packet.c_str());
-	transmitCount++;
-	ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
-	return OperationResult::SUCCESS;
+	int jitter = rand() % 200; 
+    vTaskDelay(pdMS_TO_TICKS(jitter));
+    std::string packet = message->createPacketForSending();
+    Logger::logf("SEND %s\n", packet.c_str());
+    transmitCount++;
+    ResponseStatus rs = e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+    return OperationResult::SUCCESS;
 }
 
 double calculateToA(
