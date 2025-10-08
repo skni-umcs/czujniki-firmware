@@ -16,6 +16,7 @@
 #include <sensors/subtypes/test_sensor.h>
 #include <sensors/subtypes/sensor.h>
 #include <sensors/subtypes/heap_sensor.h>
+#include <sensors/subtypes/sensor_facade_sensor.h>
 #include <message/message_content.h>
 #include "subtypes/bme_constants.h"
 #include <utils/logger.h>
@@ -151,6 +152,8 @@ OperationResult SensorFacade::setupService(std::shared_ptr<SmallTransmit> baseTr
         sensorCandidates.push_back(std::unique_ptr<CPUSensor>(new CPUSensor()));
         std::shared_ptr<LoraTransmit> transmit = std::static_pointer_cast<LoraTransmit>(baseTransmit);
         sensorCandidates.push_back(std::unique_ptr<LoraSensor>(new LoraSensor(transmit)));
+        auto thisPtr = this->shared_from_this();
+        sensorCandidates.push_back(std::unique_ptr<SensorFacadeSensor>(new SensorFacadeSensor(thisPtr)));
     #endif
     sensorCandidates.push_back(std::unique_ptr<HeapSensor>(new HeapSensor()));
     for(std::unique_ptr<Sensor> & sensor : sensorCandidates) {
