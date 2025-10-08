@@ -177,7 +177,7 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
 	int noise_dBm = -(256 - getNoise());
 
 	if (noise_dBm > -90) {
-		int backoff = 50 + (rand() % 200);
+		int backoff = 50 + (random() % 200);
 		Logger::logf("Busy channel detected (%d dBm), delaying %d ms", noise_dBm, backoff);
 		vTaskDelay(pdMS_TO_TICKS(backoff));
 	}
