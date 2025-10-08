@@ -174,8 +174,13 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 }
 
 OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
-	int jitter = rand() % 200; 
-    vTaskDelay(pdMS_TO_TICKS(jitter));
+	int noise_dBm = -(256 - getNoise());
+
+	if (noise_dBm > -90) {
+		int backoff = 50 + (rand() % 200);
+		Logger::logf("Busy channel detected (%d dBm), delaying %d ms", noise_dBm, backoff);
+		vTaskDelay(pdMS_TO_TICKS(backoff));
+	}
     std::string packet = message->createPacketForSending();
     Logger::logf("SEND %s\n", packet.c_str());
     transmitCount++;
