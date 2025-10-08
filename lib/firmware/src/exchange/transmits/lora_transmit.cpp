@@ -134,6 +134,7 @@ void LoraTransmit::setup() {
 	configuration.OPTION.RSSIAmbientNoise = RSSI_AMBIENT_NOISE_ENABLED; // Need to send special command
 	configuration.TRANSMISSION_MODE.enableRSSI = RSSI_ENABLED; // Enable RSSI info
 	configuration.TRANSMISSION_MODE.enableLBT = 0;
+	configuration.SPED.airDataRate = AIR_DATA_RATE_101_192; // Air baud rate
 	configuration.CRYPT.CRYPT_H = 1;
 	configuration.CRYPT.CRYPT_L = 1;
 	configuration.OPTION.transmissionPower = POWER_10;
