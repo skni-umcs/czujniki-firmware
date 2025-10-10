@@ -198,6 +198,7 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
   int backoff = 2000 + (random() % 6000);
   Logger::logf("Backoff %d ms\n", backoff);
   vTaskDelay(pdMS_TO_TICKS(backoff));
+
   std::string packet = message->createPacketForSending();
   Logger::logf("SEND %s\n", packet.c_str());
   transmitCount++;
