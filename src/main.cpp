@@ -58,6 +58,7 @@ void setup() {
   //updateCommunication->subscribe(wifiTransmit);
 
   auto configurationFacade = std::shared_ptr<ConfigurationFacade>(new ConfigurationFacade());
+  configurationFacade->init();
   #if defined(production)
     configurationFacade->plugLoraTransmit(transmit);
   #endif

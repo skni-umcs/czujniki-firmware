@@ -8,6 +8,14 @@ const char* ASK_TIMEOUT_OPTION = "service_time_ask_timeout_ms";
 const char* TIME_SYNC_PERIOD_OPTION = "time_sync_period_ms";
 #define NO_SAVE false
 
+OperationResult ConfigurationFacade::init() {
+    preferences.begin(SERVICE_PERIOD_OPTION);
+    preferences.begin(TELEMETRY_PERIOD_OPTION);
+    preferences.begin(ASK_TIMEOUT_OPTION);
+    preferences.begin(TIME_SYNC_PERIOD_OPTION);
+    return OperationResult::SUCCESS;
+}
+
 OperationResult ConfigurationFacade::plugLoraTransmit(std::shared_ptr<LoraTransmit> loraTransmit) {
     this->loraTransmit = loraTransmit;
     return OperationResult::SUCCESS;
@@ -53,7 +61,7 @@ OperationResult ConfigurationFacade::setServicePeriodMs(int servicePeriodMs, boo
         Logger::log("Set service period doesn't have a sensor facade pointer");
         return OperationResult::ERROR;
     }
-    this->sensorFacade->setServicePeriodMs(servicePeriodMs);\
+    this->sensorFacade->setServicePeriodMs(servicePeriodMs);
     if(shouldSave) {
         saveOption(SERVICE_PERIOD_OPTION, servicePeriodMs);
     }

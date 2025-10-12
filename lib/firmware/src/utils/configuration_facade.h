@@ -16,6 +16,7 @@ class ConfigurationFacade {
     std::shared_ptr<ServiceCommunication> serviceCommunication = nullptr;
 
     public:
+        OperationResult init();
         OperationResult plugLoraTransmit(std::shared_ptr<LoraTransmit> loraTransmit);
         OperationResult plugPassthroughCommunication(std::shared_ptr<PassthroughCommunication> passthroughCommunication);
         OperationResult plugSensorFacade(std::shared_ptr<SensorFacade> sensorFacade);
