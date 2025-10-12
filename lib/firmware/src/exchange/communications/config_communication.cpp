@@ -9,9 +9,13 @@
 #include <message/message_content.h>
 #include <utils/logger.h>
 #include <utils/address_handler.h>
+#include "utils/preferences_constant.h"
+
+const char* LAST_REMOTE_RESET_TIMESTAMP = "lastRemoteResetTimestamp";
 
 std::shared_ptr<ConfigCommunication> ConfigCommunication::create(std::shared_ptr<ConfigurationFacade> configFacade) {
     auto configCommunication = std::shared_ptr<ConfigCommunication>(new ConfigCommunication());
+    preferences.begin(LAST_REMOTE_RESET_TIMESTAMP);
 
     configCommunication->configFacade = configFacade;
 
@@ -28,16 +32,18 @@ OperationResult ConfigCommunication::getNotified(std::shared_ptr<Message> messag
     TransmissionCode messageType = serverMessage.getType();
     switch(messageType) {
         case(TransmissionCode::CONFIG_UPDATE):
-            updateConfig(serverMessage.getDetails(), message->getDestination());
+            updateConfig(serverMessage, message);
             break;
     }
     return OperationResult::SUCCESS;
 }
-OperationResult ConfigCommunication::updateConfig(std::string configDetails, moduleAddress destination) {
+OperationResult ConfigCommunication::updateConfig(MessageContent messageContent, std::shared_ptr<Message> message) {
+    std::string configDetails = messageContent.getDetails();
     if (configDetails.empty()) {
         return OperationResult::ERROR;
     }
-    
+    moduleAddress destination = message->getDestination();
+
     char cmd = static_cast<char>(std::tolower(static_cast<unsigned char>(configDetails[0])));
     std::string arg = configDetails.substr(1);
 
@@ -66,7 +72,10 @@ OperationResult ConfigCommunication::updateConfig(std::string configDetails, mod
 
             case 'r': {
                 if(destination == AddressHandler::getInstance()->readAddress()) {
-                    ESP.restart();
+                    if(preferences.isKey(LAST_REMOTE_RESET_TIMESTAMP) && preferences.getUShort(LAST_REMOTE_RESET_TIMESTAMP) != messageContent.getJsonificationEpoch()) {
+                        preferences.putUShort(LAST_REMOTE_RESET_TIMESTAMP, messageContent.getJsonificationEpoch());
+                        ESP.restart();
+                    }
                     return OperationResult::SUCCESS;
                 }
                 return OperationResult::OPERATION_IGNORED;
