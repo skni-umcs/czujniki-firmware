@@ -20,7 +20,7 @@ OperationResult SensorFacadeSensor::setupSensor() {
 
 std::map<std::string, std::string> SensorFacadeSensor::getSensorData() {
   std::map<std::string, std::string> resultMap;
-  resultMap.insert(std::make_pair(TELEMETRY_PERIOD_MS, std::to_string(facade->getTelemetryPeriodMs())));
-  resultMap.insert(std::make_pair(SERVICE_PERIOD_MS, std::to_string(facade->getServicePeriodMs())));
+  resultMap.insert(std::make_pair(TELEMETRY_PERIOD_MS, std::to_string(facade->getTelemetryPeriodMs()/1000)));
+  resultMap.insert(std::make_pair(SERVICE_PERIOD_MS, std::to_string(facade->getServicePeriodMs()/1000)));
   return resultMap;
 }
