@@ -7,6 +7,7 @@
 #include "time/timer.h"
 #include "time/time_constants.h"
 #include <utils/configuration_facade.h>
+#include <message/message_content.h>
 
 class ConfigCommunication : public SmallCommunication {
     std::shared_ptr<ConfigurationFacade> configFacade;

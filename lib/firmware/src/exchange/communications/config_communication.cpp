@@ -37,6 +37,11 @@ OperationResult ConfigCommunication::getNotified(std::shared_ptr<Message> messag
     }
     return OperationResult::SUCCESS;
 }
+
+bool isBroadcastOrCurrentDestination(char reach, moduleAddress destination) {
+    return reach == '*' || destination == AddressHandler::getInstance()->readAddress();
+}
+
 OperationResult ConfigCommunication::updateConfig(MessageContent messageContent, std::shared_ptr<Message> message) {
     std::string configDetails = messageContent.getDetails();
     if (configDetails.empty()) {
@@ -44,8 +49,9 @@ OperationResult ConfigCommunication::updateConfig(MessageContent messageContent,
     }
     moduleAddress destination = message->getDestination();
 
-    char cmd = static_cast<char>(std::tolower(static_cast<unsigned char>(configDetails[0])));
-    std::string arg = configDetails.substr(1);
+    char reach = static_cast<char>(std::tolower(static_cast<unsigned char>(configDetails[0])));
+    char cmd = static_cast<char>(std::tolower(static_cast<unsigned char>(configDetails[1])));
+    std::string arg = configDetails.substr(2);
 
     auto ltrim = [](std::string &s) {
         s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
@@ -57,45 +63,48 @@ OperationResult ConfigCommunication::updateConfig(MessageContent messageContent,
     rtrim(arg);
 
     try {
-        switch (cmd) {
-            case 'a': {
-                if (arg.empty()) return OperationResult::ERROR;
-                int seconds = std::stoi(arg);
-                return configFacade->setAskTimeoutMs(seconds*1000);
-            }
+        if(isBroadcastOrCurrentDestination(reach, destination)) {
+            switch (cmd) {
+                case 'a': {
+                    if (arg.empty()) return OperationResult::ERROR;
+                    int seconds = std::stoi(arg);
+                    return configFacade->setAskTimeoutMs(seconds*1000);
+                }
 
-            case 'p': {
-                if (arg.empty()) return OperationResult::ERROR;
-                int seconds = std::stoi(arg);
-                return configFacade->setTimeSyncPeriodMs(seconds*1000);
-            }
+                case 'p': {
+                    if (arg.empty()) return OperationResult::ERROR;
+                    int seconds = std::stoi(arg);
+                    return configFacade->setTimeSyncPeriodMs(seconds*1000);
+                }
 
-            case 'r': {
-                if(destination == AddressHandler::getInstance()->readAddress()) {
+                case 'r': {
                     if(preferences.isKey(LAST_REMOTE_RESET_TIMESTAMP) && preferences.getUShort(LAST_REMOTE_RESET_TIMESTAMP) != messageContent.getJsonificationEpoch()) {
                         preferences.putUShort(LAST_REMOTE_RESET_TIMESTAMP, messageContent.getJsonificationEpoch());
                         ESP.restart();
                     }
                     return OperationResult::SUCCESS;
                 }
-                return OperationResult::OPERATION_IGNORED;
-            }
 
-            case 't': {
-                if (arg.empty()) return OperationResult::ERROR;
-                int seconds = std::stoi(arg);
-                return configFacade->setTelemetryPeriodMs(seconds*1000);
-            }
+                case 't': {
+                    if (arg.empty()) return OperationResult::ERROR;
+                    int seconds = std::stoi(arg);
+                    return configFacade->setTelemetryPeriodMs(seconds*1000);
+                }
 
-            case 's': {
-                if (arg.empty()) return OperationResult::ERROR;
-                int seconds = std::stoi(arg);
-                return configFacade->setServicePeriodMs(seconds*1000);
-            }
+                case 's': {
+                    if (arg.empty()) return OperationResult::ERROR;
+                    int seconds = std::stoi(arg);
+                    return configFacade->setServicePeriodMs(seconds*1000);
+                }
 
-            default:
-                return OperationResult::ERROR;
+                default:
+                    return OperationResult::ERROR;
+            }
         }
+        else {
+            return OperationResult::OPERATION_IGNORED;
+        }
+     
     } catch (const std::exception &) {
         return OperationResult::ERROR;
     }
