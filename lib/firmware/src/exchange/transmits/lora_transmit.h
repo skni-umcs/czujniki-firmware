@@ -1,15 +1,20 @@
 #ifndef LORATRANSMIT_H
 #define LORATRANSMIT_H
 
-#include <string>
-#include <exchange/communications/communication.h>
-#include "transmit.h"
-#include "small_transmit.h"
+#include <ArduinoJson.h>
 #include <LoRa_E220.h>
-#include "time/timer.h"
-#include "message/message.h"
-#include <deque>
+#include <exchange/communications/communication.h>
+#include <message/message_content.h>
 #include <time/waiter.h>
+#include <utils/storage_types.h>
+
+#include <deque>
+#include <string>
+
+#include "message/message.h"
+#include "small_transmit.h"
+#include "time/timer.h"
+#include "transmit.h"
 #include "wifi_transmit.h"
 
 #if defined(esp32firebeetle)
@@ -34,37 +39,40 @@
 
 const int POLL_TIMER_PRIORITY = 1;
 
-#define ERROR_NOISE 256*2
+#define ERROR_NOISE 256 * 2
 
-class LoraTransmit : public SmallTransmit
-{
-  LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN, M0_PIN, M1_PIN, UART_BPS_RATE_9600);
+class LoraTransmit : public SmallTransmit {
+  LoRa_E220 e220ttl = LoRa_E220(ESP_RX_PIN, ESP_TX_PIN, &Serial1, AUX_PIN,
+                                M0_PIN, M1_PIN, UART_BPS_RATE_9600);
   std::shared_ptr<Timer> pollTimer = Timer::create(POLL_TIMER_PRIORITY);
   std::shared_ptr<Timer> noiseUpdateTimer = Timer::create();
+  std::shared_ptr<Timer> configValidationTimer = Timer::create();
+  Configuration expectedConfig;
   int noiseRaw = ERROR_NOISE;
   std::deque<std::shared_ptr<Message>> messages;
   bool canTransmit = true;
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
   int transmitCount = 0;
 
-  public:
-    static std::shared_ptr<LoraTransmit> create();
-    void setup();
-    OperationResult poll();
-    OperationResult physicalSend(std::shared_ptr<Message> message);
-    OperationResult advanceMessages();
-    OperationResult send(std::shared_ptr<Message> message) override;
-    OperationResult scheduleMessage(std::shared_ptr<Message> message);
-    OperationResult receive(std::shared_ptr<Message> message) override;
-    OperationResult updateNoise();
-    int getSnr(int readRssi);
-    int getNoise();
-    bool getCanTransmit();
-    int getWaitingMessagesCount();
-    int getTransmitCount();
-    TransmitType type() const override {
-      return TransmitType::LoraTransmit;
-    }
+ public:
+  static std::shared_ptr<LoraTransmit> create();
+  void setup();
+  OperationResult poll();
+  OperationResult physicalSend(std::shared_ptr<Message> message);
+  OperationResult advanceMessages();
+  OperationResult send(std::shared_ptr<Message> message) override;
+  OperationResult scheduleMessage(std::shared_ptr<Message> message);
+  OperationResult receive(std::shared_ptr<Message> message) override;
+  OperationResult updateNoise();
+  OperationResult validateConfiguration();
+  OperationResult restoreConfiguration();
+
+  int getSnr(int readRssi);
+  int getNoise();
+  bool getCanTransmit();
+  int getWaitingMessagesCount();
+  int getTransmitCount();
+  TransmitType type() const override { return TransmitType::LoraTransmit; }
 };
 
 #endif
