@@ -154,8 +154,8 @@ void LoraTransmit::setup() {
       RSSI_ENABLED;  // Enable RSSI info
   configuration.TRANSMISSION_MODE.enableLBT = 0;
   configuration.SPED.airDataRate = AIR_DATA_RATE_101_192;  // Air baud rate
-  configuration.CRYPT.CRYPT_H = 113;
-  configuration.CRYPT.CRYPT_L = 244;
+  configuration.CRYPT.CRYPT_H = 1;
+  configuration.CRYPT.CRYPT_L = 1;
   configuration.OPTION.transmissionPower = POWER_10;
   configuration.CHAN = CHANNEL;
   configuration.OPTION.subPacketSetting = SPS_200_00;
