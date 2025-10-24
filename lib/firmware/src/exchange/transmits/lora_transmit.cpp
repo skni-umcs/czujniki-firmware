@@ -1,10 +1,13 @@
 #include "lora_transmit.h"
 
+#include <ArduinoJson.h>
 #include <FastCRC.h>
 #include <LoRa_E220.h>
+#include <message/message_content.h>
 #include <utils/address_handler.h>
 #include <utils/logger.h>
 #include <utils/operation_result.h>
+#include <utils/storage_types.h>
 
 #include <sstream>
 
@@ -206,15 +209,37 @@ OperationResult LoraTransmit::validateConfiguration() {
 
   if (isConfigurationDifferent(currentConfig, expectedConfig)) {
     Logger::log("Configuration validation failed");
-    restoreConfiguration();
+    OperationResult restoreResult = restoreConfiguration();
+    bool restorationSucceeded = (restoreResult == OperationResult::SUCCESS);
+    sendConfigurationReport(true, restorationSucceeded);
     return OperationResult::ERROR;
   }
 
   Logger::log("Configuration validation passed");
+  sendConfigurationReport(false,
+                          true);  // validation passed, no restoration needed
   return OperationResult::SUCCESS;
 }
 
-OperationResult LoraTransmit::restoreConfiguration() {
+void LoraTransmit::sendConfigurationReport(bool validationFailed,
+                                           bool restorationSucceeded) {
+  JsonDocument doc;
+  JsonObject report = doc.to<JsonObject>();
+  std::string serializedJson;
+
+  report["vf"] = validationFailed ? 1 : 0;      // validation_failed
+  report["rs"] = restorationSucceeded ? 1 : 0;  // restoration_succeeded
+
+  serializeJson(doc, serializedJson);
+  MessageContent packetMessage =
+      MessageContent(TransmissionCode::LORA_CONFIG_REPORT, serializedJson);
+
+  auto message =
+      GeneratedMessage::fromText(packetMessage.getJson(), SERVER_ADDRESS);
+  this->send(message);
+}
+
+OperationResult LoraTransmit::validateConfiguration() {
   Logger::log("Restoring LoRa configuration");
 
   ResponseStatus rs =
