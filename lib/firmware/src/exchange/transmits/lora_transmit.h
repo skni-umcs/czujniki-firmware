@@ -1,9 +1,12 @@
 #ifndef LORATRANSMIT_H
 #define LORATRANSMIT_H
 
+#include <ArduinoJson.h>
 #include <LoRa_E220.h>
 #include <exchange/communications/communication.h>
+#include <message/message_content.h>
 #include <time/waiter.h>
+#include <utils/storage_types.h>
 
 #include <deque>
 #include <string>
@@ -63,8 +66,12 @@ class LoraTransmit : public SmallTransmit {
   OperationResult updateNoise();
   OperationResult validateConfiguration();
   OperationResult restoreConfiguration();
+  void sendConfigurationReport(bool validationFailed,
+                               bool restorationSucceeded);
   int getSnr(int readRssi);
   int getNoise();
+  bool isConfigurationDifferent(const Configuration& current,
+                                const Configuration& expected);
   bool getCanTransmit();
   int getWaitingMessagesCount();
   int getTransmitCount();

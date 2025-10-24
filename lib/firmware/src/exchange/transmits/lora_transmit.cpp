@@ -1,10 +1,13 @@
 #include "lora_transmit.h"
 
+#include <ArduinoJson.h>
 #include <FastCRC.h>
 #include <LoRa_E220.h>
+#include <message/message_content.h>
 #include <utils/address_handler.h>
 #include <utils/logger.h>
 #include <utils/operation_result.h>
+#include <utils/storage_types.h>
 
 #include <sstream>
 
@@ -171,6 +174,24 @@ void LoraTransmit::setup() {
   updateNoise();
 }
 
+bool LoraTransmit::isConfigurationDifferent(const Configuration& current,
+                                            const Configuration& expected) {
+  return (current.TRANSMISSION_MODE.fixedTransmission !=
+              expected.TRANSMISSION_MODE.fixedTransmission ||
+          current.OPTION.RSSIAmbientNoise != expected.OPTION.RSSIAmbientNoise ||
+          current.TRANSMISSION_MODE.enableRSSI !=
+              expected.TRANSMISSION_MODE.enableRSSI ||
+          current.TRANSMISSION_MODE.enableLBT !=
+              expected.TRANSMISSION_MODE.enableLBT ||
+          current.SPED.airDataRate != expected.SPED.airDataRate ||
+          current.OPTION.transmissionPower !=
+              expected.OPTION.transmissionPower ||
+          current.CHAN != expected.CHAN ||
+          current.OPTION.subPacketSetting != expected.OPTION.subPacketSetting ||
+          current.SPED.uartBaudRate != expected.SPED.uartBaudRate ||
+          current.ADDL != expected.ADDL || current.ADDH != expected.ADDH);
+}
+
 OperationResult LoraTransmit::validateConfiguration() {
   Logger::log("Validating LoRa configuration");
 
@@ -186,39 +207,39 @@ OperationResult LoraTransmit::validateConfiguration() {
 
   printParameters(currentConfig);
 
-  bool configChanged = false;
-
-  if (currentConfig.TRANSMISSION_MODE.fixedTransmission !=
-          expectedConfig.TRANSMISSION_MODE.fixedTransmission ||
-      currentConfig.OPTION.RSSIAmbientNoise !=
-          expectedConfig.OPTION.RSSIAmbientNoise ||
-      currentConfig.TRANSMISSION_MODE.enableRSSI !=
-          expectedConfig.TRANSMISSION_MODE.enableRSSI ||
-      currentConfig.TRANSMISSION_MODE.enableLBT !=
-          expectedConfig.TRANSMISSION_MODE.enableLBT ||
-      currentConfig.SPED.airDataRate != expectedConfig.SPED.airDataRate ||
-      currentConfig.OPTION.transmissionPower !=
-          expectedConfig.OPTION.transmissionPower ||
-      currentConfig.CHAN != expectedConfig.CHAN ||
-      currentConfig.OPTION.subPacketSetting !=
-          expectedConfig.OPTION.subPacketSetting ||
-      currentConfig.SPED.uartBaudRate != expectedConfig.SPED.uartBaudRate ||
-      currentConfig.ADDL != expectedConfig.ADDL ||
-      currentConfig.ADDH != expectedConfig.ADDH) {
-    configChanged = true;
-  }
-
-  if (configChanged) {
+  if (isConfigurationDifferent(currentConfig, expectedConfig)) {
     Logger::log("Configuration validation failed");
-    restoreConfiguration();
+    OperationResult restoreResult = restoreConfiguration();
+    bool restorationSucceeded = (restoreResult == OperationResult::SUCCESS);
+    sendConfigurationReport(true, restorationSucceeded);
     return OperationResult::ERROR;
   }
 
   Logger::log("Configuration validation passed");
+  sendConfigurationReport(false,
+                          true);  // validation passed, no restoration needed
   return OperationResult::SUCCESS;
 }
 
-OperationResult LoraTransmit::restoreConfiguration() {
+void LoraTransmit::sendConfigurationReport(bool validationFailed,
+                                           bool restorationSucceeded) {
+  JsonDocument doc;
+  JsonObject report = doc.to<JsonObject>();
+  std::string serializedJson;
+
+  report["vf"] = validationFailed ? 1 : 0;      // validation_failed
+  report["rs"] = restorationSucceeded ? 1 : 0;  // restoration_succeeded
+
+  serializeJson(doc, serializedJson);
+  MessageContent packetMessage =
+      MessageContent(TransmissionCode::LORA_CONFIG_REPORT, serializedJson);
+
+  auto message =
+      GeneratedMessage::fromText(packetMessage.getJson(), SERVER_ADDRESS);
+  this->send(message);
+}
+
+OperationResult LoraTransmit::validateConfiguration() {
   Logger::log("Restoring LoRa configuration");
 
   ResponseStatus rs =
