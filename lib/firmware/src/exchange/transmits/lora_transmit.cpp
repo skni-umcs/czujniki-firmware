@@ -100,7 +100,7 @@ void printParameters(struct Configuration configuration) {
 
 const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5 * 60000;
-const int DEFAULT_CONFIG_VALIDATION_MS = 24 * 60000;  // 1 hour
+const int DEFAULT_CONFIG_VALIDATION_MS = 24 * 60000;  // 24 hours
 const int MAX_MESSAGE_ADVANCE_MS = 60 * 60000;
 const int CHANNEL = 20;
 const unsigned char HOP_DISCARD_LIMIT = 0;
