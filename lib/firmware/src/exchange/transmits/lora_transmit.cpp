@@ -171,6 +171,24 @@ void LoraTransmit::setup() {
   updateNoise();
 }
 
+bool LoraTransmit::isConfigurationDifferent(const Configuration& current,
+                                            const Configuration& expected) {
+  return (current.TRANSMISSION_MODE.fixedTransmission !=
+              expected.TRANSMISSION_MODE.fixedTransmission ||
+          current.OPTION.RSSIAmbientNoise != expected.OPTION.RSSIAmbientNoise ||
+          current.TRANSMISSION_MODE.enableRSSI !=
+              expected.TRANSMISSION_MODE.enableRSSI ||
+          current.TRANSMISSION_MODE.enableLBT !=
+              expected.TRANSMISSION_MODE.enableLBT ||
+          current.SPED.airDataRate != expected.SPED.airDataRate ||
+          current.OPTION.transmissionPower !=
+              expected.OPTION.transmissionPower ||
+          current.CHAN != expected.CHAN ||
+          current.OPTION.subPacketSetting != expected.OPTION.subPacketSetting ||
+          current.SPED.uartBaudRate != expected.SPED.uartBaudRate ||
+          current.ADDL != expected.ADDL || current.ADDH != expected.ADDH);
+}
+
 OperationResult LoraTransmit::validateConfiguration() {
   Logger::log("Validating LoRa configuration");
 
@@ -186,29 +204,7 @@ OperationResult LoraTransmit::validateConfiguration() {
 
   printParameters(currentConfig);
 
-  bool configChanged = false;
-
-  if (currentConfig.TRANSMISSION_MODE.fixedTransmission !=
-          expectedConfig.TRANSMISSION_MODE.fixedTransmission ||
-      currentConfig.OPTION.RSSIAmbientNoise !=
-          expectedConfig.OPTION.RSSIAmbientNoise ||
-      currentConfig.TRANSMISSION_MODE.enableRSSI !=
-          expectedConfig.TRANSMISSION_MODE.enableRSSI ||
-      currentConfig.TRANSMISSION_MODE.enableLBT !=
-          expectedConfig.TRANSMISSION_MODE.enableLBT ||
-      currentConfig.SPED.airDataRate != expectedConfig.SPED.airDataRate ||
-      currentConfig.OPTION.transmissionPower !=
-          expectedConfig.OPTION.transmissionPower ||
-      currentConfig.CHAN != expectedConfig.CHAN ||
-      currentConfig.OPTION.subPacketSetting !=
-          expectedConfig.OPTION.subPacketSetting ||
-      currentConfig.SPED.uartBaudRate != expectedConfig.SPED.uartBaudRate ||
-      currentConfig.ADDL != expectedConfig.ADDL ||
-      currentConfig.ADDH != expectedConfig.ADDH) {
-    configChanged = true;
-  }
-
-  if (configChanged) {
+  if (isConfigurationDifferent(currentConfig, expectedConfig)) {
     Logger::log("Configuration validation failed");
     restoreConfiguration();
     return OperationResult::ERROR;

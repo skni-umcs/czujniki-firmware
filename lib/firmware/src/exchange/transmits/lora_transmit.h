@@ -65,6 +65,8 @@ class LoraTransmit : public SmallTransmit {
   OperationResult restoreConfiguration();
   int getSnr(int readRssi);
   int getNoise();
+  bool isConfigurationDifferent(const Configuration& current,
+                                const Configuration& expected);
   bool getCanTransmit();
   int getWaitingMessagesCount();
   int getTransmitCount();
