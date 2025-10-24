@@ -100,6 +100,7 @@ void printParameters(struct Configuration configuration) {
 
 const int DEFAULT_LORA_POLL_MS = 100;
 const int DEFAULT_NOISE_UPDATE_MS = 5 * 60000;
+const int DEFAULT_CONFIG_VALIDATION_MS = 24 * 60000;  // 1 hour
 const int MAX_MESSAGE_ADVANCE_MS = 60 * 60000;
 const int CHANNEL = 20;
 const unsigned char HOP_DISCARD_LIMIT = 0;
@@ -144,10 +145,7 @@ void LoraTransmit::setup() {
 
   moduleAddress address = AddressHandler::getInstance()->readAddress();
 
-  ResponseStructContainer c = ResponseStructContainer();
-  c = e220ttl.getConfiguration();
-  // It's important get configuration pointer before all other operation
-  Configuration configuration = *(Configuration*)c.data;
+  Configuration configuration;
   configuration.TRANSMISSION_MODE.fixedTransmission =
       FT_FIXED_TRANSMISSION;  // Enable repeater mode
   configuration.OPTION.RSSIAmbientNoise =
@@ -156,20 +154,86 @@ void LoraTransmit::setup() {
       RSSI_ENABLED;  // Enable RSSI info
   configuration.TRANSMISSION_MODE.enableLBT = 0;
   configuration.SPED.airDataRate = AIR_DATA_RATE_101_192;  // Air baud rate
-  configuration.CRYPT.CRYPT_H = 1;
-  configuration.CRYPT.CRYPT_L = 1;
+  configuration.CRYPT.CRYPT_H = 113;
+  configuration.CRYPT.CRYPT_L = 244;
   configuration.OPTION.transmissionPower = POWER_10;
   configuration.CHAN = CHANNEL;
+  configuration.OPTION.subPacketSetting = SPS_200_00;
+  configuration.SPED.uartBaudRate = UART_BPS_9600;
   configuration.ADDL = address & 0x00ff;
   configuration.ADDH = address & 0xff00;
-  ResponseStatus rs =
-      e220ttl.setConfiguration(configuration, WRITE_CFG_PWR_DWN_SAVE);
+
+  expectedConfig = configuration;
+  validateConfiguration();
 
   printParameters(configuration);
 
+  updateNoise();
+}
+
+OperationResult LoraTransmit::validateConfiguration() {
+  Logger::log("Validating LoRa configuration");
+
+  ResponseStructContainer c = e220ttl.getConfiguration();
+  if (c.status.code != 1) {
+    Logger::log("Failed to read current configuration");
+    c.close();
+    return OperationResult::ERROR;
+  }
+
+  Configuration currentConfig = *(Configuration*)c.data;
   c.close();
 
+  printParameters(currentConfig);
+
+  bool configChanged = false;
+
+  if (currentConfig.TRANSMISSION_MODE.fixedTransmission !=
+          expectedConfig.TRANSMISSION_MODE.fixedTransmission ||
+      currentConfig.OPTION.RSSIAmbientNoise !=
+          expectedConfig.OPTION.RSSIAmbientNoise ||
+      currentConfig.TRANSMISSION_MODE.enableRSSI !=
+          expectedConfig.TRANSMISSION_MODE.enableRSSI ||
+      currentConfig.TRANSMISSION_MODE.enableLBT !=
+          expectedConfig.TRANSMISSION_MODE.enableLBT ||
+      currentConfig.SPED.airDataRate != expectedConfig.SPED.airDataRate ||
+      currentConfig.OPTION.transmissionPower !=
+          expectedConfig.OPTION.transmissionPower ||
+      currentConfig.CHAN != expectedConfig.CHAN ||
+      currentConfig.OPTION.subPacketSetting !=
+          expectedConfig.OPTION.subPacketSetting ||
+      currentConfig.SPED.uartBaudRate != expectedConfig.SPED.uartBaudRate ||
+      currentConfig.ADDL != expectedConfig.ADDL ||
+      currentConfig.ADDH != expectedConfig.ADDH) {
+    configChanged = true;
+  }
+
+  if (configChanged) {
+    Logger::log("Configuration validation failed");
+    restoreConfiguration();
+    return OperationResult::ERROR;
+  }
+
+  Logger::log("Configuration validation passed");
+  return OperationResult::SUCCESS;
+}
+
+OperationResult LoraTransmit::restoreConfiguration() {
+  Logger::log("Restoring LoRa configuration");
+
+  ResponseStatus rs =
+      e220ttl.setConfiguration(expectedConfig, WRITE_CFG_PWR_DWN_SAVE);
+  if (rs.code != 1) {
+    Logger::log("Failed to restore configuration");
+    return OperationResult::ERROR;
+  }
+
+  Logger::log("Configuration restored successfully");
+  printParameters(expectedConfig);
+
   updateNoise();
+
+  return OperationResult::SUCCESS;
 }
 
 std::shared_ptr<LoraTransmit> LoraTransmit::create() {
@@ -185,6 +249,11 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
   loraTransmit->noiseUpdateTimer.get()->setExecuteFunction(
       [loraTransmit]() { loraTransmit->updateNoise(); });
   loraTransmit->noiseUpdateTimer.get()->updateTime(DEFAULT_NOISE_UPDATE_MS);
+
+  loraTransmit->configValidationTimer.get()->setExecuteFunction(
+      [loraTransmit]() { loraTransmit->validateConfiguration(); });
+  loraTransmit->configValidationTimer.get()->updateTime(
+      DEFAULT_CONFIG_VALIDATION_MS);
 
   loraTransmit->sendWaiter.get()->setExecuteFunction(
       [loraTransmit]() { loraTransmit->advanceMessages(); });
