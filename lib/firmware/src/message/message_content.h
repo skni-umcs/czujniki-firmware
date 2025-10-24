@@ -17,7 +17,6 @@ enum class TransmissionCode : char {
   SERVICE_READING = 's',
   TIME_SYNCHRONIZATION = 'o',
   CONFIG_UPDATE = 'u',
-  LORA_CONFIG_REPORT = 'l'
 };
 
 class MessageContent {
