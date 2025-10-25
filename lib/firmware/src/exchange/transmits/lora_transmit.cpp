@@ -164,7 +164,6 @@ void LoraTransmit::setup() {
   configuration.ADDH = address & 0xff00;
 
   expectedConfig = configuration;
-  validateConfiguration();
 
   printParameters(configuration);
 
