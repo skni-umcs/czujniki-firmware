@@ -103,6 +103,7 @@ const int DEFAULT_NOISE_UPDATE_MS = 5 * 60000;
 const int DEFAULT_CONFIG_VALIDATION_MS = 6 * 60 * 60000;  // 6 hours
 const int MAX_MESSAGE_ADVANCE_MS = 60 * 60000;
 const int CHANNEL = 20;
+const int NOISE_THRESHOLD_DBM = -75;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
@@ -154,8 +155,8 @@ void LoraTransmit::setup() {
       RSSI_ENABLED;  // Enable RSSI info
   configuration.TRANSMISSION_MODE.enableLBT = 0;
   configuration.SPED.airDataRate = AIR_DATA_RATE_101_192;  // Air baud rate
-  configuration.CRYPT.CRYPT_H = 1;
-  configuration.CRYPT.CRYPT_L = 1;
+  configuration.CRYPT.CRYPT_H = 113;
+  configuration.CRYPT.CRYPT_L = 244;
   configuration.OPTION.transmissionPower = POWER_10;
   configuration.CHAN = CHANNEL;
   configuration.OPTION.subPacketSetting = SPS_200_00;
@@ -262,10 +263,20 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 }
 
 OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
-  int noise_dBm = -(256 - getNoise());
-  int backoff = 2000 + (random() % 6000);
+  int backoff = 100 + (random() % 900);
   Logger::logf("Backoff %d ms\n", backoff);
   vTaskDelay(pdMS_TO_TICKS(backoff));
+
+  updateNoise();
+  int noise_dBm = -(256 - getNoise());
+  Logger::logf("Noise threshold: %d dBm.\n", NOISE_THRESHOLD_DBM);
+  Logger::logf("Current noise: %d dBm.\n", noise_dBm);
+  if (noise_dBm >= NOISE_THRESHOLD_DBM) {
+    Logger::logf("Channel busy, noise: %d dBm. Deferring message.\n",
+                 noise_dBm);
+
+    return OperationResult::DEFERRED;
+  }
 
   std::string packet = message->createPacketForSending();
   Logger::logf("SEND %s\n", packet.c_str());
@@ -309,25 +320,45 @@ double calculateToA(int size, int sf, int bw, std::string codingRate = "4/5",
 
 int airTime(std::shared_ptr<Message> message) {
   int length = message.get()->createPacketForSending().size();
-  int waitTime = calculateToA(length, 7, 125) * 99;
+  int waitTime = calculateToA(length, 7, 125);
   Logger::logf("WAIT TIME: %d\n", waitTime);
   return waitTime;
 }
 
 OperationResult LoraTransmit::advanceMessages() {
+  const int MAX_RETRIES = 7;
+
   if (messages.size() > 0) {
-    while (messages.size() > 0) {
-      std::shared_ptr<Message> message = messages.front();
-      messages.pop_front();
-      if (message->getShouldTransmit()) {
-        physicalSend(message);
+    std::shared_ptr<Message> message = messages.front();
+    messages.pop_front();
+    if (message->getShouldTransmit()) {
+      OperationResult result = physicalSend(message);
+      if (result == OperationResult::DEFERRED) {
+        retryCount++;
+        if (retryCount >= MAX_RETRIES) {
+          Logger::logf("Max retries (%d) reached, dropping message\n",
+                       MAX_RETRIES);
+          retryCount = 0;
+          canTransmit = true;
+          sendWaiter.get()->updateTime(100);
+        } else {
+          messages.push_front(message);
+          int backoff = (1 << retryCount) * 100 + (random() % 200);
+          Logger::logf("Retry %d/%d, backoff: %d ms\n", retryCount, MAX_RETRIES,
+                       backoff);
+          canTransmit = true;
+          sendWaiter.get()->updateTime(backoff);
+        }
+      } else {
+        retryCount = 0;  // Reset on success
         canTransmit = false;
         sendWaiter.get()->updateTime(airTime(message));
-        break;
-      } else {
-        Logger::logf("LORATRANSMIT Message %s won't be broadcasted",
-                     message->getPacket().c_str());
       }
+    } else {
+      Logger::logf("LORATRANSMIT Message %s won't be broadcasted",
+                   message->getPacket().c_str());
+      canTransmit = true;
+      sendWaiter.get()->updateTime(100);
     }
   } else {
     canTransmit = true;

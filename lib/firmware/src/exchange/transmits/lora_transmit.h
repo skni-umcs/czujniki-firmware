@@ -53,6 +53,7 @@ class LoraTransmit : public SmallTransmit {
   bool canTransmit = true;
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
   int transmitCount = 0;
+  int retryCount = 0;
 
  public:
   static std::shared_ptr<LoraTransmit> create();
@@ -73,6 +74,9 @@ class LoraTransmit : public SmallTransmit {
   int getWaitingMessagesCount();
   int getTransmitCount();
   TransmitType type() const override { return TransmitType::LoraTransmit; }
+
+ private:
+  uint16_t readNoiseOptimized();
 };
 
 #endif
