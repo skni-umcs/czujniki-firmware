@@ -75,8 +75,6 @@ class LoraTransmit : public SmallTransmit {
   int getTransmitCount();
   TransmitType type() const override { return TransmitType::LoraTransmit; }
 
- private:
-  uint16_t readNoiseOptimized();
 };
 
 #endif
