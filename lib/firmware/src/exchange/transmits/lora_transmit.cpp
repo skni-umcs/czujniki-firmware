@@ -107,6 +107,12 @@ const int NOISE_THRESHOLD_DBM = -75;
 const unsigned char HOP_DISCARD_LIMIT = 0;
 
 OperationResult LoraTransmit::updateNoise() {
+
+  if (expectedConfig.OPTION.RSSIAmbientNoise != RSSI_AMBIENT_NOISE_ENABLED) {
+    Logger::log("RSSI Ambient Noise measurement not enabled in configuration");
+    return OperationResult::ERROR;
+  }
+
   Logger::log("Noise update");
   unsigned short RSSIAmbient = e220ttl.readRSSIAmbient();
 
