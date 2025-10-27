@@ -5,6 +5,7 @@
 #include <LoRa_E220.h>
 #include <exchange/communications/communication.h>
 #include <message/message_content.h>
+#include <time/time_slot_manager.h>
 #include <time/waiter.h>
 #include <utils/storage_types.h>
 
@@ -54,7 +55,8 @@ class LoraTransmit : public SmallTransmit {
   std::shared_ptr<Waiter> sendWaiter = Waiter::create();
   int transmitCount = 0;
   int retryCount = 0;
-  int collisionCount = 0;    
+  int collisionCount = 0;
+  std::shared_ptr<TimeSlotManager> timeSlotManager;
 
  public:
   static std::shared_ptr<LoraTransmit> create();
@@ -72,10 +74,11 @@ class LoraTransmit : public SmallTransmit {
   int getSnr(int readRssi);
   int getNoise();
   int getCollisionCount();
-  int getCollisionRate()
+  int getCollisionRate();
   bool getCanTransmit();
   int getWaitingMessagesCount();
   int getTransmitCount();
+  void setTimeSlotManager(std::shared_ptr<TimeSlotManager> manager);
   TransmitType type() const override { return TransmitType::LoraTransmit; }
 };
 

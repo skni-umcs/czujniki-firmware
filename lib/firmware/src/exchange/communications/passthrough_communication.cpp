@@ -1,10 +1,13 @@
-#include <string>
 #include "passthrough_communication.h"
-#include <memory>
-#include <utils/other_utils.h>
-#include "utils/address_handler.h"
-#include <utils/logger.h>
+
 #include <exchange/transmits/lora_transmit.h>
+#include <utils/logger.h>
+#include <utils/other_utils.h>
+
+#include <memory>
+#include <string>
+
+#include "utils/address_handler.h"
 
 #define MAX_LORA_QUEUE_PASSTHROUGH 5
 
@@ -13,201 +16,228 @@ const int MINIMAL_SNR = -80;
 const int MAXMIMUM_PASSTHROUGH_MESSAGES = 50;
 
 std::shared_ptr<PassthroughCommunication> PassthroughCommunication::create() {
-    auto passthroughCommunication = new PassthroughCommunication();
-    return std::shared_ptr<PassthroughCommunication>{passthroughCommunication};
+  auto passthroughCommunication = new PassthroughCommunication();
+  return std::shared_ptr<PassthroughCommunication>{passthroughCommunication};
 }
 
-OperationResult PassthroughCommunication::rebroadcast(std::shared_ptr<LoraMessage> message) {
-    message->decrementHopLimit();
-    transmit(message);
-    return OperationResult::SUCCESS;
+OperationResult PassthroughCommunication::rebroadcast(
+    std::shared_ptr<LoraMessage> message) {
+  message->decrementHopLimit();
+
+  // Dla retransmisji używamy krótszego czasu oczekiwania niż dla normalnych
+  // wiadomości Retransmisje powinny być szybsze, ale wciąż respektować sloty
+  // Dodajemy małe losowe opóźnienie aby uniknąć synchronicznych retransmisji
+  if (message->getScheduledTime() == 0) {
+    // Jeśli wiadomość nie ma jeszcze zaplanowanego czasu, może być to pilna
+    // retransmisja Dodajemy małe opóźnienie (1-3s) zamiast pełnego slotu
+    unsigned long currentEpoch = rtc.getEpoch();
+    int randomOffset = 1 + (random() % 3);  // 1-3 sekundy
+    message->setScheduledTime(currentEpoch + randomOffset);
+    Logger::logf("PASSTHROUGH quick rebroadcast scheduled in %d seconds\n",
+                 randomOffset);
+  }
+
+  transmit(message);
+  return OperationResult::SUCCESS;
 }
 
-OperationResult PassthroughCommunication::transmit(std::shared_ptr<Message> message) {
-    for(auto const& destination : transmitTo) {
-        if(destination->type() == TransmitType::LoraTransmit) {
-            std::shared_ptr<LoraTransmit> loraTransmit = std::static_pointer_cast<LoraTransmit>(destination);
-            if(loraTransmit->getWaitingMessagesCount() <= MAX_LORA_QUEUE_PASSTHROUGH) {
-                destination->send(message);
-            }
-        }
-        else {
-            Logger::log("Passthrough only accepts lora transmit!");
-        }
+OperationResult PassthroughCommunication::transmit(
+    std::shared_ptr<Message> message) {
+  for (auto const& destination : transmitTo) {
+    if (destination->type() == TransmitType::LoraTransmit) {
+      std::shared_ptr<LoraTransmit> loraTransmit =
+          std::static_pointer_cast<LoraTransmit>(destination);
+      if (loraTransmit->getWaitingMessagesCount() <=
+          MAX_LORA_QUEUE_PASSTHROUGH) {
+        destination->send(message);
+      }
+    } else {
+      Logger::log("Passthrough only accepts lora transmit!");
     }
-    return OperationResult::SUCCESS;
+  }
+  return OperationResult::SUCCESS;
 }
 
 OperationResult alreadyRebroadcasted() {
-    Logger::log("already rebro");
-    return OperationResult::SUCCESS;
+  Logger::log("already rebro");
+  return OperationResult::SUCCESS;
 }
 
-std::vector<std::shared_ptr<LoraMessage>> PassthroughCommunication::getSameMessages(std::shared_ptr<LoraMessage> message) {
-    std::vector<std::shared_ptr<LoraMessage>> result;
+std::vector<std::shared_ptr<LoraMessage>>
+PassthroughCommunication::getSameMessages(
+    std::shared_ptr<LoraMessage> message) {
+  std::vector<std::shared_ptr<LoraMessage>> result;
 
-    for (auto setMessage : messageSet) {
-        if(message != setMessage && message->isSameMessage(setMessage)) {
-            result.emplace(result.begin(), setMessage);
-        }
+  for (auto setMessage : messageSet) {
+    if (message != setMessage && message->isSameMessage(setMessage)) {
+      result.emplace(result.begin(), setMessage);
     }
+  }
 
-    return result;
+  return result;
 }
 
-OperationResult PassthroughCommunication::removeSameMessages(std::vector<std::shared_ptr<LoraMessage>>& rebroadcastedMessages, std::shared_ptr<LoraMessage> message) {
-    message->setShouldTransmit(false);
-    vectorErase(messageSet, message);
-    for (auto rebroadcastedMessage : rebroadcastedMessages) {
-        rebroadcastedMessage->setShouldTransmit(false);
-        vectorErase(messageSet, rebroadcastedMessage);
-    }
-    return OperationResult::SUCCESS;
+OperationResult PassthroughCommunication::removeSameMessages(
+    std::vector<std::shared_ptr<LoraMessage>>& rebroadcastedMessages,
+    std::shared_ptr<LoraMessage> message) {
+  message->setShouldTransmit(false);
+  vectorErase(messageSet, message);
+  for (auto rebroadcastedMessage : rebroadcastedMessages) {
+    rebroadcastedMessage->setShouldTransmit(false);
+    vectorErase(messageSet, rebroadcastedMessage);
+  }
+  return OperationResult::SUCCESS;
 }
 
-bool PassthroughCommunication::shouldRebroadcast(std::shared_ptr<LoraMessage> message) {
-    return message->getHopLimit() > 0 && 
-    !message->isCurrentModuleSenderPresent() && 
-    message->getDestination() != AddressHandler::getInstance()->readAddress();
+bool PassthroughCommunication::shouldRebroadcast(
+    std::shared_ptr<LoraMessage> message) {
+  return message->getHopLimit() > 0 &&
+         !message->isCurrentModuleSenderPresent() &&
+         message->getDestination() !=
+             AddressHandler::getInstance()->readAddress();
 }
 
-OperationResult PassthroughCommunication::rebroadcastAfterWait(std::shared_ptr<LoraMessage> loraMessage) {
-    Logger::logf("rebroadcastAfterWait for %s", loraMessage->getPacket().c_str());
-    if (!vectorContains(messageSet, loraMessage)) {
-        return alreadyRebroadcasted();
-    }
-    std::shared_ptr<LoraMessage> lastLoraMessage = messageSet.back();
-    Logger::logf("rebroadcastAfterWait removing message %s", lastLoraMessage->getPacket().c_str());
-    int debugSizeBefore = messageSet.size();
-    messageSet.pop_back();
-    int debugSizeAfter = messageSet.size();
-    Logger::logf("Popped up, messageSet decreased from %d to %d", debugSizeBefore, debugSizeAfter);
-    std::vector<std::shared_ptr<LoraMessage>> sameMessages = getSameMessages(loraMessage);
+OperationResult PassthroughCommunication::rebroadcastAfterWait(
+    std::shared_ptr<LoraMessage> loraMessage) {
+  Logger::logf("rebroadcastAfterWait for %s", loraMessage->getPacket().c_str());
+  if (!vectorContains(messageSet, loraMessage)) {
+    return alreadyRebroadcasted();
+  }
+  std::shared_ptr<LoraMessage> lastLoraMessage = messageSet.back();
+  Logger::logf("rebroadcastAfterWait removing message %s",
+               lastLoraMessage->getPacket().c_str());
+  int debugSizeBefore = messageSet.size();
+  messageSet.pop_back();
+  int debugSizeAfter = messageSet.size();
+  Logger::logf("Popped up, messageSet decreased from %d to %d", debugSizeBefore,
+               debugSizeAfter);
+  std::vector<std::shared_ptr<LoraMessage>> sameMessages =
+      getSameMessages(loraMessage);
 
-    if (sameMessages.empty()) {
-        rebroadcast(loraMessage);
-    }
-    else {
-        removeSameMessages(sameMessages, loraMessage);
-    }
-    return OperationResult::SUCCESS;
+  if (sameMessages.empty()) {
+    rebroadcast(loraMessage);
+  } else {
+    removeSameMessages(sameMessages, loraMessage);
+  }
+  return OperationResult::SUCCESS;
 }
 
 OperationResult PassthroughCommunication::processNewMessage() {
-    auto loraMessage = messageSet.back();
-    Logger::logf("PASSTHROUGH process new message %s", loraMessage->getPacket().c_str());
+  auto loraMessage = messageSet.back();
+  Logger::logf("PASSTHROUGH process new message %s",
+               loraMessage->getPacket().c_str());
 
-    if (!passthroughTaskHandle) {
-        const uint32_t stackWords = configMINIMAL_STACK_SIZE * 6;
-        if (xTaskCreate(
-                PassthroughCommunication::passthroughTaskFunc,
-                "PassthroughTask",
-                stackWords,
-                this,
-                tskIDLE_PRIORITY + 2,
-                &passthroughTaskHandle) != pdPASS) {
-            Logger::log("PASSTHROUGH failed to create task");
-            return OperationResult::SUCCESS;
-        }
+  if (!passthroughTaskHandle) {
+    const uint32_t stackWords = configMINIMAL_STACK_SIZE * 6;
+    if (xTaskCreate(PassthroughCommunication::passthroughTaskFunc,
+                    "PassthroughTask", stackWords, this, tskIDLE_PRIORITY + 2,
+                    &passthroughTaskHandle) != pdPASS) {
+      Logger::log("PASSTHROUGH failed to create task");
+      return OperationResult::SUCCESS;
     }
-    int msDelay = (int)((double)(loraMessage->getSnr() - MINIMAL_SNR) * SNR_WAIT_MULTIPLIER);
-    if (msDelay < 1) msDelay = 1;
-    Logger::logf("PASSTHROUGH WAIT %i ms\n", msDelay);
+  }
+  int msDelay = (int)((double)(loraMessage->getSnr() - MINIMAL_SNR) *
+                      SNR_WAIT_MULTIPLIER);
+  if (msDelay < 1) msDelay = 1;
+  Logger::logf("PASSTHROUGH WAIT %i ms\n", msDelay);
 
-    scheduledMessage = loraMessage;
-    scheduledDelayTicks = pdMS_TO_TICKS(msDelay);
-    xTaskNotifyGive(passthroughTaskHandle);
+  scheduledMessage = loraMessage;
+  scheduledDelayTicks = pdMS_TO_TICKS(msDelay);
+  xTaskNotifyGive(passthroughTaskHandle);
 
-    Logger::log("PASSTHROUGH scheduled (freertos)");
-    return OperationResult::SUCCESS;
+  Logger::log("PASSTHROUGH scheduled (freertos)");
+  return OperationResult::SUCCESS;
 }
 
 void PassthroughCommunication::passthroughTaskFunc(void* pvParameters) {
-    auto *self = static_cast<PassthroughCommunication*>(pvParameters);
-    for (;;) {
-        ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
+  auto* self = static_cast<PassthroughCommunication*>(pvParameters);
+  for (;;) {
+    ulTaskNotifyTake(pdTRUE, portMAX_DELAY);
 
-        while (true) {
-            auto localMsg = self->scheduledMessage;
-            TickType_t localDelay = self->scheduledDelayTicks;
-            if (!localMsg) break;
+    while (true) {
+      auto localMsg = self->scheduledMessage;
+      TickType_t localDelay = self->scheduledDelayTicks;
+      if (!localMsg) break;
 
-
-            BaseType_t got = xTaskNotifyWait(0, 0, nullptr, localDelay);
-            if (got == pdFALSE) {
-                Logger::log("PASSTHROUGH execute afterwait (freertos)");
-                self->rebroadcastAfterWait(localMsg);
-                self->ponderAfterWait(true);
-                break;
-            }
-        }
+      BaseType_t got = xTaskNotifyWait(0, 0, nullptr, localDelay);
+      if (got == pdFALSE) {
+        Logger::log("PASSTHROUGH execute afterwait (freertos)");
+        self->rebroadcastAfterWait(localMsg);
+        self->ponderAfterWait(true);
+        break;
+      }
     }
+  }
 }
 
 OperationResult PassthroughCommunication::ponderAfterWait(bool isLoop) {
-    Logger::logf("ponderAfterWait %d %d %d", isLoop, isOldLoopActive, messageSet.empty());
-    if (!isOldLoopActive || isLoop) {
-        if (!messageSet.empty()) {
-            isOldLoopActive = true;
-            processNewMessage();
-        }
-        else {
-            Logger::logf("PASSTHROUGH set empty for isLoop: %d", isLoop);
-            isOldLoopActive = false;
-        }
+  Logger::logf("ponderAfterWait %d %d %d", isLoop, isOldLoopActive,
+               messageSet.empty());
+  if (!isOldLoopActive || isLoop) {
+    if (!messageSet.empty()) {
+      isOldLoopActive = true;
+      processNewMessage();
+    } else {
+      Logger::logf("PASSTHROUGH set empty for isLoop: %d", isLoop);
+      isOldLoopActive = false;
     }
-    return OperationResult::SUCCESS;
+  }
+  return OperationResult::SUCCESS;
 }
 
-OperationResult PassthroughCommunication::updateSetFromNewMessage(std::shared_ptr<Message> message) {
-    std::vector<std::shared_ptr<LoraMessage>> toErase;
-    for (const auto& oldMessage : messageSet) {
-        if (oldMessage->getWasTransmitted()) {
-            toErase.push_back(oldMessage);
-        }
-        else if(oldMessage->isSameMessage(message)) {
-            oldMessage->setShouldTransmit(false);
-            toErase.push_back(oldMessage);
-        }
-        else if(messageSet.size()-toErase.size() > MAXMIMUM_PASSTHROUGH_MESSAGES) {
-            oldMessage->setShouldTransmit(false);
-            toErase.push_back(oldMessage);
-        }
+OperationResult PassthroughCommunication::updateSetFromNewMessage(
+    std::shared_ptr<Message> message) {
+  std::vector<std::shared_ptr<LoraMessage>> toErase;
+  for (const auto& oldMessage : messageSet) {
+    if (oldMessage->getWasTransmitted()) {
+      toErase.push_back(oldMessage);
+    } else if (oldMessage->isSameMessage(message)) {
+      oldMessage->setShouldTransmit(false);
+      toErase.push_back(oldMessage);
+    } else if (messageSet.size() - toErase.size() >
+               MAXMIMUM_PASSTHROUGH_MESSAGES) {
+      oldMessage->setShouldTransmit(false);
+      toErase.push_back(oldMessage);
     }
-    Logger::logf("PASSTHROUGH ERASE %d messages", toErase.size());
-    for (const auto& key : toErase) {
-        vectorErase(messageSet, key);
-    }
-    return OperationResult::SUCCESS;
+  }
+  Logger::logf("PASSTHROUGH ERASE %d messages", toErase.size());
+  for (const auto& key : toErase) {
+    vectorErase(messageSet, key);
+  }
+  return OperationResult::SUCCESS;
 }
 
-OperationResult PassthroughCommunication::getNotified(std::shared_ptr<Message> message) {
-    if(!message->getIsPacketCorrect()) {
-        return OperationResult::OPERATION_IGNORED;
-    }
-    if (message->type() != MessageType::LoraMessage) {
-        Logger::log("Passthrough got non-lora message, discarding");
-        return OperationResult::ERROR;
-    }
-    updateSetFromNewMessage(message);
-    std::shared_ptr<LoraMessage> loraMessage = std::static_pointer_cast<LoraMessage>(message);
-
-    Logger::logf("REBROADCAST CONDITION: %d", shouldRebroadcast(loraMessage));
-    if (shouldRebroadcast(loraMessage)) {
-        messageSet.emplace(messageSet.begin(), loraMessage);
-        int size = messageSet.size();
-        Logger::logf("Emplaced message in passthrough, size: %d", size);
-        ponderAfterWait(false);
-        return OperationResult::SUCCESS;
-    }
+OperationResult PassthroughCommunication::getNotified(
+    std::shared_ptr<Message> message) {
+  if (!message->getIsPacketCorrect()) {
     return OperationResult::OPERATION_IGNORED;
+  }
+  if (message->type() != MessageType::LoraMessage) {
+    Logger::log("Passthrough got non-lora message, discarding");
+    return OperationResult::ERROR;
+  }
+  updateSetFromNewMessage(message);
+  std::shared_ptr<LoraMessage> loraMessage =
+      std::static_pointer_cast<LoraMessage>(message);
 
+  Logger::logf("REBROADCAST CONDITION: %d", shouldRebroadcast(loraMessage));
+  if (shouldRebroadcast(loraMessage)) {
+    messageSet.emplace(messageSet.begin(), loraMessage);
+    int size = messageSet.size();
+    Logger::logf("Emplaced message in passthrough, size: %d", size);
+    ponderAfterWait(false);
+    return OperationResult::SUCCESS;
+  }
+  return OperationResult::OPERATION_IGNORED;
 }
 
 int PassthroughCommunication::getMessageSetLength() {
-    return messageSet.size();
+  return messageSet.size();
 }
 
-bool PassthroughCommunication::getIsSendWaiting() {
-    return isOldLoopActive;
+bool PassthroughCommunication::getIsSendWaiting() { return isOldLoopActive; }
+void PassthroughCommunication::setTimeSlotManager(
+    std::shared_ptr<TimeSlotManager> manager) {
+  timeSlotManager = manager;
+  Logger::log("TimeSlotManager set in PassthroughCommunication");
 }

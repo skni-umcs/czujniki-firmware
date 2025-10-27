@@ -2,6 +2,7 @@
 
 #include <FastCRC.h>
 #include <LoRa_E220.h>
+#include <time/time_constants.h>
 #include <utils/address_handler.h>
 #include <utils/logger.h>
 #include <utils/operation_result.h>
@@ -125,8 +126,6 @@ OperationResult LoraTransmit::updateNoise() {
 
   return OperationResult::SUCCESS;
 }
-
-
 
 int LoraTransmit::getSnr(int readRssi) {
   int RssidB = -((256) - readRssi);
@@ -269,19 +268,23 @@ std::shared_ptr<LoraTransmit> LoraTransmit::create() {
 }
 
 OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
-  int backoff = 100 + (random() % 900);
-  Logger::logf("Backoff %d ms\n", backoff);
-  vTaskDelay(pdMS_TO_TICKS(backoff));
+  // Używamy losowego backoff tylko gdy nie mamy synchronizacji czasu
+  if (!timeSlotManager || !timeSlotManager->isTimeSynchronized()) {
+    int backoff = 2000 + (random() % 6000);
+    Logger::logf("No time sync - random backoff %d ms\n", backoff);
+    vTaskDelay(pdMS_TO_TICKS(backoff));
+  } else {
+    Logger::logf("Using time slot %d - no random backoff\n",
+                 timeSlotManager->getMySlotNumber());
+  }
 
   updateNoise();
   int noise_dBm = -(256 - getNoise());
   Logger::logf("Noise threshold: %d dBm.\n", NOISE_THRESHOLD_DBM);
   Logger::logf("Current noise: %d dBm.\n", noise_dBm);
   if (noise_dBm >= NOISE_THRESHOLD_DBM) {
-    Logger::logf("Channel busy, noise: %d dBm. Deferring message.\n",
-                 noise_dBm);
+    Logger::logf("Channel busy, noise: %d dBm.\n", noise_dBm);
     collisionCount++;
-    return OperationResult::DEFERRED;
   }
 
   std::string packet = message->createPacketForSending();
@@ -332,39 +335,39 @@ int airTime(std::shared_ptr<Message> message) {
 }
 
 OperationResult LoraTransmit::advanceMessages() {
-  const int MAX_RETRIES = 7;
-
   if (messages.size() > 0) {
-    std::shared_ptr<Message> message = messages.front();
-    messages.pop_front();
-    if (message->getShouldTransmit()) {
-      OperationResult result = physicalSend(message);
-      if (result == OperationResult::DEFERRED) {
-        retryCount++;
-        if (retryCount >= MAX_RETRIES) {
-          Logger::logf("Max retries (%d) reached, dropping message\n",
-                       MAX_RETRIES);
-          retryCount = 0;
-          canTransmit = true;
-          sendWaiter.get()->updateTime(100);
-        } else {
-          messages.push_front(message);
-          int backoff = (1 << retryCount) * 100 + (random() % 200);
-          Logger::logf("Retry %d/%d, backoff: %d ms\n", retryCount, MAX_RETRIES,
-                       backoff);
-          canTransmit = true;
-          sendWaiter.get()->updateTime(backoff);
+    while (messages.size() > 0) {
+      std::shared_ptr<Message> message = messages.front();
+
+      // Sprawdź czy nadszedł zaplanowany czas wysłania
+      if (timeSlotManager && timeSlotManager->isTimeSynchronized()) {
+        unsigned long currentEpoch = rtc.getEpoch();
+        unsigned long scheduledTime = message->getScheduledTime();
+
+        if (scheduledTime > 0 && scheduledTime > currentEpoch) {
+          // Za wcześnie, czekamy
+          unsigned long waitTime =
+              (scheduledTime - currentEpoch) * 1000;  // konwersja na ms
+          unsigned long nextCheckMs =
+              waitTime < 1000 ? waitTime : 1000;  // Max 1s na sprawdzenie
+          Logger::logf(
+              "Message scheduled for %lu, current %lu, waiting %lu ms\n",
+              scheduledTime, currentEpoch, nextCheckMs);
+          sendWaiter.get()->updateTime(nextCheckMs);
+          break;
         }
-      } else {
-        retryCount = 0;  // Reset on success
+      }
+
+      messages.pop_front();
+      if (message->getShouldTransmit()) {
+        physicalSend(message);
         canTransmit = false;
         sendWaiter.get()->updateTime(airTime(message));
+        break;
+      } else {
+        Logger::logf("LORATRANSMIT Message %s won't be broadcasted",
+                     message->getPacket().c_str());
       }
-    } else {
-      Logger::logf("LORATRANSMIT Message %s won't be broadcasted",
-                   message->getPacket().c_str());
-      canTransmit = true;
-      sendWaiter.get()->updateTime(100);
     }
   } else {
     canTransmit = true;
@@ -378,6 +381,24 @@ OperationResult LoraTransmit::scheduleMessage(
   if (getWaitingMessagesCount() <= MAX_QUEUE) {
     Logger::logf("SCHEDULE SEND %s\n",
                  message->createPacketForSending().c_str());
+
+    // Jeśli mamy synchronizację czasu, oblicz opóźnienie do mojego slotu
+    if (timeSlotManager && timeSlotManager->isTimeSynchronized()) {
+      unsigned long currentEpoch = rtc.getEpoch();
+      unsigned long delayMs = timeSlotManager->getDelayToNextSlot(currentEpoch);
+      unsigned long scheduledEpoch = currentEpoch + (delayMs / 1000);
+
+      message->setScheduledTime(scheduledEpoch);
+      Logger::logf(
+          "Time slot system active - slot %d, waiting %lu ms (scheduled for "
+          "epoch %lu)\n",
+          timeSlotManager->getMySlotNumber(), delayMs, scheduledEpoch);
+    } else {
+      // Brak synchronizacji - wysyłamy natychmiast (będzie losowy backoff)
+      message->setScheduledTime(0);
+      Logger::log("No time sync - using random backoff instead");
+    }
+
     messages.push_back(message);
   }
   /*if(canTransmit) {
@@ -431,11 +452,20 @@ int LoraTransmit::getTransmitCount() { return transmitCount; }
 
 int LoraTransmit::getCollisionCount() { return this->collisionCount; }
 
-
 int LoraTransmit::getCollisionRate() {
   if (transmitCount == 0) {
     return 0;
   }
   float rate = (float)collisionCount / (float)transmitCount * 100.0f;
-  return (int)(rate * 10.0f + 0.5f); 
+  return (int)(rate * 10.0f + 0.5f);
+}
+void LoraTransmit::setTimeSlotManager(
+    std::shared_ptr<TimeSlotManager> manager) {
+  timeSlotManager = manager;
+  if (manager && manager->isTimeSynchronized()) {
+    Logger::logf("TimeSlotManager set - using slot %d\n",
+                 manager->getMySlotNumber());
+  } else {
+    Logger::log("TimeSlotManager set - waiting for time synchronization");
+  }
 }
