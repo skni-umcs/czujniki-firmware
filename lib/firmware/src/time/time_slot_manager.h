@@ -8,7 +8,7 @@
 class TimeSlotManager {
  private:
   static const int SLOT_DURATION_MS = 5000;  // 5 sekund na slot
-  static const int SLOTS_PER_CYCLE = 65;     // 65 slotów = ~5.4 min cykl
+  static const int SLOTS_PER_CYCLE = 100;    // 100 slotów = ~8.20 min cykl
 
   moduleAddress myAddress;
   unsigned long lastSyncEpoch = 0;
