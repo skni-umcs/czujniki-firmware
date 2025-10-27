@@ -340,19 +340,20 @@ OperationResult LoraTransmit::advanceMessages() {
       std::shared_ptr<Message> message = messages.front();
 
       // Sprawdź czy nadszedł zaplanowany czas wysłania
-      if (timeSlotManager && timeSlotManager->isTimeSynchronized()) {
-        unsigned long currentEpoch = rtc.getEpoch();
-        unsigned long scheduledTime = message->getScheduledTime();
+      // Używamy millis() zamiast epoch - dzięki temu zmiana czasu RTC nie
+      // wpłynie na opóźnienia
+      unsigned long scheduledTime = message->getScheduledTime();
+      if (scheduledTime > 0) {
+        unsigned long currentMillis = millis();
 
-        if (scheduledTime > 0 && scheduledTime > currentEpoch) {
+        if (scheduledTime > currentMillis) {
           // Za wcześnie, czekamy
-          unsigned long waitTime =
-              (scheduledTime - currentEpoch) * 1000;  // konwersja na ms
+          unsigned long waitTime = scheduledTime - currentMillis;
           unsigned long nextCheckMs =
               waitTime < 1000 ? waitTime : 1000;  // Max 1s na sprawdzenie
           Logger::logf(
-              "Message scheduled for %lu, current %lu, waiting %lu ms\n",
-              scheduledTime, currentEpoch, nextCheckMs);
+              "Message scheduled for %lu ms, current %lu ms, waiting %lu ms\n",
+              scheduledTime, currentMillis, nextCheckMs);
           sendWaiter.get()->updateTime(nextCheckMs);
           break;
         }
@@ -383,16 +384,18 @@ OperationResult LoraTransmit::scheduleMessage(
                  message->createPacketForSending().c_str());
 
     // Jeśli mamy synchronizację czasu, oblicz opóźnienie do mojego slotu
+    // Używamy millis() + delayMs zamiast epoch - dzięki temu zmiana czasu RTC
+    // nie wpłynie na opóźnienia
     if (timeSlotManager && timeSlotManager->isTimeSynchronized()) {
       unsigned long currentEpoch = rtc.getEpoch();
       unsigned long delayMs = timeSlotManager->getDelayToNextSlot(currentEpoch);
-      unsigned long scheduledEpoch = currentEpoch + (delayMs / 1000);
+      unsigned long scheduledMillis = millis() + delayMs;
 
-      message->setScheduledTime(scheduledEpoch);
+      message->setScheduledTime(scheduledMillis);
       Logger::logf(
           "Time slot system active - slot %d, waiting %lu ms (scheduled for "
-          "epoch %lu)\n",
-          timeSlotManager->getMySlotNumber(), delayMs, scheduledEpoch);
+          "millis %lu)\n",
+          timeSlotManager->getMySlotNumber(), delayMs, scheduledMillis);
     } else {
       // Brak synchronizacji - wysyłamy natychmiast (będzie losowy backoff)
       message->setScheduledTime(0);

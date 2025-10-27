@@ -30,11 +30,12 @@ OperationResult PassthroughCommunication::rebroadcast(
   if (message->getScheduledTime() == 0) {
     // Jeśli wiadomość nie ma jeszcze zaplanowanego czasu, może być to pilna
     // retransmisja Dodajemy małe opóźnienie (1-3s) zamiast pełnego slotu
-    unsigned long currentEpoch = rtc.getEpoch();
-    int randomOffset = 1 + (random() % 3);  // 1-3 sekundy
-    message->setScheduledTime(currentEpoch + randomOffset);
-    Logger::logf("PASSTHROUGH quick rebroadcast scheduled in %d seconds\n",
-                 randomOffset);
+
+    int randomOffsetMs = (1 + (random() % 3)) * 1000;  // 1-3 sekundy w ms
+    unsigned long scheduledMillis = millis() + randomOffsetMs;
+    message->setScheduledTime(scheduledMillis);
+    Logger::logf("PASSTHROUGH quick rebroadcast scheduled in %d ms\n",
+                 randomOffsetMs);
   }
 
   transmit(message);

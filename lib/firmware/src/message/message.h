@@ -27,7 +27,8 @@ class Message {
   bool shouldTransmit = true;
   bool wasTransmitted = false;
   unsigned long scheduledTime =
-      0;  // Epoch kiedy wysłać wiadomość (0 = natychmiast)
+      0;  // millis() kiedy wysłać wiadomość (0 = natychmiast) - używamy
+          // millis() zamiast epoch, aby uniknąć problemów ze zmianą czasu RTC
  public:
   Message();
   Message(std::vector<moduleAddress> senders, moduleAddress destination,
@@ -47,7 +48,9 @@ class Message {
   virtual bool getWasTransmitted();
   OperationResult setShouldTransmit(bool shouldTransmit);
   OperationResult setWasTransmitted(bool wasTransmitted);
-  void setScheduledTime(unsigned long epoch) { scheduledTime = epoch; }
+  void setScheduledTime(unsigned long millisTime) {
+    scheduledTime = millisTime;
+  }
   unsigned long getScheduledTime() const { return scheduledTime; }
   virtual std::string getPacket();
   virtual OperationResult decrementHopLimit();
