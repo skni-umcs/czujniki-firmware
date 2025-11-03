@@ -126,8 +126,6 @@ OperationResult LoraTransmit::updateNoise() {
   return OperationResult::SUCCESS;
 }
 
-
-
 int LoraTransmit::getSnr(int readRssi) {
   int RssidB = -((256) - readRssi);
   int noisedB = -((256) - noiseRaw);
@@ -281,7 +279,6 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
     Logger::logf("Channel busy, noise: %d dBm. Deferring message.\n",
                  noise_dBm);
     collisionCount++;
-    return OperationResult::DEFERRED;
   }
 
   std::string packet = message->createPacketForSending();
@@ -332,39 +329,19 @@ int airTime(std::shared_ptr<Message> message) {
 }
 
 OperationResult LoraTransmit::advanceMessages() {
-  const int MAX_RETRIES = 7;
-
   if (messages.size() > 0) {
-    std::shared_ptr<Message> message = messages.front();
-    messages.pop_front();
-    if (message->getShouldTransmit()) {
-      OperationResult result = physicalSend(message);
-      if (result == OperationResult::DEFERRED) {
-        retryCount++;
-        if (retryCount >= MAX_RETRIES) {
-          Logger::logf("Max retries (%d) reached, dropping message\n",
-                       MAX_RETRIES);
-          retryCount = 0;
-          canTransmit = true;
-          sendWaiter.get()->updateTime(100);
-        } else {
-          messages.push_front(message);
-          int backoff = (1 << retryCount) * 100 + (random() % 200);
-          Logger::logf("Retry %d/%d, backoff: %d ms\n", retryCount, MAX_RETRIES,
-                       backoff);
-          canTransmit = true;
-          sendWaiter.get()->updateTime(backoff);
-        }
-      } else {
-        retryCount = 0;  // Reset on success
+    while (messages.size() > 0) {
+      std::shared_ptr<Message> message = messages.front();
+      messages.pop_front();
+      if (message->getShouldTransmit()) {
+        physicalSend(message);
         canTransmit = false;
         sendWaiter.get()->updateTime(airTime(message));
+        break;
+      } else {
+        Logger::logf("LORATRANSMIT Message %s won't be broadcasted",
+                     message->getPacket().c_str());
       }
-    } else {
-      Logger::logf("LORATRANSMIT Message %s won't be broadcasted",
-                   message->getPacket().c_str());
-      canTransmit = true;
-      sendWaiter.get()->updateTime(100);
     }
   } else {
     canTransmit = true;
@@ -431,11 +408,10 @@ int LoraTransmit::getTransmitCount() { return transmitCount; }
 
 int LoraTransmit::getCollisionCount() { return this->collisionCount; }
 
-
 int LoraTransmit::getCollisionRate() {
   if (transmitCount == 0) {
     return 0;
   }
   float rate = (float)collisionCount / (float)transmitCount * 100.0f;
-  return (int)(rate * 10.0f + 0.5f); 
+  return (int)(rate * 10.0f + 0.5f);
 }
