@@ -173,6 +173,9 @@ void LoraTransmit::setup() {
   printParameters(configuration);
 
   updateNoise();
+
+  lastSuccessfulComm = millis();
+  errorCount = 0;
 }
 
 OperationResult LoraTransmit::validateConfiguration() {
@@ -240,6 +243,31 @@ OperationResult LoraTransmit::restoreConfiguration() {
   return OperationResult::SUCCESS;
 }
 
+OperationResult LoraTransmit::reinitializeUART() {
+  Logger::log("Reinitializing UART communication");
+
+  Serial1.flush();
+  while (Serial1.available()) {
+    Serial1.read();
+  }
+
+  Serial1.end();
+  vTaskDelay(pdMS_TO_TICKS(100));
+
+  Serial1.begin(9600, SERIAL_8N1, ESP_RX_PIN, ESP_TX_PIN);
+  vTaskDelay(pdMS_TO_TICKS(100));
+
+  OperationResult result = restoreConfiguration();
+
+  if (result == OperationResult::SUCCESS) {
+    Logger::log("UART reinitialized successfully");
+  } else {
+    Logger::log("UART reinitialization failed");
+  }
+
+  return result;
+}
+
 std::shared_ptr<LoraTransmit> LoraTransmit::create() {
   auto loraTransmit = new LoraTransmit();
   // loraTransmit->DEBUG_wifi = DEBUG_wifi;
@@ -284,8 +312,31 @@ OperationResult LoraTransmit::physicalSend(std::shared_ptr<Message> message) {
   std::string packet = message->createPacketForSending();
   Logger::logf("SEND %s\n", packet.c_str());
   transmitCount++;
+
+  Serial1.flush();
+  while (Serial1.available()) {
+    Serial1.read();
+  }
+
   ResponseStatus rs =
       e220ttl.sendBroadcastFixedMessage(CHANNEL, packet.c_str());
+
+  if (rs.code != 1) {
+    Logger::logf("Send failed with code: %d\n", rs.code);
+    errorCount++;
+
+    if (errorCount >= MAX_ERRORS_BEFORE_RESET) {
+      Logger::logf("Too many errors (%d), reinitializing UART\n", errorCount);
+      reinitializeUART();
+      errorCount = 0;
+    }
+
+    return OperationResult::ERROR;
+  }
+
+  errorCount = 0;
+  lastSuccessfulComm = millis();
+
   return OperationResult::SUCCESS;
 }
 
@@ -369,6 +420,14 @@ OperationResult LoraTransmit::send(std::shared_ptr<Message> message) {
 }
 
 OperationResult LoraTransmit::poll() {
+  if (lastSuccessfulComm > 0 &&
+      (millis() - lastSuccessfulComm) > UART_TIMEOUT_MS) {
+    Logger::logf("UART timeout - no communication for %lu ms\n",
+                 millis() - lastSuccessfulComm);
+    reinitializeUART();
+    lastSuccessfulComm = millis();
+  }
+
   if (e220ttl.available() > 1) {
 // read the String message
 #ifdef ENABLE_RSSI
@@ -376,11 +435,27 @@ OperationResult LoraTransmit::poll() {
 #else
     ResponseContainer rc = e220ttl.receiveMessage();
 #endif
-    // Is something goes wrong print error
     if (rc.status.code != 1) {
       Logger::log(rc.status.getResponseDescription());
+      errorCount++;
+
+      Serial1.flush();
+      while (Serial1.available()) {
+        Serial1.read();
+      }
+
+      if (errorCount >= MAX_ERRORS_BEFORE_RESET) {
+        Logger::logf("Too many receive errors (%d), reinitializing UART\n",
+                     errorCount);
+        reinitializeUART();
+        errorCount = 0;
+      }
+
       return OperationResult::ERROR;
     } else {
+      errorCount = 0;
+      lastSuccessfulComm = millis();
+
       byte rssi = rc.rssi;
       int snr = getSnr((int)rssi);
       auto loraMessage = std::shared_ptr<LoraMessage>(

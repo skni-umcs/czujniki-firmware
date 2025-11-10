@@ -55,6 +55,10 @@ class LoraTransmit : public SmallTransmit {
   int transmitCount = 0;
   int retryCount = 0;
   int collisionCount = 0;
+  int errorCount = 0;
+  unsigned long lastSuccessfulComm = 0;
+  static const int MAX_ERRORS_BEFORE_RESET = 10;
+  static const unsigned long UART_TIMEOUT_MS = 60000;  // 60 seconds
 
  public:
   static std::shared_ptr<LoraTransmit> create();
@@ -68,6 +72,7 @@ class LoraTransmit : public SmallTransmit {
   OperationResult updateNoise();
   OperationResult validateConfiguration();
   OperationResult restoreConfiguration();
+  OperationResult reinitializeUART();
 
   int getSnr(int readRssi);
   int getNoise();
